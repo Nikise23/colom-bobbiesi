@@ -1241,6 +1241,111 @@ def limpiar_turnos_vencidos():
     guardar_json(TURNOS_FILE, nuevos)
     return jsonify({"eliminados": eliminados, "ok": True})
 
+# ========================== HISTORIAS CLÍNICAS ==================
+
+@app.route("/historias-gestion")
+@login_requerido
+@rol_requerido("medico")
+def ver_historias_gestion():
+    return render_template("historias_gestion.html")
+
+@app.route("/api/historias/buscar", methods=["GET"])
+@login_requerido
+@rol_requerido("medico")
+def buscar_historias():
+    historias = cargar_json(DATA_FILE)
+    pacientes = cargar_json(PACIENTES_FILE)
+    
+    # Parámetros de búsqueda
+    busqueda = request.args.get("busqueda", "").strip().lower()
+    pagina = int(request.args.get("pagina", 1))
+    por_pagina = int(request.args.get("por_pagina", 10))
+    ordenar_por = request.args.get("ordenar_por", "apellido")
+    orden = request.args.get("orden", "asc")
+    
+    # Enriquecer historias con datos del paciente
+    historias_enriquecidas = []
+    for historia in historias:
+        paciente = next((p for p in pacientes if p["dni"] == historia["dni"]), None)
+        if paciente:
+            historia_completa = historia.copy()
+            historia_completa["paciente"] = paciente
+            historias_enriquecidas.append(historia_completa)
+    
+    # Filtrar por búsqueda (apellido, nombre o DNI)
+    if busqueda:
+        historias_filtradas = []
+        for h in historias_enriquecidas:
+            paciente = h["paciente"]
+            apellido = paciente.get("apellido", "").lower()
+            nombre = paciente.get("nombre", "").lower()
+            dni = paciente.get("dni", "").lower()
+            
+            if (busqueda in apellido or 
+                busqueda in nombre or 
+                busqueda in dni):
+                historias_filtradas.append(h)
+        historias_enriquecidas = historias_filtradas
+    
+    # Agrupar por paciente y obtener la última consulta de cada uno
+    pacientes_unicos = {}
+    for h in historias_enriquecidas:
+        dni = h["dni"]
+        if dni not in pacientes_unicos:
+            pacientes_unicos[dni] = {
+                "paciente": h["paciente"],
+                "ultima_consulta": h["fecha_consulta"],
+                "total_consultas": 1,
+                "ultima_historia": h
+            }
+        else:
+            pacientes_unicos[dni]["total_consultas"] += 1
+            # Comparar fechas para encontrar la más reciente
+            if h["fecha_consulta"] > pacientes_unicos[dni]["ultima_consulta"]:
+                pacientes_unicos[dni]["ultima_consulta"] = h["fecha_consulta"]
+                pacientes_unicos[dni]["ultima_historia"] = h
+    
+    # Convertir a lista para ordenamiento
+    lista_pacientes = list(pacientes_unicos.values())
+    
+    # Ordenar
+    if ordenar_por == "apellido":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("apellido", "").lower(),
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "nombre":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("nombre", "").lower(),
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "fecha":
+        lista_pacientes.sort(
+            key=lambda x: x["ultima_consulta"],
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "dni":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("dni", ""),
+            reverse=(orden == "desc")
+        )
+    
+    # Paginación
+    total = len(lista_pacientes)
+    inicio = (pagina - 1) * por_pagina
+    fin = inicio + por_pagina
+    pacientes_pagina = lista_pacientes[inicio:fin]
+    
+    total_paginas = (total + por_pagina - 1) // por_pagina
+    
+    return jsonify({
+        "pacientes": pacientes_pagina,
+        "total": total,
+        "pagina": pagina,
+        "total_paginas": total_paginas,
+        "por_pagina": por_pagina
+    })
+
 # ========================== ADMINISTRADOR ============================
 
 @app.route("/administrador")
