@@ -81,7 +81,7 @@
     </div>
           <!-- Médico -->
     <div id="botones-medico"
-         class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3" style="display:none">
+         class="row row-cols-1 row-cols-md-3 g-3" style="display:none">
       <div class="col">
         <a href="/turnos" class="btn btn-outline-info btn-action">
           <i class="bi bi-clipboard-check"></i> Gestión de Pacientes
@@ -96,11 +96,6 @@
         <a href="#" onclick="mostrarMiAgenda()" class="btn btn-outline-primary btn-action">
           <i class="bi bi-calendar-week"></i> Ver Mi Agenda
         </a>
-      </div>
-      <div class="col">
-        <button onclick="abrirModalHistoriaClinica()" class="btn btn-outline-success btn-action">
-          <i class="bi bi-file-medical"></i> Crear Historia Clínica
-        </button>
       </div>
     </div>
   </div>
@@ -1010,13 +1005,7 @@
     }
 
 
-    /* === Modal para crear historia clínica === */
-    function abrirModalHistoriaClinica() {
-      const dni = prompt("Ingrese el DNI del paciente para crear la historia clínica:");
-      if (dni && dni.trim()) {
-        window.location.href = `/historias?dni=${dni.trim()}`;
-      }
-    }
+
 
   </script>
 </body>
