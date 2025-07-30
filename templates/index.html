@@ -774,13 +774,48 @@
     function buscarPorApellido(){
       const ape=document.getElementById("apellido_buscar").value.trim().toLowerCase();
       if(!ape) return alert("Ingrese un apellido");
-      fetch("/historias")
-        .then(r=>r.json())
-        .then(all=>{
-          const filtradas=all.filter(h=>h.nombre.toLowerCase().split(" ").some(p=>p.startsWith(ape)));
-          filtradas.length ? mostrarHistorias(filtradas)
-                           : alert("No se encontraron coincidencias");
-        });
+      
+      // Primero obtenemos los pacientes para filtrar por apellido
+      Promise.all([
+        fetch("/api/pacientes").then(r=>r.json()),
+        fetch("/api/historias").then(r=>r.json())
+      ])
+      .then(([pacientes, historias]) => {
+        // Filtrar pacientes por apellido
+        const pacientesFiltrados = pacientes.filter(p => 
+          p.apellido && p.apellido.toLowerCase().includes(ape)
+        );
+        
+        if (pacientesFiltrados.length === 0) {
+          return alert("No se encontraron pacientes con ese apellido");
+        }
+        
+        // Obtener DNIs de los pacientes filtrados
+        const dnisEncontrados = pacientesFiltrados.map(p => p.dni);
+        
+        // Filtrar historias clínicas de esos pacientes
+        const historiasFiltradas = historias.filter(h => 
+          dnisEncontrados.includes(h.dni)
+        );
+        
+        if (historiasFiltradas.length === 0) {
+          alert("Los pacientes encontrados no tienen historias clínicas registradas");
+        } else {
+          // Enriquecer historias con datos del paciente
+          const historiasEnriquecidas = historiasFiltradas.map(h => {
+            const paciente = pacientes.find(p => p.dni === h.dni);
+            return {
+              ...h,
+              nombre_paciente: paciente ? `${paciente.nombre} ${paciente.apellido}` : `DNI: ${h.dni}`
+            };
+          });
+          mostrarHistorias(historiasEnriquecidas);
+        }
+      })
+      .catch(error => {
+        console.error('Error en búsqueda por apellido:', error);
+        alert("Error al realizar la búsqueda");
+      });
     }
     function limpiarBusqueda(){
       document.getElementById("dni_buscar").value = "";
