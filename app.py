@@ -693,12 +693,16 @@ def registrar_pago():
     if not paciente:
         return jsonify({"error": "Paciente no encontrado"}), 404
     
-    # Verificar si ya existe un pago para este paciente en esta fecha
+    # Verificar si ya existe un pago para este paciente en esta fecha y hora
     pagos = cargar_json(PAGOS_FILE)
-    pago_existente = next((p for p in pagos if p["dni_paciente"] == data["dni_paciente"] and p["fecha"] == data["fecha"]), None)
+    hora = data.get("hora", "")
+    pago_existente = next((p for p in pagos if 
+                          p["dni_paciente"] == data["dni_paciente"] and 
+                          p["fecha"] == data["fecha"] and 
+                          p.get("hora", "") == hora), None)
      
-    if pago_existente:
-        return jsonify({"error": "Ya existe un pago registrado para este paciente en esta fecha"}), 400
+    if pago_existente and hora:
+        return jsonify({"error": "Ya existe un pago registrado para este paciente en esta fecha y hora"}), 400
      
     nuevo_pago = {
         "id": len(pagos) + 1,
@@ -706,6 +710,7 @@ def registrar_pago():
         "nombre_paciente": f"{paciente.get('nombre', '')} {paciente.get('apellido', '')}".strip(),
         "monto": monto,
         "fecha": data["fecha"],
+        "hora": data.get("hora", ""),
         "fecha_registro": datetime.now(timezone_ar).isoformat(),
         "observaciones": data.get("observaciones", ""),
         "obra_social": paciente.get("obra_social", ""),
