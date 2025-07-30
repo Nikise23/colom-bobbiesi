@@ -116,7 +116,7 @@
         "fecha_nacimiento": "1987-10-08",
         "edad": 37,
         "obra_social": "OSDE",
-        "numero_obra_social": "0",
+        "numero_obra_social": "62169827903",
         "celular": "1140790208"
     },
     {
@@ -166,7 +166,7 @@
         "fecha_nacimiento": "1991-04-10",
         "edad": 34,
         "obra_social": "OSDE",
-        "numero_obra_social": "0",
+        "numero_obra_social": "62683830301",
         "celular": "1164397370"
     },
     {
@@ -216,7 +216,7 @@
         "fecha_nacimiento": "2009-07-07",
         "edad": 16,
         "obra_social": "PREMEDIC",
-        "numero_obra_social": "0",
+        "numero_obra_social": "0235569810302",
         "celular": "1162496908"
     },
     {
@@ -520,7 +520,7 @@
         "celular": "11 6412-1136"
     },
     {
-        "dni": "43.777.272",
+        "dni": "43777272",
         "nombre": "Jose Luis",
         "apellido": "Cejas",
         "fecha_nacimiento": "2001-10-15",
@@ -710,16 +710,6 @@
         "celular": "1123989537"
     },
     {
-        "dni": "33301677",
-        "nombre": "ERR",
-        "apellido": "...",
-        "fecha_nacimiento": "2013-07-01",
-        "edad": 12,
-        "obra_social": "SS",
-        "numero_obra_social": "SS",
-        "celular": "SS"
-    },
-    {
         "dni": "42877840",
         "nombre": "Loana",
         "apellido": "Roldan",
@@ -774,9 +764,9 @@
         "nombre": "Priscila Daiana",
         "apellido": "Bernal",
         "fecha_nacimiento": "2013-07-16",
-        "edad": 11,
+        "edad": 12,
         "obra_social": "PREMEDIC",
-        "numero_obra_social": "096913730201",
+        "numero_obra_social": "0296913730201",
         "celular": "1124500963"
     },
     {
@@ -871,7 +861,7 @@
     },
     {
         "dni": "29782145",
-        "nombre": "Inees Gisela",
+        "nombre": "Ines Gisela",
         "apellido": "Redes",
         "fecha_nacimiento": "1982-10-09",
         "edad": 42,
@@ -1008,5 +998,2755 @@
         "obra_social": "0",
         "numero_obra_social": "0",
         "celular": "0"
+    },
+    {
+        "dni": "46185420 25",
+        "nombre": "Caterin Sofia",
+        "apellido": "Quiroz",
+        "fecha_nacimiento": "2004-10-25",
+        "edad": 20,
+        "obra_social": "Principal Plan",
+        "numero_obra_social": "27461854201",
+        "celular": "1165256449"
+    },
+    {
+        "nombre": "Bautista",
+        "apellido": "Dominguez",
+        "dni": "47348336",
+        "fecha_nacimiento": "2006-08-07",
+        "obra_social": "PAMI",
+        "numero_obra_social": "155510050202 03",
+        "celular": "1532996287",
+        "edad": 18
+    },
+    {
+        "nombre": "Valentina",
+        "apellido": "Parere",
+        "dni": "48361832",
+        "fecha_nacimiento": "2025-10-06",
+        "obra_social": "Premedic",
+        "numero_obra_social": "0272089270201",
+        "celular": "0",
+        "edad": -1
+    },
+    {
+        "dni": "42528131",
+        "nombre": "Lucila",
+        "apellido": "Arce",
+        "fecha_nacimiento": "2000-02-17",
+        "edad": 25,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0381914280101",
+        "celular": "1161033490"
+    },
+    {
+        "dni": "38191428",
+        "nombre": "Santiago",
+        "apellido": "Bareiro",
+        "fecha_nacimiento": "1994-03-03",
+        "edad": 31,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0381914280001",
+        "celular": "1165540182"
+    },
+    {
+        "nombre": "Miriam",
+        "apellido": "Coman",
+        "dni": "22179610",
+        "fecha_nacimiento": "1971-04-27",
+        "obra_social": "PAMI",
+        "numero_obra_social": "155510050202 00",
+        "celular": "1532996287",
+        "edad": 54
+    },
+    {
+        "nombre": "Fabio",
+        "apellido": "Santilan",
+        "dni": "18003221",
+        "fecha_nacimiento": "1966-09-20",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "11 3866-4880",
+        "edad": 58
+    },
+    {
+        "nombre": "Luciano",
+        "apellido": "Escobar Otazu",
+        "dni": "58907723",
+        "fecha_nacimiento": "2021-05-23",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1136456319",
+        "edad": 4
+    },
+    {
+        "nombre": "Veronica",
+        "apellido": "Olivera",
+        "dni": "29955135",
+        "fecha_nacimiento": "1982-11-13",
+        "obra_social": "OSADEF",
+        "numero_obra_social": "27299551356",
+        "celular": "1131483971",
+        "edad": 42
+    },
+    {
+        "dni": "25391795",
+        "nombre": "Valeria Vanina",
+        "apellido": "Varela",
+        "fecha_nacimiento": "1976-08-12",
+        "edad": 48,
+        "obra_social": "Principal Plan",
+        "numero_obra_social": "23253017954",
+        "celular": "1164970139"
+    },
+    {
+        "nombre": "Ulises",
+        "apellido": "Borja",
+        "dni": "26259345",
+        "fecha_nacimiento": "1977-12-13",
+        "obra_social": "visitar",
+        "numero_obra_social": "6453300",
+        "celular": "1162526953",
+        "edad": 47
+    },
+    {
+        "dni": "43902884",
+        "nombre": "Gonzalo Nicolas",
+        "apellido": "Ocampo Allende",
+        "fecha_nacimiento": "2002-01-02",
+        "edad": 23,
+        "obra_social": "osde",
+        "numero_obra_social": "63035037901",
+        "celular": "11-36076445"
+    },
+    {
+        "dni": "42824898",
+        "nombre": "Brian Ezequiel",
+        "apellido": "Rios",
+        "fecha_nacimiento": "1997-05-21",
+        "edad": 28,
+        "obra_social": "osde",
+        "numero_obra_social": "63145148901",
+        "celular": "11-67004325"
+    },
+    {
+        "dni": "18220672",
+        "nombre": "Luis Ariel",
+        "apellido": "Gimenez",
+        "fecha_nacimiento": "1967-02-02",
+        "edad": 58,
+        "obra_social": "osde",
+        "numero_obra_social": "62438360001",
+        "celular": "11-60028540"
+    },
+    {
+        "dni": "46741544",
+        "nombre": "Azul Aylen",
+        "apellido": "Gomez",
+        "fecha_nacimiento": "2005-06-02",
+        "edad": 20,
+        "obra_social": "osde",
+        "numero_obra_social": "62441932003",
+        "celular": "0"
+    },
+    {
+        "dni": "26705451",
+        "nombre": "Erica Analia",
+        "apellido": "Gonzalez",
+        "fecha_nacimiento": "1978-07-14",
+        "edad": 47,
+        "obra_social": "osde",
+        "numero_obra_social": "62441932002",
+        "celular": "0"
+    },
+    {
+        "dni": "43460699",
+        "nombre": "Abril Celeste",
+        "apellido": "Gomez",
+        "fecha_nacimiento": "2001-04-17",
+        "edad": 24,
+        "obra_social": "osde",
+        "numero_obra_social": "62441932004",
+        "celular": "0"
+    },
+    {
+        "dni": "23192312",
+        "nombre": "Silvia Karina",
+        "apellido": "Pizarro",
+        "fecha_nacimiento": "1973-05-29",
+        "edad": 52,
+        "obra_social": "osde",
+        "numero_obra_social": "60677030407",
+        "celular": "11-44759472"
+    },
+    {
+        "dni": "96219754",
+        "nombre": "Ritha Sloveska",
+        "apellido": "Poveda Diaz",
+        "fecha_nacimiento": "2003-12-26",
+        "edad": 21,
+        "obra_social": "osde",
+        "numero_obra_social": "63190427001",
+        "celular": "387-5463669"
+    },
+    {
+        "dni": "46580123",
+        "nombre": "Abel",
+        "apellido": "Piris Paz",
+        "fecha_nacimiento": "2004-12-27",
+        "edad": 20,
+        "obra_social": "osde",
+        "numero_obra_social": "63260773301",
+        "celular": "11-40797270"
+    },
+    {
+        "dni": "40134796",
+        "nombre": "Ramon",
+        "apellido": "Carafi",
+        "fecha_nacimiento": "1997-01-30",
+        "edad": 28,
+        "obra_social": "osde",
+        "numero_obra_social": "62988413601",
+        "celular": "11-61372697"
+    },
+    {
+        "dni": "24412048",
+        "nombre": "Pablo Alejandro",
+        "apellido": "Herrera",
+        "fecha_nacimiento": "1975-01-04",
+        "edad": 50,
+        "obra_social": "osde",
+        "numero_obra_social": "39208610701",
+        "celular": "11-57486027"
+    },
+    {
+        "dni": "53127906",
+        "nombre": "Gala Jazmin",
+        "apellido": "Resolani",
+        "fecha_nacimiento": "2013-03-08",
+        "edad": 12,
+        "obra_social": "osde",
+        "numero_obra_social": "63259181002",
+        "celular": "0"
+    },
+    {
+        "dni": "24191820",
+        "nombre": "Sonia Gladys",
+        "apellido": "Quintiero",
+        "fecha_nacimiento": "1975-12-12",
+        "edad": 49,
+        "obra_social": "osde",
+        "numero_obra_social": "39208610702",
+        "celular": "11-57486027"
+    },
+    {
+        "nombre": "Jorgelina Andrea",
+        "apellido": "Schiavi",
+        "dni": "30315016",
+        "fecha_nacimiento": "1978-08-27",
+        "obra_social": "visitar",
+        "numero_obra_social": "27303150167",
+        "celular": "1545281650",
+        "edad": 46
+    },
+    {
+        "nombre": "Lourdes Guadalupe",
+        "apellido": "Ramirez",
+        "dni": "45283891",
+        "fecha_nacimiento": "2003-11-16",
+        "obra_social": "visitar",
+        "numero_obra_social": "27452838910",
+        "celular": "1545281650",
+        "edad": 21
+    },
+    {
+        "nombre": "Axel",
+        "apellido": "Gonzalez",
+        "dni": "40475222",
+        "fecha_nacimiento": "1997-08-16",
+        "obra_social": "premedic",
+        "numero_obra_social": "0404752220001",
+        "celular": "1165794288",
+        "edad": 27
+    },
+    {
+        "nombre": "Genesis",
+        "apellido": "Ceballos",
+        "dni": "40884575",
+        "fecha_nacimiento": "1998-01-17",
+        "obra_social": "IOMA",
+        "numero_obra_social": "141304127994",
+        "celular": "1121682380",
+        "edad": 27
+    },
+    {
+        "nombre": "Lisandro",
+        "apellido": "Duarte",
+        "dni": "70312606",
+        "fecha_nacimiento": "2024-06-17",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1165235883",
+        "edad": 1
+    },
+    {
+        "nombre": "Santino",
+        "apellido": "Molero",
+        "dni": "53329432",
+        "fecha_nacimiento": "2013-11-02",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1153208458",
+        "edad": 11
+    },
+    {
+        "dni": "55501483",
+        "nombre": "Bastian",
+        "apellido": "Aguirre",
+        "fecha_nacimiento": "2016-05-17",
+        "edad": 9,
+        "obra_social": "premedic",
+        "numero_obra_social": "0386295300201",
+        "celular": "1141563341"
+    },
+    {
+        "nombre": "Silvana",
+        "apellido": "Pereyra",
+        "dni": "29873189",
+        "fecha_nacimiento": "1982-10-28",
+        "obra_social": "osde",
+        "numero_obra_social": "61433637502",
+        "celular": "1132332866",
+        "edad": 42
+    },
+    {
+        "nombre": "Rocio",
+        "apellido": "Meza Pereyra",
+        "dni": "53379017",
+        "fecha_nacimiento": "2013-08-10",
+        "obra_social": "osde",
+        "numero_obra_social": "61433637503",
+        "celular": "1132332866",
+        "edad": 11
+    },
+    {
+        "nombre": "Maximo",
+        "apellido": "Meza Pereyra",
+        "dni": "55563090",
+        "fecha_nacimiento": "2016-07-25",
+        "obra_social": "osde",
+        "numero_obra_social": "61433637504",
+        "celular": "1132332866",
+        "edad": 8
+    },
+    {
+        "dni": "26287951",
+        "nombre": "Lorena",
+        "apellido": "Albornoz",
+        "fecha_nacimiento": "1977-11-28",
+        "edad": 47,
+        "obra_social": "osadef",
+        "numero_obra_social": "26287951",
+        "celular": "11-36114442"
+    },
+    {
+        "dni": "11661751",
+        "nombre": "Santa",
+        "apellido": "Gonzalez",
+        "fecha_nacimiento": "1955-04-08",
+        "edad": 70,
+        "obra_social": "PAMI",
+        "numero_obra_social": "15078485890700",
+        "celular": "1132013782"
+    },
+    {
+        "dni": "53050753",
+        "nombre": "Liz mayerli",
+        "apellido": "Parmigiano",
+        "fecha_nacimiento": "2013-03-24",
+        "edad": 12,
+        "obra_social": "BENE SALUD",
+        "numero_obra_social": "33503995",
+        "celular": "1161803245"
+    },
+    {
+        "dni": "55327505",
+        "nombre": "Gian Luca",
+        "apellido": "Parmigiano",
+        "fecha_nacimiento": "2016-01-06",
+        "edad": 9,
+        "obra_social": "bene",
+        "numero_obra_social": "33503995",
+        "celular": "1161803245"
+    },
+    {
+        "dni": "58994175",
+        "nombre": "Dimitri",
+        "apellido": "Parmigiano",
+        "fecha_nacimiento": "2021-08-13",
+        "edad": 3,
+        "obra_social": "Bene",
+        "numero_obra_social": "33503995",
+        "celular": "1161803245"
+    },
+    {
+        "nombre": "Celina Ana",
+        "apellido": "Kukaj",
+        "dni": "11348696",
+        "fecha_nacimiento": "1954-03-07",
+        "obra_social": "IOMA",
+        "numero_obra_social": "861134869600",
+        "celular": "0",
+        "edad": 71
+    },
+    {
+        "dni": "36022381",
+        "nombre": "Federico",
+        "apellido": "Ferreira",
+        "fecha_nacimiento": "1991-07-25",
+        "edad": 33,
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1131840816"
+    },
+    {
+        "dni": "58495489",
+        "nombre": "Ricardo",
+        "apellido": "Fernandez",
+        "fecha_nacimiento": "2020-06-18",
+        "edad": 5,
+        "obra_social": "sancor",
+        "numero_obra_social": "215209102",
+        "celular": "1151591399"
+    },
+    {
+        "dni": "43999481",
+        "nombre": "Yamila",
+        "apellido": "Aguirre",
+        "fecha_nacimiento": "2002-04-07",
+        "edad": 23,
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1131711849"
+    },
+    {
+        "nombre": "Hugo",
+        "apellido": "Escalada",
+        "dni": "23005130",
+        "fecha_nacimiento": "1973-01-08",
+        "obra_social": "myc salud",
+        "numero_obra_social": "23005130",
+        "celular": "1135044984",
+        "edad": 52
+    },
+    {
+        "dni": "25483301",
+        "nombre": "Veronica",
+        "apellido": "Sosa",
+        "fecha_nacimiento": "1976-05-08",
+        "edad": 49,
+        "obra_social": "Myc Salud",
+        "numero_obra_social": "25483301",
+        "celular": "1151145768"
+    },
+    {
+        "dni": "38827236",
+        "nombre": "Sihuen",
+        "apellido": "Colombo",
+        "fecha_nacimiento": "21995-02-28",
+        "edad": null,
+        "obra_social": "osde",
+        "numero_obra_social": "63261514001",
+        "celular": "1164030738"
+    },
+    {
+        "dni": "44299028",
+        "nombre": "Victoria Stefania",
+        "apellido": "Romano",
+        "fecha_nacimiento": "2002-05-07",
+        "edad": 23,
+        "obra_social": "OSDE",
+        "numero_obra_social": "63066066101",
+        "celular": "1128430899"
+    },
+    {
+        "dni": "33638455",
+        "nombre": "Sandra Leonela",
+        "apellido": "Romero",
+        "fecha_nacimiento": "1988-07-07",
+        "edad": 37,
+        "obra_social": "visitar",
+        "numero_obra_social": "27336384554",
+        "celular": "1152611809"
+    },
+    {
+        "nombre": "Thaima",
+        "apellido": "Villalba",
+        "dni": "57667016",
+        "fecha_nacimiento": "2019-04-04",
+        "obra_social": "visitar",
+        "numero_obra_social": "27576670163",
+        "celular": "1134430939",
+        "edad": 6
+    },
+    {
+        "nombre": "Noem Leonor",
+        "apellido": "Pardo Gomez",
+        "dni": "70724807",
+        "fecha_nacimiento": "2025-05-05",
+        "obra_social": "63209140003",
+        "numero_obra_social": "osde",
+        "celular": "1135196079",
+        "edad": 0
+    },
+    {
+        "nombre": "Kimberly",
+        "apellido": "Medina",
+        "dni": "70406557",
+        "fecha_nacimiento": "0024-02-01",
+        "obra_social": "Diagnos",
+        "numero_obra_social": "23704065574",
+        "celular": "1171456131",
+        "edad": 2001
+    },
+    {
+        "nombre": "Victor Hugo",
+        "apellido": "Carabajal",
+        "dni": "17397334",
+        "fecha_nacimiento": "1965-09-19",
+        "obra_social": "visitar",
+        "numero_obra_social": "5635900",
+        "celular": "1153766908",
+        "edad": 59
+    },
+    {
+        "nombre": "Maximiliano",
+        "apellido": "Rodríguez Roset",
+        "dni": "40108629",
+        "fecha_nacimiento": "1997-01-06",
+        "obra_social": "osde",
+        "numero_obra_social": "62 939328 0 01",
+        "celular": "1156442102",
+        "edad": 28
+    },
+    {
+        "nombre": "Lorena Daiana",
+        "apellido": "Sanchez",
+        "dni": "37696000",
+        "fecha_nacimiento": "0094-12-31",
+        "obra_social": "osde",
+        "numero_obra_social": "62978149302",
+        "celular": "11-27619642",
+        "edad": 1930
+    },
+    {
+        "nombre": "Jesus Nehemias Sebastian",
+        "apellido": "Gonzalez",
+        "dni": "56871465",
+        "fecha_nacimiento": "2018-04-23",
+        "obra_social": "osde",
+        "numero_obra_social": "62375777902",
+        "celular": "11-55648867",
+        "edad": 7
+    },
+    {
+        "nombre": "Daniela",
+        "apellido": "Alcaraz",
+        "dni": "36039294",
+        "fecha_nacimiento": "1990-12-17",
+        "obra_social": "osde",
+        "numero_obra_social": "62509488201",
+        "celular": "11-30025995",
+        "edad": 34
+    },
+    {
+        "nombre": "Lola",
+        "apellido": "Gretzschel",
+        "dni": "70697535",
+        "fecha_nacimiento": "2005-04-10",
+        "obra_social": "osde",
+        "numero_obra_social": "62475832903",
+        "celular": "11-52314411",
+        "edad": 20
+    },
+    {
+        "nombre": "Abril",
+        "apellido": "Male",
+        "dni": "42390142",
+        "fecha_nacimiento": "2000-01-21",
+        "obra_social": "osde",
+        "numero_obra_social": "63229694002",
+        "celular": "11-40880640",
+        "edad": 25
+    },
+    {
+        "nombre": "Narella Agustina",
+        "apellido": "Saavedra",
+        "dni": "44422114",
+        "fecha_nacimiento": "2002-09-12",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1138139206",
+        "edad": 22
+    },
+    {
+        "nombre": "Trinidad",
+        "apellido": "Mendez",
+        "dni": "42410164",
+        "fecha_nacimiento": "2000-03-04",
+        "obra_social": "osde",
+        "numero_obra_social": "60960021304",
+        "celular": "11-33142494",
+        "edad": 25
+    },
+    {
+        "nombre": "Maria Clara",
+        "apellido": "Machicote",
+        "dni": "28351009",
+        "fecha_nacimiento": "1980-10-12",
+        "obra_social": "osde",
+        "numero_obra_social": "62147617901",
+        "celular": "11-22736259",
+        "edad": 44
+    },
+    {
+        "nombre": "Tatiana Nahir",
+        "apellido": "Coronel",
+        "dni": "41688371",
+        "fecha_nacimiento": "1999-01-19",
+        "obra_social": "osde",
+        "numero_obra_social": "63078970201",
+        "celular": "11-62352293",
+        "edad": 26
+    },
+    {
+        "nombre": "Myriam Iris",
+        "apellido": "Moreira",
+        "dni": "20396645",
+        "fecha_nacimiento": "1968-09-19",
+        "obra_social": "osde",
+        "numero_obra_social": "63132872502",
+        "celular": "11-57258113",
+        "edad": 56
+    },
+    {
+        "nombre": "Quimey",
+        "apellido": "Beade Iribarne",
+        "dni": "32905255",
+        "fecha_nacimiento": "1987-04-02",
+        "obra_social": "osde",
+        "numero_obra_social": "62526432001",
+        "celular": "11-26602847",
+        "edad": 38
+    },
+    {
+        "nombre": "Viviana Gabriela",
+        "apellido": "Silva",
+        "dni": "31635545",
+        "fecha_nacimiento": "1985-06-27",
+        "obra_social": "osde",
+        "numero_obra_social": "62623273101",
+        "celular": "11-53750991",
+        "edad": 40
+    },
+    {
+        "dni": "59519513",
+        "nombre": "Valentin",
+        "apellido": "Albisu Bavaro",
+        "fecha_nacimiento": "2022-08-31",
+        "edad": 2,
+        "obra_social": "osde",
+        "numero_obra_social": "61460119203",
+        "celular": "1168985943"
+    },
+    {
+        "nombre": "Ana Beatriz",
+        "apellido": "Rudaz",
+        "dni": "23560802",
+        "fecha_nacimiento": "1973-12-22",
+        "obra_social": "osde",
+        "numero_obra_social": "62 533280 5 02",
+        "celular": "1135228415",
+        "edad": 51
+    },
+    {
+        "nombre": "Eduardo Marin",
+        "apellido": "Leyes",
+        "dni": "26399174",
+        "fecha_nacimiento": "1977-07-07",
+        "obra_social": "OSDE",
+        "numero_obra_social": "63164051601",
+        "celular": "1123230161",
+        "edad": 48
+    },
+    {
+        "nombre": "Melina",
+        "apellido": "Sanchez",
+        "dni": "57084309",
+        "fecha_nacimiento": "2018-02-16",
+        "obra_social": "IOMA",
+        "numero_obra_social": "124510772503",
+        "celular": "1165686127",
+        "edad": 7
+    },
+    {
+        "nombre": "Maximo Omar",
+        "apellido": "Sioville",
+        "dni": "54830747",
+        "fecha_nacimiento": "2015-06-07",
+        "obra_social": "OSADEF",
+        "numero_obra_social": "20548307474",
+        "celular": "1161321842",
+        "edad": 10
+    },
+    {
+        "dni": "34692022",
+        "nombre": "Natalia Romina",
+        "apellido": "Benitez Aquino",
+        "fecha_nacimiento": "1989-10-28",
+        "edad": 35,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0341535580101",
+        "celular": "1126665219"
+    },
+    {
+        "dni": "57389899",
+        "nombre": "Constanza",
+        "apellido": "Suarez",
+        "fecha_nacimiento": "2018-10-16",
+        "edad": 6,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0341535580301",
+        "celular": "1126665219"
+    },
+    {
+        "nombre": "Olivia",
+        "apellido": "Cordoba",
+        "dni": "56354080",
+        "fecha_nacimiento": "2000-02-01",
+        "obra_social": "osde",
+        "numero_obra_social": "63164051604",
+        "celular": "1123230161",
+        "edad": 25
+    },
+    {
+        "nombre": "Helena",
+        "apellido": "Leyes",
+        "dni": "58796902",
+        "fecha_nacimiento": "2000-01-20",
+        "obra_social": "osde",
+        "numero_obra_social": "63164051603",
+        "celular": "1123230161",
+        "edad": 25
+    },
+    {
+        "nombre": "India Jana",
+        "apellido": "Sandoval",
+        "dni": "27769619",
+        "fecha_nacimiento": "2015-04-22",
+        "obra_social": "osde",
+        "numero_obra_social": "62080580202",
+        "celular": "1168094532",
+        "edad": 10
+    },
+    {
+        "nombre": "Juan Elian",
+        "apellido": "Esquinini",
+        "dni": "49251667",
+        "fecha_nacimiento": "2019-05-18",
+        "obra_social": "bene salud",
+        "numero_obra_social": "35830870/01",
+        "celular": "1132477249",
+        "edad": 6
+    },
+    {
+        "dni": "52242017",
+        "nombre": "Santino Luciano",
+        "apellido": "Esquinini",
+        "fecha_nacimiento": "2011-07-27",
+        "edad": 13,
+        "obra_social": "bene salud",
+        "numero_obra_social": "35830870/2",
+        "celular": "1132477249"
+    },
+    {
+        "dni": "52615705",
+        "nombre": "Tiziano",
+        "apellido": "Esquinini",
+        "fecha_nacimiento": "2012-02-27",
+        "edad": 13,
+        "obra_social": "bene salud",
+        "numero_obra_social": "35830870/3",
+        "celular": "1132477249"
+    },
+    {
+        "nombre": "Susana Soledad",
+        "apellido": "Segueira",
+        "dni": "28329314",
+        "fecha_nacimiento": "1980-11-28",
+        "obra_social": "IOMA",
+        "numero_obra_social": "2283293146/00",
+        "celular": "1160481755",
+        "edad": 44
+    },
+    {
+        "nombre": "Maria Carolina",
+        "apellido": "Cortizo",
+        "dni": "31059376",
+        "fecha_nacimiento": "1984-06-04",
+        "obra_social": "osde",
+        "numero_obra_social": "61270241201",
+        "celular": "1130006780",
+        "edad": 41
+    },
+    {
+        "nombre": "Zoe",
+        "apellido": "Orellana",
+        "dni": "57093158",
+        "fecha_nacimiento": "2018-07-17",
+        "obra_social": "Principal plan",
+        "numero_obra_social": "27570931585",
+        "celular": "1124619004",
+        "edad": 7
+    },
+    {
+        "nombre": "Veronica",
+        "apellido": "Ocampo Cajal",
+        "dni": "30408009",
+        "fecha_nacimiento": "1983-07-13",
+        "obra_social": "Ioma",
+        "numero_obra_social": "23040800900",
+        "celular": "1163329130",
+        "edad": 42
+    },
+    {
+        "nombre": "Bautista Nicolas",
+        "apellido": "Trayanoff",
+        "dni": "49600934",
+        "fecha_nacimiento": "2009-06-18",
+        "obra_social": "Premedic",
+        "numero_obra_social": "0352470340101",
+        "celular": "1168971009",
+        "edad": 16
+    },
+    {
+        "dni": "53591721",
+        "nombre": "Maia Isabella",
+        "apellido": "Trayanoff",
+        "fecha_nacimiento": "2013-09-30",
+        "edad": 11,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0352470340201",
+        "celular": "1168971009"
+    },
+    {
+        "dni": "36588649",
+        "nombre": "Melisa",
+        "apellido": "Fernandez",
+        "fecha_nacimiento": "1991-03-05",
+        "edad": 34,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0352470340301",
+        "celular": "1168971009"
+    },
+    {
+        "nombre": "Alexis",
+        "apellido": "Gomez",
+        "dni": "32655301",
+        "fecha_nacimiento": "1986-12-17",
+        "obra_social": "osde",
+        "numero_obra_social": "62960339001",
+        "celular": "1562013945",
+        "edad": 38
+    },
+    {
+        "nombre": "Maria Candela",
+        "apellido": "Lara",
+        "dni": "42948277",
+        "fecha_nacimiento": "2000-09-28",
+        "obra_social": "sancor salud",
+        "numero_obra_social": "1891675/00",
+        "celular": "1141652821",
+        "edad": 24
+    },
+    {
+        "nombre": "Kai Luca",
+        "apellido": "Cardozo del Marmol",
+        "dni": "70354945",
+        "fecha_nacimiento": "2024-07-24",
+        "obra_social": "osde",
+        "numero_obra_social": "62747008305",
+        "celular": "1132998974",
+        "edad": 0
+    },
+    {
+        "nombre": "Analia Soledad",
+        "apellido": "Barrutia",
+        "dni": "28623216",
+        "fecha_nacimiento": "1981-05-19",
+        "obra_social": "visitar",
+        "numero_obra_social": "51532901",
+        "celular": "1126313882",
+        "edad": 44
+    },
+    {
+        "nombre": "Bautista",
+        "apellido": "Rodriguez",
+        "dni": "51495016",
+        "fecha_nacimiento": "2011-11-25",
+        "obra_social": "ospe",
+        "numero_obra_social": "2028904029403",
+        "celular": "1165416038",
+        "edad": 13
+    },
+    {
+        "dni": "24258997",
+        "nombre": "Sebastian Gonzalo",
+        "apellido": "Audicio",
+        "fecha_nacimiento": "2013-05-11",
+        "edad": 12,
+        "obra_social": "osde",
+        "numero_obra_social": "63132872501",
+        "celular": "1136483184"
+    },
+    {
+        "nombre": "Adrian",
+        "apellido": "Dominguez",
+        "dni": "32618124",
+        "fecha_nacimiento": "1986-08-18",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1169499764",
+        "edad": 38
+    },
+    {
+        "nombre": "Lourdes",
+        "apellido": "Sotelo",
+        "dni": "36399826",
+        "fecha_nacimiento": "1991-08-08",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1151324802",
+        "edad": 33
+    },
+    {
+        "nombre": "Chloe Amparo",
+        "apellido": "Luque Saavedra",
+        "dni": "70638656",
+        "fecha_nacimiento": "2025-06-30",
+        "obra_social": "Ioma",
+        "numero_obra_social": "2440949370002",
+        "celular": "1138474337",
+        "edad": 0
+    },
+    {
+        "dni": "46641364",
+        "nombre": "Leila Agostina",
+        "apellido": "Jaimes Penayo",
+        "fecha_nacimiento": "2005-07-05",
+        "edad": 20,
+        "obra_social": "Premedic",
+        "numero_obra_social": "0215859650301",
+        "celular": "11 6614-0715"
+    },
+    {
+        "dni": "57640083",
+        "nombre": "Cataleya Berenice",
+        "apellido": "Weimer",
+        "fecha_nacimiento": "2019-03-31",
+        "edad": 6,
+        "obra_social": "Principal plan",
+        "numero_obra_social": "27576400832",
+        "celular": "1150202207"
+    },
+    {
+        "nombre": "Cristina",
+        "apellido": "Lazzari",
+        "dni": "13995559",
+        "fecha_nacimiento": "1959-08-08",
+        "obra_social": "Osde",
+        "numero_obra_social": "61293202702",
+        "celular": "1159540681",
+        "edad": 65
+    },
+    {
+        "nombre": "Ariel",
+        "apellido": "Robles Konda",
+        "dni": "48424942",
+        "fecha_nacimiento": "2007-11-08",
+        "obra_social": "Osde",
+        "numero_obra_social": "63158593004",
+        "celular": "1149896871",
+        "edad": 17
+    },
+    {
+        "nombre": "Pedro Ignacio",
+        "apellido": "Appiolaza",
+        "dni": "33873777",
+        "fecha_nacimiento": "1988-07-17",
+        "obra_social": "premedic",
+        "numero_obra_social": "0338737770001",
+        "celular": "1144164939",
+        "edad": 37
+    },
+    {
+        "nombre": "Melina",
+        "apellido": "Noronha Ghisolfo",
+        "dni": "44081443",
+        "fecha_nacimiento": "2002-02-04",
+        "obra_social": "osde",
+        "numero_obra_social": "60491487405",
+        "celular": "0",
+        "edad": 23
+    },
+    {
+        "nombre": "Joaquin",
+        "apellido": "Fernandes",
+        "dni": "48796192",
+        "fecha_nacimiento": "2008-06-24",
+        "obra_social": "osde",
+        "numero_obra_social": "61926755003",
+        "celular": "11-22543678",
+        "edad": 17
+    },
+    {
+        "dni": "59191797",
+        "nombre": "Elian Ander",
+        "apellido": "Rios",
+        "fecha_nacimiento": "2022-02-06",
+        "edad": 3,
+        "obra_social": "osde",
+        "numero_obra_social": "62900127702",
+        "celular": "11-65863773"
+    },
+    {
+        "dni": "53606030",
+        "nombre": "Ada Luz",
+        "apellido": "Lucero",
+        "fecha_nacimiento": "2013-11-24",
+        "edad": 11,
+        "obra_social": "osde",
+        "numero_obra_social": "63175361203",
+        "celular": "11-35987740"
+    },
+    {
+        "dni": "57294745",
+        "nombre": "Scally Ghio",
+        "apellido": "Alfonso",
+        "fecha_nacimiento": "2018-09-12",
+        "edad": 6,
+        "obra_social": "osde",
+        "numero_obra_social": "62723498302",
+        "celular": "1157634287"
+    },
+    {
+        "nombre": "Fabio",
+        "apellido": "Escudero",
+        "dni": "23560198",
+        "fecha_nacimiento": "1973-09-14",
+        "obra_social": "ioma",
+        "numero_obra_social": "123560198500",
+        "celular": "11 2181-5881",
+        "edad": 51
+    },
+    {
+        "dni": "59418054",
+        "nombre": "Mateo Iker",
+        "apellido": "Aloe",
+        "fecha_nacimiento": "2022-07-30",
+        "edad": 2,
+        "obra_social": "osde",
+        "numero_obra_social": "62132444105",
+        "celular": "11-58393134"
+    },
+    {
+        "dni": "57299718",
+        "nombre": "Mia",
+        "apellido": "D Aquile",
+        "fecha_nacimiento": "2018-10-14",
+        "edad": 6,
+        "obra_social": "osde",
+        "numero_obra_social": "63025067602",
+        "celular": "11-65513822"
+    },
+    {
+        "dni": "31145291",
+        "nombre": "Maximiliano",
+        "apellido": "Galeano",
+        "fecha_nacimiento": "1984-11-21",
+        "edad": 40,
+        "obra_social": "osde",
+        "numero_obra_social": "62599081001",
+        "celular": "11-68530528"
+    },
+    {
+        "dni": "59826462",
+        "nombre": "Luca",
+        "apellido": "Lovigne Diaz",
+        "fecha_nacimiento": "2023-04-07",
+        "edad": 2,
+        "obra_social": "osde",
+        "numero_obra_social": "61818839702",
+        "celular": "11-21680348"
+    },
+    {
+        "dni": "39409614",
+        "nombre": "Joel Andres",
+        "apellido": "Caceres",
+        "fecha_nacimiento": "1996-03-20",
+        "edad": 29,
+        "obra_social": "osde",
+        "numero_obra_social": "63216986801",
+        "celular": "11-67151312"
+    },
+    {
+        "dni": "40395174",
+        "nombre": "Florencia Irene",
+        "apellido": "Sotelo",
+        "fecha_nacimiento": "1978-05-09",
+        "edad": 47,
+        "obra_social": "osde",
+        "numero_obra_social": "63236188201",
+        "celular": "11-30813575"
+    },
+    {
+        "nombre": "Caruso",
+        "apellido": "Franco",
+        "dni": "45867828",
+        "fecha_nacimiento": "2004-04-27",
+        "obra_social": "osde",
+        "numero_obra_social": "60661790504",
+        "celular": "11-38558840",
+        "edad": 21
+    },
+    {
+        "dni": "41972442",
+        "nombre": "Candela Melina",
+        "apellido": "Iuliano",
+        "fecha_nacimiento": "1999-06-10",
+        "edad": 26,
+        "obra_social": "osde",
+        "numero_obra_social": "62873089501",
+        "celular": "11-36215510"
+    },
+    {
+        "dni": "29720164",
+        "nombre": "Gariela Angelina",
+        "apellido": "Suarez",
+        "fecha_nacimiento": "0082-12-31",
+        "edad": 1942,
+        "obra_social": "osde",
+        "numero_obra_social": "61177636601",
+        "celular": "11-57392807"
+    },
+    {
+        "dni": "39749173",
+        "nombre": "Julieta",
+        "apellido": "Mateo",
+        "fecha_nacimiento": "1996-08-27",
+        "edad": 28,
+        "obra_social": "osde",
+        "numero_obra_social": "63025012901",
+        "celular": "11-23466007"
+    },
+    {
+        "nombre": "Ulises Jutco",
+        "apellido": "Ponce",
+        "dni": "50964393",
+        "fecha_nacimiento": "2011-05-04",
+        "obra_social": "ioma",
+        "numero_obra_social": "6107160014692595",
+        "celular": "1134760527",
+        "edad": 14
+    },
+    {
+        "nombre": "Gabriela",
+        "apellido": "Contreras",
+        "dni": "39283945",
+        "fecha_nacimiento": "1995-11-11",
+        "obra_social": "premedic",
+        "numero_obra_social": "0378056030101",
+        "celular": "1132441905",
+        "edad": 29
+    },
+    {
+        "nombre": "Martina",
+        "apellido": "Quintana",
+        "dni": "54809000",
+        "fecha_nacimiento": "2015-06-19",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1139431789",
+        "edad": 10
+    },
+    {
+        "nombre": "Julieta Martin",
+        "apellido": "Muñoz",
+        "dni": "46988238",
+        "fecha_nacimiento": "2005-12-21",
+        "obra_social": "osde",
+        "numero_obra_social": "61631218002",
+        "celular": "11-28395368",
+        "edad": 19
+    },
+    {
+        "nombre": "Sebastian",
+        "apellido": "Lucero",
+        "dni": "51060250",
+        "fecha_nacimiento": "2011-05-28",
+        "obra_social": "osde",
+        "numero_obra_social": "631753361202",
+        "celular": "1135987740",
+        "edad": 14
+    },
+    {
+        "nombre": "Vanesa Laura",
+        "apellido": "Gomez",
+        "dni": "24448517",
+        "fecha_nacimiento": "2000-05-31",
+        "obra_social": "osde",
+        "numero_obra_social": "61926755002",
+        "celular": "1151023446",
+        "edad": 25
+    },
+    {
+        "nombre": "Ian Giuliano Thaiel",
+        "apellido": "Carrazana",
+        "dni": "70105638",
+        "fecha_nacimiento": "2024-02-04",
+        "obra_social": "osde",
+        "numero_obra_social": "63228713502",
+        "celular": "388-5288957",
+        "edad": 1
+    },
+    {
+        "nombre": "Maira",
+        "apellido": "Marecos",
+        "dni": "41739650",
+        "fecha_nacimiento": "1999-02-28",
+        "obra_social": "OSPE",
+        "numero_obra_social": "27-41739650-6 00",
+        "celular": "1132957373",
+        "edad": 26
+    },
+    {
+        "nombre": "Nicolas",
+        "apellido": "Fernandez",
+        "dni": "37863139",
+        "fecha_nacimiento": "1993-10-13",
+        "obra_social": "IOMA",
+        "numero_obra_social": "9988776655",
+        "celular": "1162041909",
+        "edad": 31
+    },
+    {
+        "nombre": "Jhimmy Alex",
+        "apellido": "Gutierrez Velasquez",
+        "dni": "18835084",
+        "fecha_nacimiento": "1979-08-13",
+        "obra_social": "visitar",
+        "numero_obra_social": "114772500",
+        "celular": "1136828641",
+        "edad": 45
+    },
+    {
+        "nombre": "Maria Belen",
+        "apellido": "Cardoso",
+        "dni": "39390177",
+        "fecha_nacimiento": "1995-10-13",
+        "obra_social": "premedic",
+        "numero_obra_social": "0393901770001",
+        "celular": "1165329144",
+        "edad": 29
+    },
+    {
+        "dni": "54662840",
+        "nombre": "Sol Melina",
+        "apellido": "Aguire",
+        "fecha_nacimiento": "2015-04-09",
+        "edad": 10,
+        "obra_social": "IOMA",
+        "numero_obra_social": "2 30714651 2",
+        "celular": "11 5944-0235"
+    },
+    {
+        "nombre": "Rebeca Sofia",
+        "apellido": "Serrano",
+        "dni": "44384403",
+        "fecha_nacimiento": "2002-10-12",
+        "obra_social": "osde",
+        "numero_obra_social": "61838141303",
+        "celular": "0",
+        "edad": 22
+    },
+    {
+        "dni": "70522149",
+        "nombre": "Felipe",
+        "apellido": "Puig Kuhn",
+        "fecha_nacimiento": "2024-12-05",
+        "edad": 0,
+        "obra_social": "osde",
+        "numero_obra_social": "63160683002",
+        "celular": "11-51347853"
+    },
+    {
+        "dni": "49961188",
+        "nombre": "Milagros",
+        "apellido": "Portocarrero",
+        "fecha_nacimiento": "2009-12-14",
+        "edad": 15,
+        "obra_social": "osde",
+        "numero_obra_social": "61185595904",
+        "celular": "11-57428436"
+    },
+    {
+        "dni": "70648180",
+        "nombre": "Milo Benjamin",
+        "apellido": "Colman",
+        "fecha_nacimiento": "2025-04-08",
+        "edad": 0,
+        "obra_social": "osde",
+        "numero_obra_social": "63031829702",
+        "celular": "11-35720078"
+    },
+    {
+        "dni": "53835736",
+        "nombre": "Delfina",
+        "apellido": "Martinez",
+        "fecha_nacimiento": "2014-03-27",
+        "edad": 11,
+        "obra_social": "osde",
+        "numero_obra_social": "63188606004",
+        "celular": "11-60164406"
+    },
+    {
+        "dni": "47413704",
+        "nombre": "Guadalupe Ainara",
+        "apellido": "Martinez",
+        "fecha_nacimiento": "2006-07-03",
+        "edad": 19,
+        "obra_social": "osde",
+        "numero_obra_social": "63188606003",
+        "celular": "11-23861723"
+    },
+    {
+        "dni": "56048359",
+        "nombre": "Bruno Leon",
+        "apellido": "Neuwirth Rojas",
+        "fecha_nacimiento": "2017-01-15",
+        "edad": 8,
+        "obra_social": "osde",
+        "numero_obra_social": "63271370303",
+        "celular": "11-41934401"
+    },
+    {
+        "dni": "39295175",
+        "nombre": "Julieta Noelia",
+        "apellido": "Schegtel",
+        "fecha_nacimiento": "1991-12-06",
+        "edad": 33,
+        "obra_social": "osde",
+        "numero_obra_social": "61954403002",
+        "celular": "11-61300268"
+    },
+    {
+        "dni": "33689315",
+        "nombre": "Maria Andrea",
+        "apellido": "Restivo",
+        "fecha_nacimiento": "1988-01-25",
+        "edad": 37,
+        "obra_social": "osde",
+        "numero_obra_social": "61631218001",
+        "celular": "11-69073040"
+    },
+    {
+        "nombre": "Olivia",
+        "apellido": "Meichtry Quiroz",
+        "dni": "70355570",
+        "fecha_nacimiento": "0024-02-27",
+        "obra_social": "premedic",
+        "numero_obra_social": "0405500640101",
+        "celular": "1138653335",
+        "edad": 2001
+    },
+    {
+        "nombre": "German",
+        "apellido": "Gauna",
+        "dni": "40293870",
+        "fecha_nacimiento": "1997-04-19",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1159642614",
+        "edad": 28
+    },
+    {
+        "dni": "55803270",
+        "nombre": "Felipe",
+        "apellido": "Coria",
+        "fecha_nacimiento": "2016-09-04",
+        "edad": 8,
+        "obra_social": "ioma",
+        "numero_obra_social": "132652894003",
+        "celular": "1168789065"
+    },
+    {
+        "dni": "43445127",
+        "nombre": "Isaura Graciela",
+        "apellido": "Quipildor",
+        "fecha_nacimiento": "2001-09-17",
+        "edad": 23,
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1164073104"
+    },
+    {
+        "dni": "70601595",
+        "nombre": "Bautista Roman",
+        "apellido": "Britess",
+        "fecha_nacimiento": "2025-05-06",
+        "edad": 0,
+        "obra_social": "premedic",
+        "numero_obra_social": "0309941950401",
+        "celular": "1125054857"
+    },
+    {
+        "dni": "47431061",
+        "nombre": "Antonella Valentina",
+        "apellido": "Cuello",
+        "fecha_nacimiento": "2006-09-15",
+        "edad": 18,
+        "obra_social": "ioma",
+        "numero_obra_social": "230983240103",
+        "celular": "1123827156"
+    },
+    {
+        "nombre": "Victoria Serena",
+        "apellido": "Alzogaray",
+        "dni": "51168931",
+        "fecha_nacimiento": "2011-06-25",
+        "obra_social": "osadef",
+        "numero_obra_social": "27511689312",
+        "celular": "11 6693-6787",
+        "edad": 14
+    },
+    {
+        "dni": "28037658",
+        "nombre": "Gisela Vanesa",
+        "apellido": "Valles",
+        "fecha_nacimiento": "1980-04-12",
+        "edad": 45,
+        "obra_social": "osadef",
+        "numero_obra_social": "27280376588",
+        "celular": "11 6693-6787"
+    },
+    {
+        "nombre": "Nadia Denise",
+        "apellido": "Jaubrena",
+        "dni": "34948503",
+        "fecha_nacimiento": "1990-02-27",
+        "obra_social": "osde",
+        "numero_obra_social": "63166200501",
+        "celular": "11-73600403",
+        "edad": 35
+    },
+    {
+        "nombre": "Leandro",
+        "apellido": "Meza",
+        "dni": "30463530",
+        "fecha_nacimiento": "1983-08-18",
+        "obra_social": "OSDE",
+        "numero_obra_social": "61433637501",
+        "celular": "1157197692",
+        "edad": 41
+    },
+    {
+        "dni": "26705277",
+        "nombre": "Liliana",
+        "apellido": "Diaz",
+        "fecha_nacimiento": "1978-06-22",
+        "edad": 47,
+        "obra_social": "Principal plan",
+        "numero_obra_social": "20288943738",
+        "celular": "1165840792"
+    },
+    {
+        "dni": "50843605",
+        "nombre": "Nahuel",
+        "apellido": "Ortega",
+        "fecha_nacimiento": "2010-12-18",
+        "edad": 14,
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1157633972"
+    },
+    {
+        "dni": "94433608",
+        "nombre": "Alicia",
+        "apellido": "Gonzalez baez",
+        "fecha_nacimiento": "1991-01-11",
+        "edad": 34,
+        "obra_social": "Visitar",
+        "numero_obra_social": "27944336082",
+        "celular": "1134161437"
+    },
+    {
+        "nombre": "Malena",
+        "apellido": "Baliota",
+        "dni": "40713110",
+        "fecha_nacimiento": "1997-09-08",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1150399412",
+        "edad": 27
+    },
+    {
+        "nombre": "Maria",
+        "apellido": "Miranda",
+        "dni": "37018650",
+        "fecha_nacimiento": "1993-05-10",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1155079054",
+        "edad": 32
+    },
+    {
+        "nombre": "Rocio",
+        "apellido": "Fernandez arce",
+        "dni": "33396817",
+        "fecha_nacimiento": "1987-09-13",
+        "obra_social": "visitar",
+        "numero_obra_social": "211436000",
+        "celular": "11-34470370",
+        "edad": 37
+    },
+    {
+        "nombre": "Nicolas Valentin",
+        "apellido": "Gonzalez",
+        "dni": "48042153",
+        "fecha_nacimiento": "2007-11-16",
+        "obra_social": "principal plan",
+        "numero_obra_social": "0",
+        "celular": "1126796890",
+        "edad": 17
+    },
+    {
+        "nombre": "Marcelo Ramon",
+        "apellido": "Gonzalez",
+        "dni": "26358226",
+        "fecha_nacimiento": "1978-04-21",
+        "obra_social": "osde",
+        "numero_obra_social": "63270234502",
+        "celular": "0",
+        "edad": 47
+    },
+    {
+        "nombre": "Micaela Elizabeth",
+        "apellido": "Aguilera",
+        "dni": "43461340",
+        "fecha_nacimiento": "2001-05-01",
+        "obra_social": "osde",
+        "numero_obra_social": "63252311402",
+        "celular": "11-57017033",
+        "edad": 24
+    },
+    {
+        "dni": "21672364",
+        "nombre": "Pablo Javier",
+        "apellido": "Perez",
+        "fecha_nacimiento": "1970-06-02",
+        "edad": 55,
+        "obra_social": "osde",
+        "numero_obra_social": "61925462801",
+        "celular": "11-44084494"
+    },
+    {
+        "dni": "45737812",
+        "nombre": "Martina Maria Victoria",
+        "apellido": "Perez",
+        "fecha_nacimiento": "2004-03-23",
+        "edad": 21,
+        "obra_social": "osde",
+        "numero_obra_social": "61925462805",
+        "celular": "11-51360960"
+    },
+    {
+        "dni": "41545091",
+        "nombre": "Alejo Tomas",
+        "apellido": "Gomez Riaño",
+        "fecha_nacimiento": "1999-05-05",
+        "edad": 26,
+        "obra_social": "osde",
+        "numero_obra_social": "60867077302",
+        "celular": "0"
+    },
+    {
+        "nombre": "Benjamin",
+        "apellido": "Belluati Arleo",
+        "dni": "50706595",
+        "fecha_nacimiento": "2010-11-24",
+        "obra_social": "osde",
+        "numero_obra_social": "60730189804",
+        "celular": "11-56040951",
+        "edad": 14
+    },
+    {
+        "nombre": "Gabriel",
+        "apellido": "Belluati",
+        "dni": "21851641",
+        "fecha_nacimiento": "1970-11-02",
+        "obra_social": "osde",
+        "numero_obra_social": "60730189801",
+        "celular": "11-56041100",
+        "edad": 54
+    },
+    {
+        "dni": "46951335",
+        "nombre": "Mia",
+        "apellido": "Belluati",
+        "fecha_nacimiento": "2005-09-16",
+        "edad": 19,
+        "obra_social": "osde",
+        "numero_obra_social": "60730189802",
+        "celular": "11-57054014"
+    },
+    {
+        "dni": "22326682",
+        "nombre": "Paula Mariana",
+        "apellido": "Arleo",
+        "fecha_nacimiento": "1971-07-16",
+        "edad": 54,
+        "obra_social": "osde",
+        "numero_obra_social": "60730189803",
+        "celular": "0"
+    },
+    {
+        "nombre": "Mateo",
+        "apellido": "Ojeda",
+        "dni": "56249495",
+        "fecha_nacimiento": "2007-03-23",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1157362397",
+        "edad": 18
+    },
+    {
+        "nombre": "Susana",
+        "apellido": "spampinato",
+        "dni": "11822506",
+        "fecha_nacimiento": "1956-01-08",
+        "obra_social": "osde",
+        "numero_obra_social": "61867929302",
+        "celular": "1165085811",
+        "edad": 69
+    },
+    {
+        "nombre": "Anthony Manuel",
+        "apellido": "Campos Verdu",
+        "dni": "95946802",
+        "fecha_nacimiento": "1991-08-03",
+        "obra_social": "osde",
+        "numero_obra_social": "63260787302",
+        "celular": "1139510516",
+        "edad": 33
+    },
+    {
+        "nombre": "MARIA ANTONIA",
+        "apellido": "SOSA",
+        "dni": "54793855",
+        "fecha_nacimiento": "1979-12-08",
+        "obra_social": "OSDE",
+        "numero_obra_social": "62075694101",
+        "celular": "11 6809-4532",
+        "edad": 45
+    },
+    {
+        "nombre": "valentina",
+        "apellido": "sanche",
+        "dni": "50309108",
+        "fecha_nacimiento": "2010-05-21",
+        "obra_social": "principal plan",
+        "numero_obra_social": "27503091084",
+        "celular": "1151313436",
+        "edad": 15
+    },
+    {
+        "nombre": "Bianca",
+        "apellido": "Arce",
+        "dni": "41739154",
+        "fecha_nacimiento": "1999-02-13",
+        "obra_social": "bene salud",
+        "numero_obra_social": "40184792/01",
+        "celular": "1160279626",
+        "edad": 26
+    },
+    {
+        "nombre": "Josefina",
+        "apellido": "Giarreto",
+        "dni": "59744101",
+        "fecha_nacimiento": "2023-03-04",
+        "obra_social": "ioma",
+        "numero_obra_social": "131493044902",
+        "celular": "1158692367",
+        "edad": 2
+    },
+    {
+        "nombre": "dr",
+        "apellido": "corbalan",
+        "dni": "1234567",
+        "fecha_nacimiento": "0045-05-04",
+        "obra_social": "o",
+        "numero_obra_social": "o",
+        "celular": "o",
+        "edad": 1980
+    },
+    {
+        "nombre": "Leonel",
+        "apellido": "Carrasco",
+        "dni": "38040321",
+        "fecha_nacimiento": "1993-12-04",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "0",
+        "edad": 31
+    },
+    {
+        "nombre": "Maribel",
+        "apellido": "Gallardo",
+        "dni": "93982089",
+        "fecha_nacimiento": "1993-11-20",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1144921933",
+        "edad": 31
+    },
+    {
+        "nombre": "Jonas",
+        "apellido": "Anriquez",
+        "dni": "70352360",
+        "fecha_nacimiento": "2024-07-24",
+        "obra_social": "premedic",
+        "numero_obra_social": "0357377950301",
+        "celular": "1138468946",
+        "edad": 0
+    },
+    {
+        "nombre": "Eluney",
+        "apellido": "Anriquez",
+        "dni": "56405692",
+        "fecha_nacimiento": "2017-08-11",
+        "obra_social": "premedic",
+        "numero_obra_social": "0357377950201",
+        "celular": "1138468946",
+        "edad": 7
+    },
+    {
+        "nombre": "Joana",
+        "apellido": "Bogado",
+        "dni": "39670065",
+        "fecha_nacimiento": "1996-03-05",
+        "obra_social": "premedic",
+        "numero_obra_social": "0357377950101",
+        "celular": "1138468946",
+        "edad": 29
+    },
+    {
+        "nombre": "Tobias Eligio",
+        "apellido": "Jacquet Barreto",
+        "dni": "54403255",
+        "fecha_nacimiento": "2014-12-22",
+        "obra_social": "osde",
+        "numero_obra_social": "63251191402",
+        "celular": "11-68705327",
+        "edad": 10
+    },
+    {
+        "nombre": "Camila",
+        "apellido": "Borbea",
+        "dni": "42344000",
+        "fecha_nacimiento": "2001-01-15",
+        "obra_social": "osde",
+        "numero_obra_social": "63216718001",
+        "celular": "0",
+        "edad": 24
+    },
+    {
+        "dni": "40988480",
+        "nombre": "Cristian Damian",
+        "apellido": "Gonzalez",
+        "fecha_nacimiento": "1998-05-03",
+        "edad": 27,
+        "obra_social": "osde",
+        "numero_obra_social": "62721761201",
+        "celular": "11-65868203"
+    },
+    {
+        "dni": "57631167",
+        "nombre": "Nehemias Tahiel",
+        "apellido": "Nieva",
+        "fecha_nacimiento": "2017-06-20",
+        "edad": 8,
+        "obra_social": "osde",
+        "numero_obra_social": "63123377502",
+        "celular": "11-34308732"
+    },
+    {
+        "nombre": "Alai Zoe",
+        "apellido": "Aquino Toledo",
+        "dni": "59088916",
+        "fecha_nacimiento": "2021-12-12",
+        "obra_social": "osde",
+        "numero_obra_social": "62898402102",
+        "celular": "11-41649962",
+        "edad": 3
+    },
+    {
+        "nombre": "Matteo",
+        "apellido": "Boiero",
+        "dni": "56891122",
+        "fecha_nacimiento": "2018-03-22",
+        "obra_social": "osde",
+        "numero_obra_social": "61755696103",
+        "celular": "11-50552928",
+        "edad": 7
+    },
+    {
+        "dni": "38693488",
+        "nombre": "Giuliana Edith",
+        "apellido": "Romero",
+        "fecha_nacimiento": "1995-04-09",
+        "edad": 30,
+        "obra_social": "osde",
+        "numero_obra_social": "62721761205",
+        "celular": "0"
+    },
+    {
+        "nombre": "Milagros",
+        "apellido": "Roson Martin",
+        "dni": "22993159",
+        "fecha_nacimiento": "1972-11-05",
+        "obra_social": "osde",
+        "numero_obra_social": "62500658401",
+        "celular": "1161436847",
+        "edad": 52
+    },
+    {
+        "nombre": "Claudia Raquel",
+        "apellido": "Campos",
+        "dni": "27021347",
+        "fecha_nacimiento": "1978-12-17",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1133055303",
+        "edad": 46
+    },
+    {
+        "nombre": "Luciano Nahim",
+        "apellido": "Fronciani",
+        "dni": "47456390",
+        "fecha_nacimiento": "2006-08-29",
+        "obra_social": "bene salud",
+        "numero_obra_social": "28437578/2",
+        "celular": "1169617242",
+        "edad": 18
+    },
+    {
+        "nombre": "Gladys",
+        "apellido": "Grasso",
+        "dni": "20314955",
+        "fecha_nacimiento": "1968-07-01",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1131876179",
+        "edad": 57
+    },
+    {
+        "nombre": "Ana",
+        "apellido": "Aviles",
+        "dni": "29117740",
+        "fecha_nacimiento": "1978-09-26",
+        "obra_social": "Visitar",
+        "numero_obra_social": "166962700",
+        "celular": "1124522861",
+        "edad": 46
+    },
+    {
+        "nombre": "Tiara Aylén",
+        "apellido": "Morales",
+        "dni": "47831904",
+        "fecha_nacimiento": "2007-01-14",
+        "obra_social": "Biomed",
+        "numero_obra_social": "002031636369601",
+        "celular": "1161309003",
+        "edad": 18
+    },
+    {
+        "nombre": "Susana",
+        "apellido": "Najmias",
+        "dni": "10358621",
+        "fecha_nacimiento": "1952-11-18",
+        "obra_social": "Ioma",
+        "numero_obra_social": "861035862100",
+        "celular": "1158487480",
+        "edad": 72
+    },
+    {
+        "nombre": "Roma",
+        "apellido": "Ruiz",
+        "dni": "59926465",
+        "fecha_nacimiento": "2023-06-27",
+        "obra_social": "Premedic",
+        "numero_obra_social": "0381666280201",
+        "celular": "1134608443",
+        "edad": 2
+    },
+    {
+        "nombre": "Fernando",
+        "apellido": "Marchetti",
+        "dni": "28329157",
+        "fecha_nacimiento": "1980-04-18",
+        "obra_social": "Visitar",
+        "numero_obra_social": "20283291570",
+        "celular": "1165687982",
+        "edad": 45
+    },
+    {
+        "nombre": "Maite Sophia",
+        "apellido": "Astorga",
+        "dni": "70698400",
+        "fecha_nacimiento": "2025-06-24",
+        "obra_social": "Ioma",
+        "numero_obra_social": "230205407802",
+        "celular": "1166066728",
+        "edad": 0
+    },
+    {
+        "nombre": "Gustavo Manuel",
+        "apellido": "Bauza",
+        "dni": "31412282",
+        "fecha_nacimiento": "1985-01-05",
+        "obra_social": "osde",
+        "numero_obra_social": "61393464301",
+        "celular": "1162636333",
+        "edad": 40
+    },
+    {
+        "nombre": "Lucia Rosario",
+        "apellido": "Bauza Rodriguez",
+        "dni": "70029201",
+        "fecha_nacimiento": "2023-09-27",
+        "obra_social": "osde",
+        "numero_obra_social": "61393464307",
+        "celular": "1162636333",
+        "edad": 1
+    },
+    {
+        "nombre": "Mirta Isabel",
+        "apellido": "Messeri",
+        "dni": "13018329",
+        "fecha_nacimiento": "1957-06-04",
+        "obra_social": "osde",
+        "numero_obra_social": "62358835702",
+        "celular": "11-59579777",
+        "edad": 68
+    },
+    {
+        "nombre": "Lucas Santiago",
+        "apellido": "Leoncini",
+        "dni": "24496384",
+        "fecha_nacimiento": "1975-03-07",
+        "obra_social": "osde",
+        "numero_obra_social": "60882325101",
+        "celular": "11-38321193",
+        "edad": 50
+    },
+    {
+        "nombre": "Alexis Ezequiel",
+        "apellido": "Arredondo",
+        "dni": "38334343",
+        "fecha_nacimiento": "1994-11-03",
+        "obra_social": "osde",
+        "numero_obra_social": "62816987501",
+        "celular": "11-28567637",
+        "edad": 30
+    },
+    {
+        "nombre": "Silvia Liliana",
+        "apellido": "Pachao",
+        "dni": "26422888",
+        "fecha_nacimiento": "1978-06-19",
+        "obra_social": "osde",
+        "numero_obra_social": "62526738802",
+        "celular": "11-64466570",
+        "edad": 47
+    },
+    {
+        "nombre": "Juan Octavio",
+        "apellido": "Martinez Oviedo",
+        "dni": "38285453",
+        "fecha_nacimiento": "1994-04-18",
+        "obra_social": "osde",
+        "numero_obra_social": "62814680801",
+        "celular": "11-60522849",
+        "edad": 31
+    },
+    {
+        "nombre": "German Ezequiel",
+        "apellido": "Berra",
+        "dni": "36881157",
+        "fecha_nacimiento": "1992-04-19",
+        "obra_social": "osde",
+        "numero_obra_social": "62037077601",
+        "celular": "11-38093323",
+        "edad": 33
+    },
+    {
+        "nombre": "Madelaine Nicole",
+        "apellido": "Santander",
+        "dni": "41201967",
+        "fecha_nacimiento": "1999-08-28",
+        "obra_social": "osde",
+        "numero_obra_social": "63247727901",
+        "celular": "0",
+        "edad": 25
+    },
+    {
+        "nombre": "Fernando Javier",
+        "apellido": "Sandoval",
+        "dni": "22121046",
+        "fecha_nacimiento": "1971-02-27",
+        "obra_social": "osde",
+        "numero_obra_social": "62052700405",
+        "celular": "11-31925345",
+        "edad": 54
+    },
+    {
+        "nombre": "Daniel Ezequiel",
+        "apellido": "Martinez",
+        "dni": "39711871",
+        "fecha_nacimiento": "1996-06-15",
+        "obra_social": "osde",
+        "numero_obra_social": "63219699701",
+        "celular": "11-32011427",
+        "edad": 29
+    },
+    {
+        "nombre": "Benicio",
+        "apellido": "Flores",
+        "dni": "56043219",
+        "fecha_nacimiento": "2017-12-06",
+        "obra_social": "principal plan",
+        "numero_obra_social": "20560432195",
+        "celular": "1141776399",
+        "edad": 7
+    },
+    {
+        "nombre": "Maria Sol",
+        "apellido": "Rissotto",
+        "dni": "27460489",
+        "fecha_nacimiento": "1979-05-31",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1158703395",
+        "edad": 46
+    },
+    {
+        "nombre": "Baltazar",
+        "apellido": "Gonzalez Turner",
+        "dni": "50693481",
+        "fecha_nacimiento": "2011-03-21",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1158703395",
+        "edad": 14
+    },
+    {
+        "nombre": "Martino",
+        "apellido": "Gonzalez Turner",
+        "dni": "49358434",
+        "fecha_nacimiento": "2009-05-08",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1158703395",
+        "edad": 16
+    },
+    {
+        "nombre": "Jorge Alberto",
+        "apellido": "Dorego",
+        "dni": "13199354",
+        "fecha_nacimiento": "1959-04-17",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "40527894",
+        "edad": 66
+    },
+    {
+        "nombre": "Evan David",
+        "apellido": "GOMEZ",
+        "dni": "59651254",
+        "fecha_nacimiento": "2022-11-15",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1126283623",
+        "edad": 2
+    },
+    {
+        "nombre": "Mirko",
+        "apellido": "Lenkic",
+        "dni": "59203862",
+        "fecha_nacimiento": "2022-03-06",
+        "obra_social": "osde",
+        "numero_obra_social": "61 854681 1 03",
+        "celular": "1164089258",
+        "edad": 3
+    },
+    {
+        "nombre": "Daiana Sabrina Soledad",
+        "apellido": "Varela",
+        "dni": "36023952",
+        "fecha_nacimiento": "1991-04-03",
+        "obra_social": "osde",
+        "numero_obra_social": "62037077602",
+        "celular": "11-50942053",
+        "edad": 34
+    },
+    {
+        "nombre": "Laura Beatriz",
+        "apellido": "Alegre",
+        "dni": "14588107",
+        "fecha_nacimiento": "1961-07-16",
+        "obra_social": "osde",
+        "numero_obra_social": "60381906001",
+        "celular": "11-34827823",
+        "edad": 64
+    },
+    {
+        "nombre": "Rocio Beatriz",
+        "apellido": "Alvares Armoa",
+        "dni": "95815388",
+        "fecha_nacimiento": "1991-06-25",
+        "obra_social": "osde",
+        "numero_obra_social": "63053505001",
+        "celular": "11-27811994",
+        "edad": 34
+    },
+    {
+        "nombre": "Maria Belen",
+        "apellido": "Ohsz",
+        "dni": "39853185",
+        "fecha_nacimiento": "1996-09-17",
+        "obra_social": "osde",
+        "numero_obra_social": "63239328801",
+        "celular": "11-24541767",
+        "edad": 28
+    },
+    {
+        "nombre": "Axel Alen",
+        "apellido": "Horewicz",
+        "dni": "40510850",
+        "fecha_nacimiento": "1997-07-29",
+        "obra_social": "osde",
+        "numero_obra_social": "63042701001",
+        "celular": "11-62761867",
+        "edad": 27
+    },
+    {
+        "nombre": "Maria Fernanda Itziar",
+        "apellido": "Mohr Andres",
+        "dni": "29962006",
+        "fecha_nacimiento": "1982-10-24",
+        "obra_social": "osde",
+        "numero_obra_social": "63160489701",
+        "celular": "11-68305524",
+        "edad": 42
+    },
+    {
+        "nombre": "Chiara Martin",
+        "apellido": "Osa Daidone",
+        "dni": "42237380",
+        "fecha_nacimiento": "2000-01-19",
+        "obra_social": "osde",
+        "numero_obra_social": "63215033401",
+        "celular": "11-64997542",
+        "edad": 25
+    },
+    {
+        "nombre": "Alejandro Hilario",
+        "apellido": "Sandoval",
+        "dni": "25785228",
+        "fecha_nacimiento": "1977-01-20",
+        "obra_social": "osde",
+        "numero_obra_social": "62080580201",
+        "celular": "1166152833",
+        "edad": 48
+    },
+    {
+        "nombre": "Matias Joel",
+        "apellido": "Alvarez",
+        "dni": "30412998",
+        "fecha_nacimiento": "1983-02-28",
+        "obra_social": "osde",
+        "numero_obra_social": "62-356533-0-01",
+        "celular": "1122531158",
+        "edad": 42
+    },
+    {
+        "nombre": "Agustin",
+        "apellido": "Mangudo Escalada",
+        "dni": "42659191",
+        "fecha_nacimiento": "2000-05-03",
+        "obra_social": "osde",
+        "numero_obra_social": "60381906004",
+        "celular": "1123931110",
+        "edad": 25
+    },
+    {
+        "nombre": "Viviana",
+        "apellido": "Rosales",
+        "dni": "24608076",
+        "fecha_nacimiento": "1975-04-12",
+        "obra_social": "osadef",
+        "numero_obra_social": "27246080769",
+        "celular": "1123447306",
+        "edad": 50
+    },
+    {
+        "nombre": "Priscila",
+        "apellido": "Saavedra",
+        "dni": "41344117",
+        "fecha_nacimiento": "1998-07-02",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "385-167-107",
+        "edad": 27
+    },
+    {
+        "nombre": "Brenda Magali",
+        "apellido": "Gomez",
+        "dni": "44096241",
+        "fecha_nacimiento": "2002-02-08",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1124762094",
+        "edad": 23
+    },
+    {
+        "nombre": "Brian",
+        "apellido": "Saavedra",
+        "dni": "40285830",
+        "fecha_nacimiento": "1996-12-11",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1126167285",
+        "edad": 28
+    },
+    {
+        "nombre": "Gustavo javier",
+        "apellido": "Artaza",
+        "dni": "22409464",
+        "fecha_nacimiento": "1972-05-09",
+        "obra_social": "Premedic",
+        "numero_obra_social": "0224094640001",
+        "celular": "1121910512",
+        "edad": 53
+    },
+    {
+        "nombre": "Sangalli",
+        "apellido": "Quinto",
+        "dni": "59269167",
+        "fecha_nacimiento": "2022-03-18",
+        "obra_social": "Osde",
+        "numero_obra_social": "63239738004",
+        "celular": "1134424398",
+        "edad": 3
+    },
+    {
+        "nombre": "Luz",
+        "apellido": "Sanchez",
+        "dni": "49362577",
+        "fecha_nacimiento": "2009-03-29",
+        "obra_social": "ioma",
+        "numero_obra_social": "124510772500",
+        "celular": "1165686127",
+        "edad": 16
+    },
+    {
+        "nombre": "Brenda Claribel",
+        "apellido": "Villalba",
+        "dni": "42671079",
+        "fecha_nacimiento": "1999-12-27",
+        "obra_social": "osde",
+        "numero_obra_social": "63229451401",
+        "celular": "11-60302662",
+        "edad": 25
+    },
+    {
+        "nombre": "Isabella Mia",
+        "apellido": "Gonzalez Di Diego",
+        "dni": "47138260",
+        "fecha_nacimiento": "2006-03-11",
+        "obra_social": "osde",
+        "numero_obra_social": "62992315804",
+        "celular": "0",
+        "edad": 19
+    },
+    {
+        "nombre": "Octavio",
+        "apellido": "Kuhn",
+        "dni": "59457033",
+        "fecha_nacimiento": "2022-02-23",
+        "obra_social": "osde",
+        "numero_obra_social": "62890268802",
+        "celular": "11-69997361",
+        "edad": 3
+    },
+    {
+        "nombre": "Laura Viviana",
+        "apellido": "Solis",
+        "dni": "31636211",
+        "fecha_nacimiento": "1985-04-15",
+        "obra_social": "osde",
+        "numero_obra_social": "61392830902",
+        "celular": "11-40831865",
+        "edad": 40
+    },
+    {
+        "nombre": "Juan Carlos",
+        "apellido": "Robacio",
+        "dni": "4369960",
+        "fecha_nacimiento": "1941-02-07",
+        "obra_social": "osde",
+        "numero_obra_social": "61081228801",
+        "celular": "11-69839377",
+        "edad": 84
+    },
+    {
+        "nombre": "Nelida Beatriz",
+        "apellido": "Gutierrez",
+        "dni": "00819279",
+        "fecha_nacimiento": "1935-01-11",
+        "obra_social": "osde",
+        "numero_obra_social": "61081228802",
+        "celular": "11-69839377",
+        "edad": 90
+    },
+    {
+        "dni": "54455260",
+        "nombre": "Vito",
+        "apellido": "Falappa",
+        "fecha_nacimiento": "2015-01-21",
+        "edad": 10,
+        "obra_social": "osde",
+        "numero_obra_social": "60864098006",
+        "celular": "0"
+    },
+    {
+        "dni": "40797269",
+        "nombre": "Melina",
+        "apellido": "Vukusich",
+        "fecha_nacimiento": "1997-11-09",
+        "edad": 27,
+        "obra_social": "osde",
+        "numero_obra_social": "63202282401",
+        "celular": "11-41712013"
+    },
+    {
+        "dni": "50103842",
+        "nombre": "Julia",
+        "apellido": "Falappa",
+        "fecha_nacimiento": "2010-04-20",
+        "edad": 15,
+        "obra_social": "osde",
+        "numero_obra_social": "60864098003",
+        "celular": "0"
+    },
+    {
+        "dni": "51511502",
+        "nombre": "Olivia",
+        "apellido": "Falappa",
+        "fecha_nacimiento": "2011-09-29",
+        "edad": 13,
+        "obra_social": "OSDE",
+        "numero_obra_social": "60864098005",
+        "celular": "0"
+    },
+    {
+        "dni": "48694707",
+        "nombre": "Lara Martina",
+        "apellido": "Alvarez Giglio",
+        "fecha_nacimiento": "2008-03-31",
+        "edad": 17,
+        "obra_social": "osde",
+        "numero_obra_social": "61585614302",
+        "celular": "0"
+    },
+    {
+        "dni": "33643115",
+        "nombre": "Noelia Paola",
+        "apellido": "Giglio",
+        "fecha_nacimiento": "1988-01-25",
+        "edad": 37,
+        "obra_social": "osde",
+        "numero_obra_social": "61585614301",
+        "celular": "11-36551509"
+    },
+    {
+        "dni": "58497574",
+        "nombre": "Isabella Catalina",
+        "apellido": "Palmisiano",
+        "fecha_nacimiento": "2020-08-22",
+        "edad": 4,
+        "obra_social": "osde",
+        "numero_obra_social": "61929872203",
+        "celular": "11-21697836"
+    },
+    {
+        "nombre": "Sofia",
+        "apellido": "Villalonga",
+        "dni": "34019364",
+        "fecha_nacimiento": "1998-11-01",
+        "obra_social": "osde",
+        "numero_obra_social": "63042628601",
+        "celular": "1161710462",
+        "edad": 26
+    },
+    {
+        "nombre": "Norma Leonor",
+        "apellido": "Romero",
+        "dni": "10119060",
+        "fecha_nacimiento": "1951-09-07",
+        "obra_social": "PAMI",
+        "numero_obra_social": "15677819701 00",
+        "celular": "1141989049",
+        "edad": 73
+    },
+    {
+        "nombre": "Melissa",
+        "apellido": "Zoppi",
+        "dni": "40498416",
+        "fecha_nacimiento": "1997-07-03",
+        "obra_social": "osde",
+        "numero_obra_social": "63214447401",
+        "celular": "1169631368",
+        "edad": 28
+    },
+    {
+        "nombre": "Patricio",
+        "apellido": "Maidana",
+        "dni": "37768279",
+        "fecha_nacimiento": "1993-08-26",
+        "obra_social": "ospe",
+        "numero_obra_social": "20-37768279-4 00",
+        "celular": "1132515061",
+        "edad": 31
+    },
+    {
+        "nombre": "Lara",
+        "apellido": "Coronel",
+        "dni": "50158554",
+        "fecha_nacimiento": "2010-03-15",
+        "obra_social": "Premedic",
+        "numero_obra_social": "0281457070201",
+        "celular": "1154826408",
+        "edad": 15
+    },
+    {
+        "nombre": "Marisol",
+        "apellido": "Coronel",
+        "dni": "57645705",
+        "fecha_nacimiento": "2019-03-27",
+        "obra_social": "premedic",
+        "numero_obra_social": "0281457070301",
+        "celular": "1154826408",
+        "edad": 6
+    },
+    {
+        "nombre": "Maria Susana",
+        "apellido": "Borge",
+        "dni": "18458598",
+        "fecha_nacimiento": "1967-07-12",
+        "obra_social": "visitar",
+        "numero_obra_social": "32009516",
+        "celular": "1138696439",
+        "edad": 58
+    },
+    {
+        "nombre": "Ambar",
+        "apellido": "Candiloro Sakala",
+        "dni": "57075659",
+        "fecha_nacimiento": "2018-07-09",
+        "obra_social": "visitar",
+        "numero_obra_social": "57075659",
+        "celular": "1123401897",
+        "edad": 7
+    },
+    {
+        "nombre": "Maria",
+        "apellido": "Sanchez",
+        "dni": "40796578",
+        "fecha_nacimiento": "1997-10-04",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1135885335",
+        "edad": 27
+    },
+    {
+        "nombre": "Jazmin Antonella",
+        "apellido": "Cortes",
+        "dni": "48697766",
+        "fecha_nacimiento": "2008-08-27",
+        "obra_social": "visitar",
+        "numero_obra_social": "27486977669",
+        "celular": "1131830593",
+        "edad": 16
+    },
+    {
+        "nombre": "Romina",
+        "apellido": "Cisneros",
+        "dni": "34027827",
+        "fecha_nacimiento": "1988-07-26",
+        "obra_social": "premedic",
+        "numero_obra_social": "0340278270001",
+        "celular": "1160465962",
+        "edad": 37
+    },
+    {
+        "dni": "35757138",
+        "nombre": "Yanina",
+        "apellido": "Fernandez",
+        "fecha_nacimiento": "1991-02-27",
+        "edad": 34,
+        "obra_social": "premedic",
+        "numero_obra_social": "0357571380001",
+        "celular": "1130603886"
+    },
+    {
+        "dni": "54818717",
+        "nombre": "Paloma",
+        "apellido": "Pravato",
+        "fecha_nacimiento": "2015-05-12",
+        "edad": 10,
+        "obra_social": "osde",
+        "numero_obra_social": "63268632302",
+        "celular": "1156379525"
+    },
+    {
+        "dni": "41858500",
+        "nombre": "Gaston Ezequiel",
+        "apellido": "Moreira",
+        "fecha_nacimiento": "1999-08-09",
+        "edad": 25,
+        "obra_social": "osde",
+        "numero_obra_social": "61308806804",
+        "celular": "11-57619599"
+    },
+    {
+        "dni": "41024676",
+        "nombre": "Joaquina Maria",
+        "apellido": "Saenz Valiente",
+        "fecha_nacimiento": "1998-06-19",
+        "edad": 27,
+        "obra_social": "osde",
+        "numero_obra_social": "63186800201",
+        "celular": "11-33677830"
+    },
+    {
+        "dni": "70077719",
+        "nombre": "Margarita",
+        "apellido": "Akiyama",
+        "fecha_nacimiento": "2023-12-01",
+        "edad": 1,
+        "obra_social": "61701446803",
+        "numero_obra_social": "Osde",
+        "celular": "11-23224359"
+    },
+    {
+        "nombre": "Geronimo",
+        "apellido": "Santillan",
+        "dni": "58582618",
+        "fecha_nacimiento": "2020-10-05",
+        "obra_social": "osde",
+        "numero_obra_social": "62234687204",
+        "celular": "11-61455204",
+        "edad": 4
+    },
+    {
+        "dni": "46281063",
+        "nombre": "Priscila Tamara",
+        "apellido": "Fernandez",
+        "fecha_nacimiento": "2004-09-24",
+        "edad": 20,
+        "obra_social": "osde",
+        "numero_obra_social": "62458953502",
+        "celular": "0"
+    },
+    {
+        "nombre": "Fengbing",
+        "apellido": "Chen",
+        "dni": "94115957",
+        "fecha_nacimiento": "1989-03-09",
+        "obra_social": "osde",
+        "numero_obra_social": "62342080401",
+        "celular": "11-38832606",
+        "edad": 36
+    },
+    {
+        "dni": "32318197",
+        "nombre": "Mercedes",
+        "apellido": "Delahaye",
+        "fecha_nacimiento": "1986-05-01",
+        "edad": 39,
+        "obra_social": "osde",
+        "numero_obra_social": "63067787402",
+        "celular": "11-41910134"
+    },
+    {
+        "dni": "54906352",
+        "nombre": "Francesco",
+        "apellido": "Donaire",
+        "fecha_nacimiento": "2015-07-03",
+        "edad": 10,
+        "obra_social": "osde",
+        "numero_obra_social": "61672849102",
+        "celular": "11-26675904"
+    },
+    {
+        "dni": "58571385",
+        "nombre": "Renata Enola",
+        "apellido": "Bordenave Rocca",
+        "fecha_nacimiento": "2020-12-06",
+        "edad": 4,
+        "obra_social": "osde",
+        "numero_obra_social": "63070968702",
+        "celular": "11-41805713"
+    },
+    {
+        "dni": "45236215",
+        "nombre": "Matias",
+        "apellido": "Parra",
+        "fecha_nacimiento": "2003-09-13",
+        "edad": 21,
+        "obra_social": "premedic",
+        "numero_obra_social": "0452362150001",
+        "celular": "1161573467"
+    },
+    {
+        "nombre": "Veronica",
+        "apellido": "Moretti",
+        "dni": "18516993",
+        "fecha_nacimiento": "1967-05-16",
+        "obra_social": "osde",
+        "numero_obra_social": "62123071401",
+        "celular": "1131098109",
+        "edad": 58
+    },
+    {
+        "nombre": "Jana Sofia",
+        "apellido": "Molina",
+        "dni": "57012606",
+        "fecha_nacimiento": "2018-04-29",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1156388992",
+        "edad": 7
+    },
+    {
+        "nombre": "Victoria Lucia",
+        "apellido": "Nunez",
+        "dni": "46279487",
+        "fecha_nacimiento": "2005-01-03",
+        "obra_social": "osde",
+        "numero_obra_social": "000000000000",
+        "celular": "1164458823",
+        "edad": 20
+    },
+    {
+        "nombre": "Gonzalo Leon",
+        "apellido": "Barrios",
+        "dni": "56500406",
+        "fecha_nacimiento": "2017-11-10",
+        "obra_social": "ioma",
+        "numero_obra_social": "233262621003",
+        "celular": "1134207492",
+        "edad": 7
+    },
+    {
+        "nombre": "Alejo Valentin",
+        "apellido": "Garay",
+        "dni": "48986781",
+        "fecha_nacimiento": "2008-10-20",
+        "obra_social": "ioma",
+        "numero_obra_social": "230340502002",
+        "celular": "1134207492",
+        "edad": 16
+    },
+    {
+        "nombre": "Amelie",
+        "apellido": "Eberle",
+        "dni": "70772030",
+        "fecha_nacimiento": "2025-07-17",
+        "obra_social": "osde",
+        "numero_obra_social": "61531953901",
+        "celular": "1140901824",
+        "edad": 0
+    },
+    {
+        "nombre": "Eugenia Valentina",
+        "apellido": "Gomez",
+        "dni": "54517971",
+        "fecha_nacimiento": "2014-12-31",
+        "obra_social": "Premedic",
+        "numero_obra_social": "0366095020101",
+        "celular": "1137679587",
+        "edad": 10
+    },
+    {
+        "nombre": "Silvana",
+        "apellido": "Suarez",
+        "dni": "29478836",
+        "fecha_nacimiento": "1982-04-13",
+        "obra_social": "osde",
+        "numero_obra_social": "61859527802",
+        "celular": "1169908615",
+        "edad": 43
+    },
+    {
+        "nombre": "Uncos",
+        "apellido": "Alicia",
+        "dni": "30595150",
+        "fecha_nacimiento": "1983-04-06",
+        "obra_social": "premedic",
+        "numero_obra_social": "0925244030101",
+        "celular": "1162244381",
+        "edad": 42
+    },
+    {
+        "nombre": "Carolina",
+        "apellido": "Rocca",
+        "dni": "41553297",
+        "fecha_nacimiento": "1998-02-25",
+        "obra_social": "osde",
+        "numero_obra_social": "63070968704",
+        "celular": "1141805713",
+        "edad": 27
+    },
+    {
+        "nombre": "Francesca",
+        "apellido": "Bordenave",
+        "dni": "56043290",
+        "fecha_nacimiento": "2017-01-20",
+        "obra_social": "osde",
+        "numero_obra_social": "63070968703",
+        "celular": "1141805713",
+        "edad": 8
+    },
+    {
+        "nombre": "Lara Luciana",
+        "apellido": "Verdejo",
+        "dni": "48867064",
+        "fecha_nacimiento": "2008-01-14",
+        "obra_social": "0",
+        "numero_obra_social": "0",
+        "celular": "1162189630",
+        "edad": 17
     }
 ]

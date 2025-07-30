@@ -598,5 +598,2333 @@
         "medico": "Francisco Colom",
         "id": 75,
         "fecha_creacion": "2025-07-15T17:43:03.770350-03:00"
+    },
+    {
+        "dni": "33895069",
+        "consulta_medica": "control cx de orzuelo od inferior\ntodo ok\ncontinua cio quidex unguento cada 6hs",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 76,
+        "fecha_creacion": "2025-07-16T14:57:04.270079-03:00"
+    },
+    {
+        "dni": "46741544",
+        "consulta_medica": "od -1.50 -2.50*10 10/10\noi -1.00 -2.00*165 9/10\ncorre y estudios ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 77,
+        "fecha_creacion": "2025-07-16T15:03:01.349629-03:00"
+    },
+    {
+        "dni": "26705451",
+        "consulta_medica": "av 10/10\nadd+ 1.75\ncorr y estudios",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 78,
+        "fecha_creacion": "2025-07-16T15:05:54.257859-03:00"
+    },
+    {
+        "dni": "26027050",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 79,
+        "fecha_creacion": "2025-07-16T15:09:10.804148-03:00"
+    },
+    {
+        "dni": "43460699",
+        "consulta_medica": "avod-1.00*5 10/10\noi -1.00 * 0 10/10",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 80,
+        "fecha_creacion": "2025-07-16T15:09:48.232302-03:00"
+    },
+    {
+        "dni": "42824898",
+        "consulta_medica": "av2\nod -0.5*100\noi -0.50*85 10/10",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 81,
+        "fecha_creacion": "2025-07-16T15:14:56.095244-03:00"
+    },
+    {
+        "dni": "47831895",
+        "consulta_medica": "fondo de ojo normal\nconsulta pasada di lentes de descanso",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 82,
+        "fecha_creacion": "2025-07-16T15:18:30.154002-03:00"
+    },
+    {
+        "dni": "41672789",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 83,
+        "fecha_creacion": "2025-07-16T15:18:46.832991-03:00"
+    },
+    {
+        "dni": "27270502",
+        "consulta_medica": "av2\nod -0.75*170 10/10\noi -0.25 *10 10/10\nadd +1.5",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 84,
+        "fecha_creacion": "2025-07-16T15:28:54.940609-03:00"
+    },
+    {
+        "dni": "11661751",
+        "consulta_medica": "od -0..25 -1.00*10 10/10\noi 1.00*1655 10/10\nadd +3",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 85,
+        "fecha_creacion": "2025-07-16T15:36:57.932113-03:00"
+    },
+    {
+        "dni": "18220672",
+        "consulta_medica": "od -0.50 -0.75*80 10/10\noi -0.25 -0.5*100 10/10\nad +2.75 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 86,
+        "fecha_creacion": "2025-07-16T15:42:50.914392-03:00"
+    },
+    {
+        "dni": "47348336",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 87,
+        "fecha_creacion": "2025-07-16T15:44:22.317437-03:00"
+    },
+    {
+        "dni": "43902884",
+        "consulta_medica": "- 0.25  10/10 ao\nlentes de descanso",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 88,
+        "fecha_creacion": "2025-07-16T15:47:30.899637-03:00"
+    },
+    {
+        "dni": "26027050",
+        "consulta_medica": "cvc normal \nfo nromal ao ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 89,
+        "fecha_creacion": "2025-07-16T15:52:18.738292-03:00"
+    },
+    {
+        "dni": "30085692",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 90,
+        "fecha_creacion": "2025-07-16T15:54:12.762509-03:00"
+    },
+    {
+        "dni": "41672789",
+        "consulta_medica": "cvc normal ao \nfo normal\npio 14 ao",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 91,
+        "fecha_creacion": "2025-07-16T15:55:28.704584-03:00"
+    },
+    {
+        "dni": "22179610",
+        "consulta_medica": "av 10/10\nadd +2.25\ncito fo ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 92,
+        "fecha_creacion": "2025-07-16T16:00:03.279762-03:00"
+    },
+    {
+        "dni": "53301677",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 93,
+        "fecha_creacion": "2025-07-16T16:02:00.344822-03:00"
+    },
+    {
+        "dni": "47348336",
+        "consulta_medica": "av 10/10\ndaltonismo\ncvc normal ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 94,
+        "fecha_creacion": "2025-07-16T16:03:56.956034-03:00"
+    },
+    {
+        "dni": "18003386",
+        "consulta_medica": "control exeresis quiste palpebral\ntodo ojk\ncontinua con eritromiicna crema cada 6hs",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 95,
+        "fecha_creacion": "2025-07-16T16:08:14.617278-03:00"
+    },
+    {
+        "dni": "22179610",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 96,
+        "fecha_creacion": "2025-07-16T16:13:43.646572-03:00"
+    },
+    {
+        "dni": "38518541",
+        "consulta_medica": "le dijeron glaucoma se pone timolom\nav2\nod -0.50 -1.00*150 10/10\noi -0.50 -1.00*180 10/10\npio 14 no se pone las gotas hace 15 dias\nindico corr y estudios ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 97,
+        "fecha_creacion": "2025-07-16T16:16:36.030169-03:00"
+    },
+    {
+        "dni": "23192312",
+        "consulta_medica": "av\nod +0.25 10/10\noi +0.50 10/10\nadd +2.00 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 98,
+        "fecha_creacion": "2025-07-16T16:21:40.138244-03:00"
+    },
+    {
+        "dni": "36312757",
+        "consulta_medica": "ve borroso oi\nav\nod 10/10\noi 9/10 no mejora\nbmc queratitis inferior +",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 99,
+        "fecha_creacion": "2025-07-16T16:28:50.252110-03:00"
+    },
+    {
+        "dni": "29955135",
+        "consulta_medica": "av 10/10 \nad +1.25",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 100,
+        "fecha_creacion": "2025-07-16T16:32:02.920307-03:00"
+    },
+    {
+        "dni": "25391795",
+        "consulta_medica": "sospcecha penfigoide\ncito posadas para toma de biopsia",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 101,
+        "fecha_creacion": "2025-07-16T16:37:17.039324-03:00"
+    },
+    {
+        "dni": "42528131",
+        "consulta_medica": "operada de stsrabismio\nav2\nod 0.75 -0.5*40 10/10\noi -0.50 10/10\n",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 102,
+        "fecha_creacion": "2025-07-16T16:44:21.796545-03:00"
+    },
+    {
+        "dni": "38191428",
+        "consulta_medica": "-0.50 *0 \noi -0.50*75 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 103,
+        "fecha_creacion": "2025-07-16T16:47:41.367686-03:00"
+    },
+    {
+        "dni": "30085692",
+        "consulta_medica": "cvc normal\nfo normal ao ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 104,
+        "fecha_creacion": "2025-07-16T16:50:16.811059-03:00"
+    },
+    {
+        "dni": "53301677",
+        "consulta_medica": "cvc normal ao \nfondo de ojo normal \n",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 105,
+        "fecha_creacion": "2025-07-16T16:52:47.642704-03:00"
+    },
+    {
+        "dni": "46580123",
+        "consulta_medica": "av cscsc 10/10\nflotarodes ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 106,
+        "fecha_creacion": "2025-07-16T16:56:05.995458-03:00"
+    },
+    {
+        "dni": "29955135",
+        "consulta_medica": "fo normal ao \npio 14",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 107,
+        "fecha_creacion": "2025-07-16T16:59:25.969270-03:00"
+    },
+    {
+        "dni": "30315016",
+        "consulta_medica": "av2\nod -1.00 *0 10/10\noi -0.50 *80 10/10\nadd +1.5",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 108,
+        "fecha_creacion": "2025-07-16T17:03:50.723232-03:00"
+    },
+    {
+        "dni": "43999481",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Julieta Colom",
+        "id": 109,
+        "fecha_creacion": "2025-07-16T17:05:47.267266-03:00"
+    },
+    {
+        "dni": "45283891",
+        "consulta_medica": "av2\n-1.00 -1.00 *5 10/10\noi -0.50 1.00 * 0",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 110,
+        "fecha_creacion": "2025-07-16T17:08:23.744714-03:00"
+    },
+    {
+        "dni": "22179610",
+        "consulta_medica": "fo normal ao cvcnormal",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 111,
+        "fecha_creacion": "2025-07-16T17:16:12.905329-03:00"
+    },
+    {
+        "dni": "40134796",
+        "consulta_medica": "od +0.50 -1.00 *0 10/120\noi +0.50 1.25*45 10/10 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 112,
+        "fecha_creacion": "2025-07-16T17:22:29.271532-03:00"
+    },
+    {
+        "dni": "11348696",
+        "consulta_medica": "preqx ok\nentrego conseminiteno e indicaciones para cx de catarata ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 113,
+        "fecha_creacion": "2025-07-16T17:34:25.087916-03:00"
+    },
+    {
+        "dni": "55501483",
+        "consulta_medica": "trauma ocular\nav 10/10\nbcm inyecc conjunti\nineiido eritr y turno fo ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 114,
+        "fecha_creacion": "2025-07-16T17:37:51.564703-03:00"
+    },
+    {
+        "dni": "58495489",
+        "consulta_medica": "fo noral ao \ndi +0.75 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 115,
+        "fecha_creacion": "2025-07-16T17:42:37.782529-03:00"
+    },
+    {
+        "dni": "43999481",
+        "consulta_medica": "paciente oeprwada de refractivca hace 10 dias\nav normal\ncvc normal\ngendarmeria",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 116,
+        "fecha_creacion": "2025-07-16T17:47:59.818760-03:00"
+    },
+    {
+        "dni": "47348336",
+        "consulta_medica": "fo noral ao ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 117,
+        "fecha_creacion": "2025-07-16T17:48:34.398054-03:00"
+    },
+    {
+        "dni": "36022381",
+        "consulta_medica": "conjuntivitis viral oi\nav 10/10\n quidex ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 118,
+        "fecha_creacion": "2025-07-16T17:49:16.710136-03:00"
+    },
+    {
+        "dni": "38827236",
+        "consulta_medica": "av\nod -3.00 2.00*0 10/10\noi 3.50 10/10\ncvc normal ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 119,
+        "fecha_creacion": "2025-07-16T18:02:55.057869-03:00"
+    },
+    {
+        "dni": "18003221",
+        "consulta_medica": "av\nod +0.25 \noi +0.50 -0.50*0 10/10\nadd +2.5",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 120,
+        "fecha_creacion": "2025-07-16T18:07:07.902359-03:00"
+    },
+    {
+        "dni": "24412048",
+        "consulta_medica": "av2\nod 0.5*0 10/10\noi -0.75 *80 10/10\nadd+2 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 121,
+        "fecha_creacion": "2025-07-16T18:11:51.175544-03:00"
+    },
+    {
+        "dni": "48361832",
+        "consulta_medica": "av2\n -0.25 -2.00 *0 10/10\noi -0.50 -2.75*0 10/10 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 122,
+        "fecha_creacion": "2025-07-16T18:16:24.482071-03:00"
+    },
+    {
+        "dni": "24191820",
+        "consulta_medica": "av\nod +1.25 10/10\noi +100 120/210\nadd +1.75 ",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 123,
+        "fecha_creacion": "2025-07-16T18:21:22.887618-03:00"
+    },
+    {
+        "dni": "44299028",
+        "consulta_medica": "od -0.50 *0 10/10\noi -0.25 *165 10/110",
+        "fecha_consulta": "2025-07-16",
+        "medico": "Francisco Colom",
+        "id": 124,
+        "fecha_creacion": "2025-07-16T18:26:08.938368-03:00"
+    },
+    {
+        "dni": "33638455",
+        "consulta_medica": "amv cd -1.25 -1.25 x 20 10/10\noi -0.75 -1.25 x 15 10/10\n\npinguecula oi but disminuido\n\n",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 125,
+        "fecha_creacion": "2025-07-17T09:45:44.253860-03:00"
+    },
+    {
+        "dni": "56871465",
+        "consulta_medica": "av 10/10 ao\nbmc sp\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 126,
+        "fecha_creacion": "2025-07-17T09:52:19.539868-03:00"
+    },
+    {
+        "dni": "57667016",
+        "consulta_medica": "TEA\nav 20/30 monoocular\nbmc sp\narm no colabora\ncito a fo control",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 127,
+        "fecha_creacion": "2025-07-17T10:04:05.517436-03:00"
+    },
+    {
+        "dni": "59519513",
+        "consulta_medica": "av 10/10 ao\narmcc+1.25 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 128,
+        "fecha_creacion": "2025-07-17T10:40:13.561391-03:00"
+    },
+    {
+        "dni": "70697535",
+        "consulta_medica": "nt paeg\nfo normal ao\ncontrol en 6 meses",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 129,
+        "fecha_creacion": "2025-07-17T10:43:44.032405-03:00"
+    },
+    {
+        "dni": "42390142",
+        "consulta_medica": "hipotiroidismo\navmc od -0.50 -0.50 x 10\noi -0.50 -0.50 x 170 10/10\n\nbmc papilas\n\ndoy olopatadina cada 24 hs + lubric",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 130,
+        "fecha_creacion": "2025-07-17T10:52:32.824598-03:00"
+    },
+    {
+        "dni": "26259345",
+        "consulta_medica": "avmc od -1.25 -0.50 x 80  10/10\noi -0.75 -1.75 x 35 10/10\ncerca add +1.50 ao\nmultifocales\n\nbmc blefaritis anterior",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 131,
+        "fecha_creacion": "2025-07-17T11:07:56.190728-03:00"
+    },
+    {
+        "dni": "70724807",
+        "consulta_medica": "NT PAEG\nFO NORMAL AO\nCONTROL EN 6 MESES",
+        "fecha_consulta": "2025-07-17",
+        "medico": "Marianela Bobbiesi",
+        "id": 132,
+        "fecha_creacion": "2025-07-17T11:14:50.230760-03:00"
+    },
+    {
+        "dni": "29782145",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 133,
+        "fecha_creacion": "2025-07-18T17:11:05.729120-03:00"
+    },
+    {
+        "dni": "28623216",
+        "consulta_medica": "MC: CONTROL\n\nAV LEJOS 10/10 AO\n\nAV CERCA +1.50 AO (J2)\n\nPENDIENTE FO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 134,
+        "fecha_creacion": "2025-07-18T17:17:07.576038-03:00"
+    },
+    {
+        "dni": "51495016",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 135,
+        "fecha_creacion": "2025-07-18T17:19:57.186257-03:00"
+    },
+    {
+        "dni": "42410164",
+        "consulta_medica": "MC: VISION BORROSA DE NOCHE\n\nAP: RETINITIS PIGMENTARIA EN ABUELO\n\nAV (SE SIENTE MAS COMODA SIN ANTEOJOS)\nOD 10/10\nOI 10/10\n\nPLAN\nINDICO LUBRICANTE OCULAR\nPENDIENTE FONDO DE OJOS",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 136,
+        "fecha_creacion": "2025-07-18T17:30:03.601033-03:00"
+    },
+    {
+        "dni": "42390142",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 137,
+        "fecha_creacion": "2025-07-18T17:35:36.151938-03:00"
+    },
+    {
+        "dni": "28329314",
+        "consulta_medica": "MC: TRAUMA OCULAR OI DE 24 HS DE EVOLUCION. EN TTO CON TROPIOFTAL CADA 8 HS + PREDNISOLONA CADA 2 HS\n\nMOVIMIENTOS OCULARES CONSERVADOS\nSIN DOLOR\nSIN DIPLOPIA\n\nACUDE BAJO DILATACION FARMACOLOGICA\n\nAV\n10/10 AO\n\nSE REALIZA FO OI\nPAPILA BORDES NETOS Y DEFINIDOS\nEXCAVACION 0.2\nRESTO SIN PARTICULARIDADES\n\nCITO A CONTROL DIA LUNES\nDOY PAUTAS DE ALARMA",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 138,
+        "fecha_creacion": "2025-07-18T17:45:28.345656-03:00"
+    },
+    {
+        "dni": "33443116",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 139,
+        "fecha_creacion": "2025-07-18T17:51:09.526269-03:00"
+    },
+    {
+        "dni": "31059376",
+        "consulta_medica": "OD NEUTRO (10/10)\nOI -0.75 X 20 (10/10)\n\nADD +1.00 J2 AO\n\nPENDIENTE FO + CAMPO\nVERRUGAS AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 140,
+        "fecha_creacion": "2025-07-18T17:54:29.203998-03:00"
+    },
+    {
+        "dni": "29782145",
+        "consulta_medica": "MC: FONDO DE OJOS\nPAPILA DE BORDES NETOS Y DEFINIDOS EXC 0.2 RESTO S/P AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 141,
+        "fecha_creacion": "2025-07-18T17:59:59.560155-03:00"
+    },
+    {
+        "dni": "38180937",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 142,
+        "fecha_creacion": "2025-07-18T18:03:28.170205-03:00"
+    },
+    {
+        "dni": "28351009",
+        "consulta_medica": "AV CERCA +1.25 AO (J2)\n\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 143,
+        "fecha_creacion": "2025-07-18T18:07:36.128840-03:00"
+    },
+    {
+        "dni": "42390142",
+        "consulta_medica": "ACUDE A FONDO DE OJOS\nPAPILA DE BORDES NETOS Y DEFINIDOS AO. EXC 0.2 AO RESTO S/P AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 144,
+        "fecha_creacion": "2025-07-18T18:14:08.652716-03:00"
+    },
+    {
+        "dni": "95719159",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 145,
+        "fecha_creacion": "2025-07-18T18:17:40.234076-03:00"
+    },
+    {
+        "dni": "42886568",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 146,
+        "fecha_creacion": "2025-07-18T18:26:30.934737-03:00"
+    },
+    {
+        "dni": "54830747",
+        "consulta_medica": "MC: ACUDE PARA NUEVOS ANTEOJOS\nOD -2.25 X 15 (10/10)\n OI  -1.75 X 175 (10/10)\n\nREALIZO FO FEB 2025",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 147,
+        "fecha_creacion": "2025-07-18T18:30:51.305377-03:00"
+    },
+    {
+        "dni": "32655301",
+        "consulta_medica": "MC: OJO ROJO AO\n\nBMC\nINYECCION CONJUNTIVAL AO\nFOLICULOS EN CONJUNTIVA TARSAL INFERIOR AO\n\nDX CONJUNTIVITIS\n\nINDICO CIPRO+DEXA CADA 4 HS. CONTROL EN 7 DIAS PARA NUEVA VALORACION Y  REFRACCION",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 148,
+        "fecha_creacion": "2025-07-18T18:37:34.249235-03:00"
+    },
+    {
+        "dni": "56354080",
+        "consulta_medica": "MC: FONDO DE OJOS NORMAL. PAPILA DE BORDES NETOS AO . EXCAVACION 0.2 AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 149,
+        "fecha_creacion": "2025-07-18T18:40:36.004164-03:00"
+    },
+    {
+        "dni": "26399174",
+        "consulta_medica": "MC: FONDO DE OJOS. PAPILA BORDES NETOS Y DEFINIDOS AO. EXCAVACION 0.3 AO. RESTO NORMAL",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 150,
+        "fecha_creacion": "2025-07-18T18:43:49.168417-03:00"
+    },
+    {
+        "dni": "45494680",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 151,
+        "fecha_creacion": "2025-07-18T18:48:10.023564-03:00"
+    },
+    {
+        "dni": "24258997",
+        "consulta_medica": "MC: FONDO DE OJOS. PAPILA DE BORDES NETOS Y DEFINIDOS AO. EXC 0.2 AO RESTO NORMAL",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 152,
+        "fecha_creacion": "2025-07-18T18:48:25.929147-03:00"
+    },
+    {
+        "dni": "32724498",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 153,
+        "fecha_creacion": "2025-07-18T18:54:06.350640-03:00"
+    },
+    {
+        "dni": "31635545",
+        "consulta_medica": "AV LEJOS\nOD - 0.50 (10/10)\nOI -0.25 (10/10)\n\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 154,
+        "fecha_creacion": "2025-07-18T18:55:54.060618-03:00"
+    },
+    {
+        "dni": "37818601",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Julieta Colom",
+        "id": 155,
+        "fecha_creacion": "2025-07-18T18:59:03.565944-03:00"
+    },
+    {
+        "dni": "32618124",
+        "consulta_medica": "MC: QUIERE ANTEOJOS\n\nOD -0.50 X 90 (10/10)\nOI -0.50 X 85 (10/10)",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 156,
+        "fecha_creacion": "2025-07-18T19:02:26.311491-03:00"
+    },
+    {
+        "dni": "33443116",
+        "consulta_medica": "MC: FONDO DE OJOS. REFIERE CEFALEA DE HACE 2 SEMANAS\n\nPAPILA DE BORDES DIFUSOS EN REGION TEMPORAL\nPAPILA DE BORDES NETOS Y DEFINIDOS OI\nEXCAVACION 0.2\n\nDOY PAUTAS DE ALARMA\nINDICO CONCURRIR A GUARDIA PARA REALIZAR NEUROIMAGEN",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 157,
+        "fecha_creacion": "2025-07-18T19:10:05.970818-03:00"
+    },
+    {
+        "dni": "38180937",
+        "consulta_medica": "FONDO DE OJOS PAPILA BORDES NETOS Y DEFINIDOS AO EXC 0.2",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 158,
+        "fecha_creacion": "2025-07-18T19:16:41.205053-03:00"
+    },
+    {
+        "dni": "95719159",
+        "consulta_medica": "FONDO DE OJOS: PAPILA DE BORDES NETOS Y DEFINIDOS AO EXC 0.2 AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 159,
+        "fecha_creacion": "2025-07-18T19:18:32.009164-03:00"
+    },
+    {
+        "dni": "45494680",
+        "consulta_medica": "FONDO DE OJOS: PAPILA BORDES NETOS Y DEFINIDOS AO EXC 0.4 AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 160,
+        "fecha_creacion": "2025-07-18T19:21:11.035581-03:00"
+    },
+    {
+        "dni": "42886568",
+        "consulta_medica": "FONDO DE OJOS: PAPILA BORDES NETOS Y DEFINIDOS AO EXC 0.4 AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 161,
+        "fecha_creacion": "2025-07-18T19:24:53.243570-03:00"
+    },
+    {
+        "dni": "37818601",
+        "consulta_medica": "FONDO DE OJOS: PAPILA BORDES NETOS Y DEFINIDOS AO EXC 0.3 AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 162,
+        "fecha_creacion": "2025-07-18T19:33:15.859688-03:00"
+    },
+    {
+        "dni": "32724498",
+        "consulta_medica": "FONDO DE OJOS: PAPILA BORDES NETOS Y DEFINIDOS AO EXC 0.3 AO",
+        "fecha_consulta": "2025-07-18",
+        "medico": "Juan Julian",
+        "id": 163,
+        "fecha_creacion": "2025-07-18T19:36:19.819928-03:00"
+    },
+    {
+        "dni": "44081443",
+        "consulta_medica": "avmc od -0.75 10/10\noi -1.25 10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 164,
+        "fecha_creacion": "2025-07-21T16:12:48.934725-03:00"
+    },
+    {
+        "dni": "58907723",
+        "consulta_medica": "px serrano desde bebe\nav 20/20 ao\narmcc +1.00 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 165,
+        "fecha_creacion": "2025-07-21T16:18:30.869140-03:00"
+    },
+    {
+        "dni": "27769619",
+        "consulta_medica": "av 10/10 ao\nbmc sp",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 166,
+        "fecha_creacion": "2025-07-21T16:22:49.081936-03:00"
+    },
+    {
+        "dni": "59191797",
+        "consulta_medica": "mc: orzuelos a repeticion\n\nav 20/20 ao\narm +0.50 -0.50 zx 180\nbmc orzuelo pequeño en tratamiento con tobra dexa unguento\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 167,
+        "fecha_creacion": "2025-07-21T16:30:10.547305-03:00"
+    },
+    {
+        "dni": "52615705",
+        "consulta_medica": "avmc od -4.00 x 170  10/10\noi +1.00 -4.00 x 10  10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 168,
+        "fecha_creacion": "2025-07-21T16:36:20.731348-03:00"
+    },
+    {
+        "dni": "49251667",
+        "consulta_medica": "avmc od -1.00 -3.00 x 170\noi -2.00 x 0 10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 169,
+        "fecha_creacion": "2025-07-21T16:40:17.188124-03:00"
+    },
+    {
+        "dni": "52242017",
+        "consulta_medica": "av 10/10 ao\nbmc sp",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 170,
+        "fecha_creacion": "2025-07-21T16:42:01.991531-03:00"
+    },
+    {
+        "dni": "36399826",
+        "consulta_medica": "avmc od -11.00 1/10\noi -5.00 10/10\ndoy -5.00 ao\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 171,
+        "fecha_creacion": "2025-07-21T16:46:49.015937-03:00"
+    },
+    {
+        "dni": "43102235",
+        "consulta_medica": "fo normal ao",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 172,
+        "fecha_creacion": "2025-07-21T16:49:44.520497-03:00"
+    },
+    {
+        "dni": "53606030",
+        "consulta_medica": "dbt tipo 1\nav 10/10 doy -0.50 x 180 dedescanso\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 173,
+        "fecha_creacion": "2025-07-21T16:54:40.516378-03:00"
+    },
+    {
+        "dni": "34692022",
+        "consulta_medica": "avmc od -1.00 -1.25 x 90  10/10\noi -0.50 -1.50 x 90 10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 174,
+        "fecha_creacion": "2025-07-21T17:00:22.813856-03:00"
+    },
+    {
+        "dni": "57389899",
+        "consulta_medica": "1/7/25 hice fo  di graduacion de cicloplejia -3.50 ao 20/20 a\nfo normal ao\ncontrol en 6 meses",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 175,
+        "fecha_creacion": "2025-07-21T17:03:47.913647-03:00"
+    },
+    {
+        "dni": "57294745",
+        "consulta_medica": "av 10/10 ao\nbmcorzuelo pequeño en ps od\ndoy eritro unguento 4 veces al dia\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 176,
+        "fecha_creacion": "2025-07-21T17:07:14.345695-03:00"
+    },
+    {
+        "dni": "56405114",
+        "consulta_medica": "av 10/10 ao\nbmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 177,
+        "fecha_creacion": "2025-07-21T17:13:09.597573-03:00"
+    },
+    {
+        "dni": "53994076",
+        "consulta_medica": "av 10/10 ao\nbmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 178,
+        "fecha_creacion": "2025-07-21T17:14:38.649657-03:00"
+    },
+    {
+        "dni": "28776796",
+        "consulta_medica": "av 10/10 ao\ncerca +1.25 ao j2",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 179,
+        "fecha_creacion": "2025-07-21T17:18:27.568516-03:00"
+    },
+    {
+        "dni": "70354945",
+        "consulta_medica": "consulta porque una hermana tiene estrabismo, para descartar estrabismo en el bb\nhirschberg centrado\nfo normal\ncontrol anual",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 180,
+        "fecha_creacion": "2025-07-21T17:27:28.504270-03:00"
+    },
+    {
+        "dni": "70638656",
+        "consulta_medica": "fo normal ao\ncontrol en 6 meses",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 181,
+        "fecha_creacion": "2025-07-21T17:30:31.105668-03:00"
+    },
+    {
+        "dni": "44258952",
+        "consulta_medica": "se quiere operar refractiva\navmc \nod -7.00 -1.25 x 20 10/10\noi -6.00 -1.50 x 20 10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 182,
+        "fecha_creacion": "2025-07-21T17:42:17.086884-03:00"
+    },
+    {
+        "dni": "39409614",
+        "consulta_medica": "avmc -1.25 x 180 ao 10/10 ao",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 183,
+        "fecha_creacion": "2025-07-21T17:47:52.775570-03:00"
+    },
+    {
+        "dni": "48796192",
+        "consulta_medica": "AVMC -0.75 X 180 AO 10/10 AO",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 184,
+        "fecha_creacion": "2025-07-21T17:53:26.762169-03:00"
+    },
+    {
+        "dni": "57084309",
+        "consulta_medica": "av 10/10 ao\nbmc alergiA\nfo normal ao\narmcc +1.00 ao\nolopatadina cada 24 hs",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 185,
+        "fecha_creacion": "2025-07-21T17:58:14.061948-03:00"
+    },
+    {
+        "dni": "57093158",
+        "consulta_medica": "px serrano\nxt\nusa -1.50 x 180 ao 10/10 ao\ncon anteojo no desvia\narmcc +1.00 -1.75 x 180 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 186,
+        "fecha_creacion": "2025-07-21T18:01:49.540595-03:00"
+    },
+    {
+        "dni": "31145291",
+        "consulta_medica": "refiuere ver borroso od por momentos, consulto 2 veces en nano le dieron lubricacion\npersonalidad tipo A\nav con su correccion 10/10 ao\nfo normal ao\nsolicito oct macular\ncito con resultados para refraccion",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 187,
+        "fecha_creacion": "2025-07-21T18:10:52.995986-03:00"
+    },
+    {
+        "dni": "59826462",
+        "consulta_medica": "conjuntivitis infecciosa\ntobramicina cada 4 hs por 7 dias\ncito a fo",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 188,
+        "fecha_creacion": "2025-07-21T18:13:29.312024-03:00"
+    },
+    {
+        "dni": "57299718",
+        "consulta_medica": "alergia lagañas le pican los ojos\nav 10/10 ao\nbmc papilas +++\nolopatadina cada 24 hs + loteprednol cada 12 hs\ncito a fo control",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 189,
+        "fecha_creacion": "2025-07-21T18:20:32.231912-03:00"
+    },
+    {
+        "dni": "40395174",
+        "consulta_medica": "-3.00 x 180 ao 10/10 ao",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 190,
+        "fecha_creacion": "2025-07-21T18:27:02.619489-03:00"
+    },
+    {
+        "dni": "45867828",
+        "consulta_medica": "no usa anteojos\n\nav1 od 7/10 oi 9/10\n\navmc \nod -1.50 x 165 10/10\noi -1.25 x 5 10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 191,
+        "fecha_creacion": "2025-07-21T18:32:43.570220-03:00"
+    },
+    {
+        "dni": "41972442",
+        "consulta_medica": "avmc od -0.75 10/10\noi -0.50 10/10",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 192,
+        "fecha_creacion": "2025-07-21T18:38:12.151088-03:00"
+    },
+    {
+        "dni": "29720164",
+        "consulta_medica": "operada de lasi se quiere volver a operar\navmc \nod -2.00 10/10\noi -0.50 10/10\ntolera\ncerca j2 con correccion\n",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 193,
+        "fecha_creacion": "2025-07-21T18:46:34.553221-03:00"
+    },
+    {
+        "dni": "70105638",
+        "consulta_medica": "fo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-21",
+        "medico": "Marianela Bobbiesi",
+        "id": 194,
+        "fecha_creacion": "2025-07-21T18:49:50.648050-03:00"
+    },
+    {
+        "dni": "42948277",
+        "consulta_medica": "avmc od -0.50 x20\noi -0.25 10/10 ao",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 195,
+        "fecha_creacion": "2025-07-22T15:12:27.683888-03:00"
+    },
+    {
+        "dni": "44384403",
+        "consulta_medica": "avmc od -1.25 x 165 10/10\noi -1.50 x 10 10/10\nolopatadina cada 24 hs",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 196,
+        "fecha_creacion": "2025-07-22T15:24:04.691629-03:00"
+    },
+    {
+        "dni": "55953600",
+        "consulta_medica": "esotropia hace 2 años\nse hizo control completo en nano hace 2 meses le indicaron +2.00 ao ve 10/10 ao\ncito a fo + armcc\npresenta orden de cx en obra social",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 197,
+        "fecha_creacion": "2025-07-22T15:33:58.867557-03:00"
+    },
+    {
+        "dni": "22799771",
+        "consulta_medica": "mc ojos rojos\nse realizo anteojos hace 2 meses\nbmc pteri grado 1/2 nasal ao\ndoy loteprednol cada 12 hs por 3 dias\naucic plus cada 6 hs\nciclosporina cada 24 hs\ncontrol en 15 dias",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 198,
+        "fecha_creacion": "2025-07-22T15:43:34.594415-03:00"
+    },
+    {
+        "dni": "41028322",
+        "consulta_medica": "avmc od -1.75 x 170\noi -1.75 x 10 10/10 ao\nalergia\nolopatadina + loteprednol cada 12 hs\n",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 199,
+        "fecha_creacion": "2025-07-22T15:50:54.187762-03:00"
+    },
+    {
+        "dni": "55801688",
+        "consulta_medica": "emetrope\ncito a fo control",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 200,
+        "fecha_creacion": "2025-07-22T15:52:24.788829-03:00"
+    },
+    {
+        "dni": "25483301",
+        "consulta_medica": "acv x hta en 2022\nhipotiroidismo\navmc od -0.75 ao 10/10\ncerca add +1.75 ao j2\nfo excavacion 0.5\noi 0.3\nresto sp\nsolicito cv oct papilar y cito a toma de pio",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 201,
+        "fecha_creacion": "2025-07-22T15:58:56.288558-03:00"
+    },
+    {
+        "dni": "29873189",
+        "consulta_medica": "anteojos para computadora\n-0.25 x 180 ao 10/10 ao\n",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 202,
+        "fecha_creacion": "2025-07-22T16:08:04.008892-03:00"
+    },
+    {
+        "dni": "53379017",
+        "consulta_medica": "emetrope",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 203,
+        "fecha_creacion": "2025-07-22T16:11:31.689445-03:00"
+    },
+    {
+        "dni": "55563090",
+        "consulta_medica": "av 10/10 ao\nbmc alergia\nolopatadina cada 214 hs",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 204,
+        "fecha_creacion": "2025-07-22T16:13:09.949458-03:00"
+    },
+    {
+        "dni": "49961188",
+        "consulta_medica": "usa od -2.50 x 180\noi -3.50 x 180 10/10 binocular\n\nbmc sp\n",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 205,
+        "fecha_creacion": "2025-07-22T16:15:14.999723-03:00"
+    },
+    {
+        "dni": "26287951",
+        "consulta_medica": "hipotiroidismo ojo seco\n\navmc od +1.25 10/10\noi +1.75 10/10\ncerca add +1.75 ao j2\nmultifocal\nlubricacion\ncito a fo + cv",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 206,
+        "fecha_creacion": "2025-07-22T16:23:55.540152-03:00"
+    },
+    {
+        "dni": "53835736",
+        "consulta_medica": "od -1.00 x 15 10/10\noi -1.00 x 180 10/10",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 207,
+        "fecha_creacion": "2025-07-22T16:29:48.413078-03:00"
+    },
+    {
+        "dni": "47413704",
+        "consulta_medica": "avmc -0.50 ao 10/10 ao",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 208,
+        "fecha_creacion": "2025-07-22T16:32:29.904419-03:00"
+    },
+    {
+        "dni": "56048359",
+        "consulta_medica": "mc cefalea no usa anteojos\nav1 5/10 ao\navmc od -2.75 x 5 10/10\noi -2.00 x 175 10/10\ncito a fo control",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 209,
+        "fecha_creacion": "2025-07-22T16:41:19.366242-03:00"
+    },
+    {
+        "dni": "70648180",
+        "consulta_medica": "fo normal ao\ncontrol en 6 meses",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 210,
+        "fecha_creacion": "2025-07-22T16:44:36.745738-03:00"
+    },
+    {
+        "dni": "46988238",
+        "consulta_medica": "avmc -0.50 ao 10/10 ao\nbmc but dimsinuido\nlubricacion\ncito a fo control",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 211,
+        "fecha_creacion": "2025-07-22T16:50:31.506973-03:00"
+    },
+    {
+        "dni": "33689315",
+        "consulta_medica": "asma, alergia en los ojos\navmc od -0.75 x 25 10/10\noi -0.75 x 155 10/10\nolopatadina + lubricacion",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 212,
+        "fecha_creacion": "2025-07-22T16:58:46.722049-03:00"
+    },
+    {
+        "dni": "13995559",
+        "consulta_medica": "avmc od+ 2.50 7/10\noi +2.00 10/10\ncerca add +3.00 ao j2",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 213,
+        "fecha_creacion": "2025-07-22T17:07:36.010826-03:00"
+    },
+    {
+        "dni": "17397334",
+        "consulta_medica": "hta\navmc od +0.75 10/10\noi +0.50 10/10\ncerca add +3.00 ao j2\nmultifocal\nbmc sp",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 214,
+        "fecha_creacion": "2025-07-22T17:15:35.781232-03:00"
+    },
+    {
+        "dni": "47431061",
+        "consulta_medica": "estrabismo operado de pequeña\navmc od +4.50 1/10\nio +4.50 10/10\nusa lc",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 215,
+        "fecha_creacion": "2025-07-22T17:31:03.463560-03:00"
+    },
+    {
+        "dni": "39295175",
+        "consulta_medica": "avmc -0.50 x 180 ao 10/10 ao",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 216,
+        "fecha_creacion": "2025-07-22T17:39:47.098146-03:00"
+    },
+    {
+        "dni": "43777272",
+        "consulta_medica": "leucoma corneal central por viruta od\n\navmc od -0.75 x 5 10/10\noi -0.75 x 175 10/10",
+        "fecha_consulta": "2025-07-22",
+        "medico": "Marianela Bobbiesi",
+        "id": 217,
+        "fecha_creacion": "2025-07-22T17:40:20.747912-03:00"
+    },
+    {
+        "dni": "43461340",
+        "consulta_medica": "av2\nod -8.00 -1.25*20 10/10\noi -12.00 -1.25*175 10/10\nlio multifo o rango ext 2500 us",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 218,
+        "fecha_creacion": "2025-07-23T15:16:46.213129-03:00"
+    },
+    {
+        "dni": "48925163",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Julieta Colom",
+        "id": 219,
+        "fecha_creacion": "2025-07-23T15:17:54.367450-03:00"
+    },
+    {
+        "dni": "26358226",
+        "consulta_medica": "dbt en estudio\nfo normal ao ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 220,
+        "fecha_creacion": "2025-07-23T15:20:25.761463-03:00"
+    },
+    {
+        "dni": "39283945",
+        "consulta_medica": "od -1.50*165 10/10\noi -0.25 -1.50*15 10/10\n",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 221,
+        "fecha_creacion": "2025-07-23T15:26:50.819231-03:00"
+    },
+    {
+        "dni": "53606030",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Julieta Colom",
+        "id": 222,
+        "fecha_creacion": "2025-07-23T15:28:40.314454-03:00"
+    },
+    {
+        "dni": "95946802",
+        "consulta_medica": "orzuelo ao\nindiecio masaje con calor si no mejora exeresis",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 223,
+        "fecha_creacion": "2025-07-23T15:31:41.150663-03:00"
+    },
+    {
+        "dni": "54809000",
+        "consulta_medica": "av2\nod +1.25 -2.50*5 8/10\noi1.50 -3.00*175 8/10",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 224,
+        "fecha_creacion": "2025-07-23T15:40:03.634856-03:00"
+    },
+    {
+        "dni": "27769619",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Julieta Colom",
+        "id": 225,
+        "fecha_creacion": "2025-07-23T15:43:19.858813-03:00"
+    },
+    {
+        "dni": "51060250",
+        "consulta_medica": "av\nod -0.75 -2.25 *20 10/10\noi -0.75 -0.50*175 10/10 ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 226,
+        "fecha_creacion": "2025-07-23T15:46:39.313884-03:00"
+    },
+    {
+        "dni": "40713110",
+        "consulta_medica": "av2\nod -1.25 -0.50*5 10/10\noi -0.75 10/10\nlagrimas ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 227,
+        "fecha_creacion": "2025-07-23T15:53:34.873998-03:00"
+    },
+    {
+        "dni": "45867828",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Julieta Colom",
+        "id": 228,
+        "fecha_creacion": "2025-07-23T15:58:37.155390-03:00"
+    },
+    {
+        "dni": "48925163",
+        "consulta_medica": "cvc normal \nfo normal ao ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 229,
+        "fecha_creacion": "2025-07-23T15:58:50.784064-03:00"
+    },
+    {
+        "dni": "53606030",
+        "consulta_medica": "fo nornal ao \ncvc normal ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 230,
+        "fecha_creacion": "2025-07-23T16:02:20.225808-03:00"
+    },
+    {
+        "dni": "43445127",
+        "consulta_medica": "av2\nod -1.50 -0.50*100 10/10\noi -1.50 -0.25*80 10/10 ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 231,
+        "fecha_creacion": "2025-07-23T16:08:57.956141-03:00"
+    },
+    {
+        "dni": "27769619",
+        "consulta_medica": "cvc normal ao\nfo normal ao ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 232,
+        "fecha_creacion": "2025-07-23T16:19:00.799531-03:00"
+    },
+    {
+        "dni": "45867828",
+        "consulta_medica": "cvc normal \nfo normal ao ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 233,
+        "fecha_creacion": "2025-07-23T16:29:11.890082-03:00"
+    },
+    {
+        "dni": "21672364",
+        "consulta_medica": "av2\nod -1.50 -1.00*55 10/10\npoi -0.50 -0.75*90 10/10 \nj2 cerca sin corr ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 234,
+        "fecha_creacion": "2025-07-23T16:39:36.113203-03:00"
+    },
+    {
+        "dni": "45737812",
+        "consulta_medica": "av2\nod -3.50 -0.25*40 10/10\noi -2.50 -1.00*110 10/10 ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 235,
+        "fecha_creacion": "2025-07-23T16:44:40.255318-03:00"
+    },
+    {
+        "dni": "46580123",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Julieta Colom",
+        "id": 236,
+        "fecha_creacion": "2025-07-23T16:53:49.474717-03:00"
+    },
+    {
+        "dni": "50843605",
+        "consulta_medica": "av2\nod  -3.50 -4.50*5 9/10\noi -3.50 -4.50 * 175 9/10",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 237,
+        "fecha_creacion": "2025-07-23T16:56:56.251017-03:00"
+    },
+    {
+        "dni": "94433608",
+        "consulta_medica": "cascarilla od por accidente\noi -2.00*10 10/10 ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 238,
+        "fecha_creacion": "2025-07-23T17:03:03.340710-03:00"
+    },
+    {
+        "dni": "23005130",
+        "consulta_medica": "fo normal ao ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 239,
+        "fecha_creacion": "2025-07-23T17:08:25.053126-03:00"
+    },
+    {
+        "dni": "41545091",
+        "consulta_medica": "av2 -1.50 -0.50*170 10/10\noi -1.75 -1.75*0 10/10 \n",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 240,
+        "fecha_creacion": "2025-07-23T17:16:20.391485-03:00"
+    },
+    {
+        "dni": "50706595",
+        "consulta_medica": "av2\nod +0.50 1.25*0 10/10\noi +1.50 -3.00*15 10/10\nsi tolera",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 241,
+        "fecha_creacion": "2025-07-23T17:23:36.119611-03:00"
+    },
+    {
+        "dni": "22326682",
+        "consulta_medica": "operada demiopia \nav 10/10\nadd +02.25",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 242,
+        "fecha_creacion": "2025-07-23T17:27:15.588797-03:00"
+    },
+    {
+        "dni": "46580123",
+        "consulta_medica": "cvc normal\nfo normal ao",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 243,
+        "fecha_creacion": "2025-07-23T17:30:00.544900-03:00"
+    },
+    {
+        "dni": "46951335",
+        "consulta_medica": "av2\nod +2.00 -2.50 *85 10/10\noi +1.50 -1.50 *95 10/10",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 244,
+        "fecha_creacion": "2025-07-23T17:37:50.946134-03:00"
+    },
+    {
+        "dni": "21851641",
+        "consulta_medica": "av +1.00 10/10 ao\nadd +2.25 ao",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 245,
+        "fecha_creacion": "2025-07-23T17:48:56.541900-03:00"
+    },
+    {
+        "dni": "38040321",
+        "consulta_medica": "av2\nod -1.50 -2.00*175 10/10\noi -1.25 -3.00*5 10/10 ",
+        "fecha_consulta": "2025-07-23",
+        "medico": "Francisco Colom",
+        "id": 246,
+        "fecha_creacion": "2025-07-23T18:18:28.803167-03:00"
+    },
+    {
+        "dni": "56249495",
+        "consulta_medica": "paciente mio\nesotropia\narmcc +1.25 -1.75 x 136\noi +1.25 -1.50 x 160\n\nhizo parche\ncon anteojos hirschberg centrado \nusa od +1.25\noi +1.25 -1.00  x 160 10/10 ao\n\ncontinua con su correccion control en 6 meses para fo",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 247,
+        "fecha_creacion": "2025-07-24T09:30:07.583428-03:00"
+    },
+    {
+        "dni": "37018650",
+        "consulta_medica": "avmc -0.25 ao 10/10 ao\nbmc alergia\ndoy olopatadina cada 24 hs",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 248,
+        "fecha_creacion": "2025-07-24T09:36:05.680869-03:00"
+    },
+    {
+        "dni": "58371096",
+        "consulta_medica": "av 20/30 ao\narm astigmatismo\ncito a fo + armcc",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 249,
+        "fecha_creacion": "2025-07-24T09:40:12.329000-03:00"
+    },
+    {
+        "dni": "56269939",
+        "consulta_medica": "cefalea orzuelos a repeticion\narmcc +2.5 ao\ndoy +1.50 ao 10/10 ao\ncontrol con anteojos",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 250,
+        "fecha_creacion": "2025-07-24T09:46:33.939757-03:00"
+    },
+    {
+        "dni": "54403255",
+        "consulta_medica": "av 10/10 ao\nbmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 251,
+        "fecha_creacion": "2025-07-24T09:51:08.841633-03:00"
+    },
+    {
+        "dni": "56405114",
+        "consulta_medica": "armcc +1.00 -0.50 x 180 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 252,
+        "fecha_creacion": "2025-07-24T09:55:32.967534-03:00"
+    },
+    {
+        "dni": "53994076",
+        "consulta_medica": "armcc +1.00 -0.50 x 180 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 253,
+        "fecha_creacion": "2025-07-24T09:57:36.443668-03:00"
+    },
+    {
+        "dni": "28776796",
+        "consulta_medica": "fo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 254,
+        "fecha_creacion": "2025-07-24T09:59:56.293525-03:00"
+    },
+    {
+        "dni": "53329432",
+        "consulta_medica": "px serrano\nesotropia\navod +2.25 10/10 oi +2.25 10/10 con graduacion sigue desviando, \narmcc +2.25 ao\nfo normal ao\ntrae preq el cardio salio mal va con nicolas colom para segunda opinion\nsangre ok\nse explica de cx desviacion 1.5 dp",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 255,
+        "fecha_creacion": "2025-07-24T10:05:03.069423-03:00"
+    },
+    {
+        "dni": "42344000",
+        "consulta_medica": "avmc -0.25 x 180 ao 10/10 ao",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 256,
+        "fecha_creacion": "2025-07-24T10:09:43.152474-03:00"
+    },
+    {
+        "dni": "40988480",
+        "consulta_medica": "avmc od -3.00 -2.50 x 5  10/10\noi -3.00 -3.50 x 170  10/10",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 257,
+        "fecha_creacion": "2025-07-24T10:16:39.754934-03:00"
+    },
+    {
+        "dni": "38693488",
+        "consulta_medica": "avmc -0.25 ao 10/10",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 258,
+        "fecha_creacion": "2025-07-24T10:20:54.087672-03:00"
+    },
+    {
+        "dni": "50964393",
+        "consulta_medica": "usa od -0.50 -1.00 x 100 10/10\noi -0.50 -0.75 x 75 10/10\nbmc sp\nfo en 2024, control en 1 año",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 259,
+        "fecha_creacion": "2025-07-24T10:28:22.145085-03:00"
+    },
+    {
+        "dni": "49251667",
+        "consulta_medica": "fo normal ao",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 260,
+        "fecha_creacion": "2025-07-24T10:34:02.824364-03:00"
+    },
+    {
+        "dni": "52615705",
+        "consulta_medica": "fo normala o",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 261,
+        "fecha_creacion": "2025-07-24T10:34:52.001799-03:00"
+    },
+    {
+        "dni": "52242017",
+        "consulta_medica": "fo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 262,
+        "fecha_creacion": "2025-07-24T10:35:49.312456-03:00"
+    },
+    {
+        "dni": "59088916",
+        "consulta_medica": "av 20/20 ao\nbmcsp\ncito a fo control",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 263,
+        "fecha_creacion": "2025-07-24T10:39:56.980660-03:00"
+    },
+    {
+        "dni": "57631167",
+        "consulta_medica": "av 10/10 ao\nbmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 264,
+        "fecha_creacion": "2025-07-24T10:44:40.046030-03:00"
+    },
+    {
+        "dni": "54662840",
+        "consulta_medica": "esotropia\nusa od +0.25 +2.50 x 70  10/10\noi +0.25 +1.75 x 100 10/10\n\npaso 1.5\n\nse va a hacer los prequirurgicos quiere operarse en septiembre\n\n",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 265,
+        "fecha_creacion": "2025-07-24T10:57:57.504159-03:00"
+    },
+    {
+        "dni": "56891122",
+        "consulta_medica": "av 10/10 ao\nbmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 266,
+        "fecha_creacion": "2025-07-24T11:03:17.805960-03:00"
+    },
+    {
+        "dni": "44422114",
+        "consulta_medica": "avmc -0.50 10/10 ao",
+        "fecha_consulta": "2025-07-24",
+        "medico": "Marianela Bobbiesi",
+        "id": 267,
+        "fecha_creacion": "2025-07-24T11:08:20.461371-03:00"
+    },
+    {
+        "dni": "31412282",
+        "consulta_medica": "av 10/10\nadd +0.75 ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 268,
+        "fecha_creacion": "2025-07-25T14:12:56.644960-03:00"
+    },
+    {
+        "dni": "70029201",
+        "consulta_medica": "buena conducta visual\n\nmadre -2.50 10/10 ao ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 269,
+        "fecha_creacion": "2025-07-25T14:17:59.729482-03:00"
+    },
+    {
+        "dni": "41739650",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 270,
+        "fecha_creacion": "2025-07-25T14:19:50.109670-03:00"
+    },
+    {
+        "dni": "13018329",
+        "consulta_medica": "fo normal por dbt\n av22.00 10/10 ao\nad +3",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 271,
+        "fecha_creacion": "2025-07-25T14:24:29.867173-03:00"
+    },
+    {
+        "dni": "24496384",
+        "consulta_medica": "se le clavcio algo en el ojo derechoav2\nod +2.00 1.00*90 10/10\noi +0.50 10/10\nadd +2",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 272,
+        "fecha_creacion": "2025-07-25T14:31:28.720716-03:00"
+    },
+    {
+        "dni": "96186032",
+        "consulta_medica": "Campos vidual entregado ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 273,
+        "fecha_creacion": "2025-07-25T14:33:11.483621-03:00"
+    },
+    {
+        "dni": "42824898",
+        "consulta_medica": "fo normal ao ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 274,
+        "fecha_creacion": "2025-07-25T14:34:10.950300-03:00"
+    },
+    {
+        "dni": "43461340",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 275,
+        "fecha_creacion": "2025-07-25T14:36:44.803441-03:00"
+    },
+    {
+        "dni": "38334343",
+        "consulta_medica": "av 10/10\ncolores normal ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 276,
+        "fecha_creacion": "2025-07-25T14:43:38.017738-03:00"
+    },
+    {
+        "dni": "48042153",
+        "consulta_medica": "av2\nod -5.00 -2.00*15 10/10\noi -5.00 -2.00*160 10/10 ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 277,
+        "fecha_creacion": "2025-07-25T14:49:10.983088-03:00"
+    },
+    {
+        "dni": "26422888",
+        "consulta_medica": "tiorides\nav2\nod +1.00 10/10\noi +1.50 10/10\nadd +1.75 ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 278,
+        "fecha_creacion": "2025-07-25T14:54:16.992678-03:00"
+    },
+    {
+        "dni": "50309108",
+        "consulta_medica": "av 10/10 ao ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 279,
+        "fecha_creacion": "2025-07-25T14:57:24.714133-03:00"
+    },
+    {
+        "dni": "39283945",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 280,
+        "fecha_creacion": "2025-07-25T14:59:28.963694-03:00"
+    },
+    {
+        "dni": "59744101",
+        "consulta_medica": "av 20/30\nchalazion\neritro y masaje con calor ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 281,
+        "fecha_creacion": "2025-07-25T15:01:56.821125-03:00"
+    },
+    {
+        "dni": "41739650",
+        "consulta_medica": "di lentes  -0.75 de astigmatismo\nfo normal ao \ncvc normal",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 282,
+        "fecha_creacion": "2025-07-25T15:05:03.589189-03:00"
+    },
+    {
+        "dni": "43461340",
+        "consulta_medica": "fo normal ao \ncvc normal ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 283,
+        "fecha_creacion": "2025-07-25T15:08:45.174620-03:00"
+    },
+    {
+        "dni": "96186032",
+        "consulta_medica": "fo normal ao ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 284,
+        "fecha_creacion": "2025-07-25T15:12:09.684960-03:00"
+    },
+    {
+        "dni": "13199354",
+        "consulta_medica": "av\nod cd1m catarat cpompleta dsilatacio intermedia grande\noi +2.00 10/10\nfo oi normal\n\ninidco preqx cx 1100 us",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 285,
+        "fecha_creacion": "2025-07-25T15:24:10.492414-03:00"
+    },
+    {
+        "dni": "38285453",
+        "consulta_medica": " 0.25 con- filtro",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 286,
+        "fecha_creacion": "2025-07-25T15:29:01.147164-03:00"
+    },
+    {
+        "dni": "93982089",
+        "consulta_medica": "av2\nod -1.50 -1.50 *15 10/10\noi -1.00 -1.75*165 10/10 ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 287,
+        "fecha_creacion": "2025-07-25T15:33:06.840482-03:00"
+    },
+    {
+        "dni": "39283945",
+        "consulta_medica": "cvc normal\nfo normal ao ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 288,
+        "fecha_creacion": "2025-07-25T15:35:49.818685-03:00"
+    },
+    {
+        "dni": "54403255",
+        "consulta_medica": "fo normal ao ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 289,
+        "fecha_creacion": "2025-07-25T15:39:01.485213-03:00"
+    },
+    {
+        "dni": "36881157",
+        "consulta_medica": "problemsa de superficie\ndolor articulares en estudio por reumatologia y con multiples gotas\nun reumatologo le dijo ar y otro le dijo normal\n\nviene a buscar derivacion con historia clinia\n\nepiescleritis a repeticion que no responde a tratamiento acompañado de dolores fuerrtes de aticulaciones ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 290,
+        "fecha_creacion": "2025-07-25T15:47:50.534743-03:00"
+    },
+    {
+        "dni": "36023952",
+        "consulta_medica": "lupus hdq dbt\nav2\nod -0.75 10/10\noi -0.50 10/10 no doy todavbi\ncvc o ctt",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 291,
+        "fecha_creacion": "2025-07-25T15:53:20.417813-03:00"
+    },
+    {
+        "dni": "22121046",
+        "consulta_medica": "av2\nod 1.25 10/10 \noi -1000 10/10\nadd +1.75 +add +2.5 ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 292,
+        "fecha_creacion": "2025-07-25T15:59:18.582547-03:00"
+    },
+    {
+        "dni": "39711871",
+        "consulta_medica": "av2\nod -1.50 *995 10/10\noi -1.25 *80 10/10 ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 293,
+        "fecha_creacion": "2025-07-25T16:05:24.974563-03:00"
+    },
+    {
+        "dni": "11348696",
+        "consulta_medica": "paga cirugia ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Francisco Colom",
+        "id": 294,
+        "fecha_creacion": "2025-07-25T16:13:40.404972-03:00"
+    },
+    {
+        "dni": "42114231",
+        "consulta_medica": "Campo visual entregado",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 295,
+        "fecha_creacion": "2025-07-25T17:10:37.064009-03:00"
+    },
+    {
+        "dni": "95815388",
+        "consulta_medica": "od -0.25 x 145 (10/10)\noi -0.25 x 45 (10/10)\n\nbmc\npapilas en conjuntiva tarsal inferior ao\nbut disminuido ao\n\nindico traler + lubricante\n",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 296,
+        "fecha_creacion": "2025-07-25T17:12:35.874631-03:00"
+    },
+    {
+        "dni": "41201967",
+        "consulta_medica": "od 0.50 x 20 (10/10)\noi 0.50 x 30 (10/10)\n\nse plantea exeresis de verruga ps oi + quistes de millium\n\npendiente fo cvc",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 297,
+        "fecha_creacion": "2025-07-25T17:20:49.264164-03:00"
+    },
+    {
+        "dni": "47454940",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 298,
+        "fecha_creacion": "2025-07-25T17:23:11.149482-03:00"
+    },
+    {
+        "dni": "14588107",
+        "consulta_medica": "DX PREDIABETES\n\nOD +2.00 (10/10)\nOI +1.75 (10/10)\n\nadd +3.00 j2 (ao)\n\nPENDIENTE FO + CVC\n\n",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 299,
+        "fecha_creacion": "2025-07-25T17:30:26.223441-03:00"
+    },
+    {
+        "dni": "53836445",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 300,
+        "fecha_creacion": "2025-07-25T17:36:20.257884-03:00"
+    },
+    {
+        "dni": "17202934",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 301,
+        "fecha_creacion": "2025-07-25T17:37:08.694576-03:00"
+    },
+    {
+        "dni": "42659191",
+        "consulta_medica": "OD - 0.50 X 115 (10/10)\nOI -0.50 X 25 (10/10)\n\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 302,
+        "fecha_creacion": "2025-07-25T17:38:42.223942-03:00"
+    },
+    {
+        "dni": "42114231",
+        "consulta_medica": "FO O.4 AO MACULA DE BRILLO CONSERVADO AO. RESTO NORMAL AO",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 303,
+        "fecha_creacion": "2025-07-25T17:42:23.501689-03:00"
+    },
+    {
+        "dni": "35957419",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 304,
+        "fecha_creacion": "2025-07-25T17:45:07.331132-03:00"
+    },
+    {
+        "dni": "47456390",
+        "consulta_medica": "OD -1.50 (10/10)\nOI -1.50 (10/10)\n\nPENDIENTE FO",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 305,
+        "fecha_creacion": "2025-07-25T17:47:28.729162-03:00"
+    },
+    {
+        "dni": "47454940",
+        "consulta_medica": "FO PAPILA BORDES NETOS Y DEFINIDOS AO. \nEXC 0.3 AO.\nRESTO NORMAL",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 306,
+        "fecha_creacion": "2025-07-25T17:55:10.196864-03:00"
+    },
+    {
+        "dni": "53836445",
+        "consulta_medica": "FO PAPILA BORDES NETOS Y DEFINIDOS AO\nEXC 0.5 AO\nRESTO NORMAL",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 307,
+        "fecha_creacion": "2025-07-25T17:56:25.062241-03:00"
+    },
+    {
+        "dni": "24258997",
+        "consulta_medica": "Campo visual entregado ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Julieta Colom",
+        "id": 308,
+        "fecha_creacion": "2025-07-25T18:00:57.194426-03:00"
+    },
+    {
+        "dni": "40510850",
+        "consulta_medica": "OD -1.50 X 160 (10/10)\nOI -1.75 X 30(10/10)\n\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 309,
+        "fecha_creacion": "2025-07-25T18:02:30.577227-03:00"
+    },
+    {
+        "dni": "29962006",
+        "consulta_medica": "MC: CONTROL\nAP: GLAUCOMA EN PADRES Y ABUELOS\n\nAV 10/10 PREFIERE NO USAR ANTEOJOS\n\nCERCA J2 SIN CORRECCION\n\nPIO 14 MMHG AO\n\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 310,
+        "fecha_creacion": "2025-07-25T18:09:45.861360-03:00"
+    },
+    {
+        "dni": "20396645",
+        "consulta_medica": "MC: CONTROL\n\nAV CERCA +2.50 AO J2\n\nINDICO LUBRICANTE OCULAR\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 311,
+        "fecha_creacion": "2025-07-25T18:15:19.766126-03:00"
+    },
+    {
+        "dni": "35957419",
+        "consulta_medica": "FONDO DE OJOS\nPAPILA BORDES NETOS Y DEFINIDOS AO\nEXC 0.3 AO\nRESTO NORMAL\n\nCITO PARA EXERESIS DE QUISTES DE MILLIUM",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 312,
+        "fecha_creacion": "2025-07-25T18:20:54.623084-03:00"
+    },
+    {
+        "dni": "33873777",
+        "consulta_medica": "OD - 2.25 X 170(10/10)\nOI '2.25 X 10 (10/10) \n\nPENDIENTE FO ",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 313,
+        "fecha_creacion": "2025-07-25T18:29:01.117948-03:00"
+    },
+    {
+        "dni": "42237380",
+        "consulta_medica": "OD-0.50 (10/10)\nOI - 0.50 (10/10)\n\nPENDIENTE FO + CVC",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 314,
+        "fecha_creacion": "2025-07-25T18:32:46.177519-03:00"
+    },
+    {
+        "dni": "70355570",
+        "consulta_medica": "FONDO DE OJOS\nPAPILA BORDES NETOS AO\nEXC 0.2\nRESTO NORMAL",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 315,
+        "fecha_creacion": "2025-07-25T18:40:14.236523-03:00"
+    },
+    {
+        "dni": "18835084",
+        "consulta_medica": "AV CERCA +1.50 AO (J2)\n\nPENDIENTE FO",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 316,
+        "fecha_creacion": "2025-07-25T18:46:35.091413-03:00"
+    },
+    {
+        "dni": "59651254",
+        "consulta_medica": "MC: TRAUMA CONTUSO CON PELOTA HACE 1 SEMANA OD\n\nBMC\nLEVE ERITEMA EN REGION SUPERCILIAR OD\nCORNEA TRANSPARENTE AO\nRESTO S/P\n\nINDICO TOBRAMICINA + DEXAMETASONA CADA 6 DURANTE 3 DIAS. CONTROL CON FONDO DE OJOS",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 317,
+        "fecha_creacion": "2025-07-25T18:53:37.030705-03:00"
+    },
+    {
+        "dni": "45494680",
+        "consulta_medica": "SE EXTRAE CHALAZION PI OD\nATB UNGUENTO\nPARCHE OCULAR 24 HS LUEGO COMENZAR QUIDEX GOTAS CADA 6. CONTROL EN 1 SEMANA",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 318,
+        "fecha_creacion": "2025-07-25T20:01:58.668470-03:00"
+    },
+    {
+        "dni": "22993159",
+        "consulta_medica": "EXERESIS DE VERRUGA SUPERCILIAR OD",
+        "fecha_consulta": "2025-07-25",
+        "medico": "Juan Julian",
+        "id": 319,
+        "fecha_creacion": "2025-07-25T20:02:54.806733-03:00"
+    },
+    {
+        "dni": "59191797",
+        "consulta_medica": "armcc +1.50 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 320,
+        "fecha_creacion": "2025-07-28T16:07:19.575266-03:00"
+    },
+    {
+        "dni": "53050753",
+        "consulta_medica": "av 10/10 ao\narmcc +1.50 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 321,
+        "fecha_creacion": "2025-07-28T16:18:22.051366-03:00"
+    },
+    {
+        "dni": "55327505",
+        "consulta_medica": "no usa anteojos\navmc od -3.00 x 5\noi -3.00 x 15  10/10 ao\narmc+1.00 -4.00 x 180 ao\nfo normal ao\ndoy correccion control al mes de uso de anteojos",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 322,
+        "fecha_creacion": "2025-07-28T16:19:14.373237-03:00"
+    },
+    {
+        "dni": "58994175",
+        "consulta_medica": "av 20/25 ao\narmcc hipermetropia y astigmatismo fisiologico\nfo polo posterior ok\ncontrol anual",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 323,
+        "fecha_creacion": "2025-07-28T16:19:51.918196-03:00"
+    },
+    {
+        "dni": "57294745",
+        "consulta_medica": "armcc +1.00 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 324,
+        "fecha_creacion": "2025-07-28T16:23:48.984925-03:00"
+    },
+    {
+        "dni": "48796192",
+        "consulta_medica": "fo normal ao",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 325,
+        "fecha_creacion": "2025-07-28T16:26:59.996664-03:00"
+    },
+    {
+        "dni": "24448517",
+        "consulta_medica": "tratamiento ca de mama\navmc od -0.75 x 90\noi -0.75 x 100 10/10 ao\ncerca ad +2.25 ao j2\n\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 326,
+        "fecha_creacion": "2025-07-28T16:37:08.677647-03:00"
+    },
+    {
+        "dni": "49307931",
+        "consulta_medica": "no ve bien pizarron\navmc od -0.50 x 10 10/10\noi -0.75 x 170 10/10\ndoy anteojos para estudio y pantallas",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 327,
+        "fecha_creacion": "2025-07-28T16:44:34.095027-03:00"
+    },
+    {
+        "dni": "59457033",
+        "consulta_medica": "av 20/20 ao\nbmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 328,
+        "fecha_creacion": "2025-07-28T16:49:14.633321-03:00"
+    },
+    {
+        "dni": "47138260",
+        "consulta_medica": "anteojos para estudio y pantallas doy +0.50 ao ve mejor 10/10 ao\nbmc sp\ncito a estudios + fo",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 329,
+        "fecha_creacion": "2025-07-28T16:54:45.426760-03:00"
+    },
+    {
+        "dni": "40293870",
+        "consulta_medica": "avmc od -2.00 -1.50 x 110  10/10\noi -1.25 -1.50 x 80  10/10\n\nbmc papilas +++\n\nolopatadina + lubricacion",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 330,
+        "fecha_creacion": "2025-07-28T17:05:07.953732-03:00"
+    },
+    {
+        "dni": "31636211",
+        "consulta_medica": "av 10/10 ao\ncerca j2 sin correccion bmc sp\ncito a fo control",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 331,
+        "fecha_creacion": "2025-07-28T17:11:15.342724-03:00"
+    },
+    {
+        "dni": "11822506",
+        "consulta_medica": "hta + hipotiroidismo\npx schwap le hace los anteojos\nvino aca por alergia\nrealizo tratamiento y mejoro . ahora quiere tratamiento de mantenimiento\nhizo olopatadina + lote + lubri\nactualmente esta optima doy olopatadina cada 24 y  luego continua solo con lubri\nvuelve si esta molesta\n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 332,
+        "fecha_creacion": "2025-07-28T17:20:18.086992-03:00"
+    },
+    {
+        "dni": "25785228",
+        "consulta_medica": "asma en tto\nav 10/10 ao\ncerca +1.50 ao j2",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 333,
+        "fecha_creacion": "2025-07-28T17:29:51.004155-03:00"
+    },
+    {
+        "dni": "54793855",
+        "consulta_medica": "trauma de puño oi\n\nav 10/10 ao\n\nbmc hemorragia subconjuntival temporal izquierda\n\ncito a fo + estudios el miercoles",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 334,
+        "fecha_creacion": "2025-07-28T17:34:06.586529-03:00"
+    },
+    {
+        "dni": "59088916",
+        "consulta_medica": "armcc +1.00 -1.00 x 180 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 335,
+        "fecha_creacion": "2025-07-28T17:37:50.866702-03:00"
+    },
+    {
+        "dni": "50103842",
+        "consulta_medica": "en estudio por cefalea\nav 10/10 ao -0.50 x 180 ao\n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 336,
+        "fecha_creacion": "2025-07-28T17:43:51.453855-03:00"
+    },
+    {
+        "dni": "51511502",
+        "consulta_medica": "av 10/10 ao \nbmc alergia\nolopatadina cada 24 hs",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 337,
+        "fecha_creacion": "2025-07-28T17:51:39.756824-03:00"
+    },
+    {
+        "dni": "54455260",
+        "consulta_medica": "doy +0.25 ao 10/10 ao para pantallas\nbmc sp",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 338,
+        "fecha_creacion": "2025-07-28T17:52:57.178795-03:00"
+    },
+    {
+        "dni": "4369960",
+        "consulta_medica": "quiere anteojos para registro\navmc od +2.00 -0.75 x 80 10/10\noi +4.00 -3.00 x 30  3/10\ncerca add +3.00 ao\nfo od catarata, resto sp\noi hiperplasia de vitreo primaria\n\n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 339,
+        "fecha_creacion": "2025-07-28T18:07:07.980129-03:00"
+    },
+    {
+        "dni": "40797269",
+        "consulta_medica": "operada de estrabismo en garrahan\nav 10/10 ao",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 340,
+        "fecha_creacion": "2025-07-28T18:12:31.209617-03:00"
+    },
+    {
+        "dni": "58497574",
+        "consulta_medica": "px de serrano\nusa od +0.75 -2.50 x 10  10/10\noi +0.75 -1.00 x 180 10/10 \n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 341,
+        "fecha_creacion": "2025-07-28T18:18:07.670508-03:00"
+    },
+    {
+        "dni": "27021347",
+        "consulta_medica": "cerca +1.50 ao j2\nbmc pteri nasal grado 1\n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 342,
+        "fecha_creacion": "2025-07-28T18:25:46.426825-03:00"
+    },
+    {
+        "dni": "48694707",
+        "consulta_medica": "abuela con glaucoma\n\nav 10/10 ao\n\nbmc alergia\nolopatadina cada 24 hs",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 343,
+        "fecha_creacion": "2025-07-28T18:32:10.513579-03:00"
+    },
+    {
+        "dni": "33643115",
+        "consulta_medica": "madre con glaucoma\nav 10/10 ao\nbmc sp\n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 344,
+        "fecha_creacion": "2025-07-28T18:35:20.340589-03:00"
+    },
+    {
+        "dni": "00819279",
+        "consulta_medica": "\nfo pseudofaquia ao\nopacidad de capsula posterior oi???\n od retinocoroidosis miopica\noi no valorable por opacidad de medios\nderivo con colom\n",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 345,
+        "fecha_creacion": "2025-07-28T18:35:34.254582-03:00"
+    },
+    {
+        "dni": "59269167",
+        "consulta_medica": "control completo el 15/4 av 20/20 fo normal ao\n\nconcurre por pediculo de conjuntiva tarsal de tercio externo de ps de 24 hs de evolucion no le duele ni le molesta\ndoy lote tobra cada 4 hs\ncontrol en 10 dias",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 346,
+        "fecha_creacion": "2025-07-28T18:45:42.999702-03:00"
+    },
+    {
+        "dni": "22409464",
+        "consulta_medica": "avmc +0.75 ao 10/10ao\ncerca add +2.25 ao j2\n\nbmc hsc nasal od resto sp\n\nderivo con cardiologo\ncito a fo + estudios",
+        "fecha_consulta": "2025-07-28",
+        "medico": "Marianela Bobbiesi",
+        "id": 347,
+        "fecha_creacion": "2025-07-28T18:55:56.150052-03:00"
+    },
+    {
+        "dni": "18516993",
+        "consulta_medica": "MC: SE REALIZO TRATAMIENTO ESTETICO TIPO PEELING ALREDEDOR DE LOS OJOS Y SIENTE ARDOR REPENTINO\n\nbmc: conjuntiva rosada sin secrecion ao cornea transparente ao caf ao rfm + ao\n\ndoy lubricacion cada 6 hs y a demanda\npautas de alarma",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 348,
+        "fecha_creacion": "2025-07-29T15:02:49.292578-03:00"
+    },
+    {
+        "dni": "41024676",
+        "consulta_medica": "avmc od -1.50 x 85 10/10\noi -1.00 x 100 10/10",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 349,
+        "fecha_creacion": "2025-07-29T15:23:25.676375-03:00"
+    },
+    {
+        "dni": "41858500",
+        "consulta_medica": "avmc od -1.00 x 25 10/10\noi -1.00 x 160 10/10",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 350,
+        "fecha_creacion": "2025-07-29T15:29:38.365581-03:00"
+    },
+    {
+        "dni": "57631167",
+        "consulta_medica": "armcc +1.00 ao\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 351,
+        "fecha_creacion": "2025-07-29T15:33:10.796834-03:00"
+    },
+    {
+        "dni": "57075659",
+        "consulta_medica": "consulto por ESOTROPIA el 6/6/25\n\narmcc +2.50 -1.00 x 180 ao\nfo normal ao\nle indique +2.00 -0.75 x 180 ao\n\nviene al control del mes de uso de anteojos\nhirshcberg centrado av con correccion 20/20 ao\nprox control en 6 meses preguntar letras",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 352,
+        "fecha_creacion": "2025-07-29T15:41:53.501016-03:00"
+    },
+    {
+        "dni": "70077719",
+        "consulta_medica": "nt paeg\nfo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 353,
+        "fecha_creacion": "2025-07-29T15:47:43.954026-03:00"
+    },
+    {
+        "dni": "18458598",
+        "consulta_medica": "sindrome antifosfolipidico\nait en diciembre\n\nav 10/10 ao\ncerca +2.75 ao j2\n",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 354,
+        "fecha_creacion": "2025-07-29T15:54:13.448734-03:00"
+    },
+    {
+        "dni": "54809000",
+        "consulta_medica": "armcc od +2.00 - 2.75 x 4\noi +2.25 -3.50 x 169  \n\nfo normala o\ncontrol en 6 meses",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 355,
+        "fecha_creacion": "2025-07-29T15:59:27.176119-03:00"
+    },
+    {
+        "dni": "58582618",
+        "consulta_medica": "mc picazon ardor ocular\n\nav 20/20 ao\nbmc papilas +++\ndoy olopatadina cada 24 hs \ncito a fo control en 15 dias",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 356,
+        "fecha_creacion": "2025-07-29T16:08:31.450423-03:00"
+    },
+    {
+        "dni": "28329157",
+        "consulta_medica": "avmc od -2.50 -0.75 x 66 10/10\noi -2.00 10/10\n\ncerca j2 sin correccion",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 357,
+        "fecha_creacion": "2025-07-29T16:15:27.228652-03:00"
+    },
+    {
+        "dni": "53835736",
+        "consulta_medica": "armcc +0.25 -2.00 x 9\noi +0.25 -2.00 x 170 \nfo normal ao\ncontrol en 6 meses",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 358,
+        "fecha_creacion": "2025-07-29T16:21:29.564738-03:00"
+    },
+    {
+        "dni": "94115957",
+        "consulta_medica": "conjuntivitis infecciosa hace 7 dias empezo hace 3 dias con quidex cada 4 hs\n\nbmc foliculos en conjuntiva tarsal ao cornea transparente ao\n\ncontinua con quidex cada 4 hs por 4 dias mas luego cada 6 hs y lubricante cada 1 hr\n",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 359,
+        "fecha_creacion": "2025-07-29T16:31:56.777657-03:00"
+    },
+    {
+        "dni": "47831904",
+        "consulta_medica": "no usa anteojos\navmc od -1.50 -1.00 x 20 10/10\noi -1.00 -1.00 x 170 10/10",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 360,
+        "fecha_creacion": "2025-07-29T16:37:28.670856-03:00"
+    },
+    {
+        "dni": "32318197",
+        "consulta_medica": "control de conjuntivitis \nbmc sp\nalta",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 361,
+        "fecha_creacion": "2025-07-29T16:46:11.119825-03:00"
+    },
+    {
+        "dni": "54906352",
+        "consulta_medica": "no usa anteojos \nav1 od 6/10\noi 10/10\npruebo od +2.25 -1.00 x 15  10/10\noi +1.50 10/10\ncito a fo + armcc",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 362,
+        "fecha_creacion": "2025-07-29T17:01:04.260312-03:00"
+    },
+    {
+        "dni": "47413704",
+        "consulta_medica": "fo normal ao\ncontrol anual",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 363,
+        "fecha_creacion": "2025-07-29T17:04:12.848890-03:00"
+    },
+    {
+        "dni": "24608076",
+        "consulta_medica": "dbt buen control\nfo normal ao\ncito a refraccion",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 364,
+        "fecha_creacion": "2025-07-29T17:08:00.644541-03:00"
+    },
+    {
+        "dni": "58571385",
+        "consulta_medica": "av 10/10 ao\nbmxc hemangiona en parpado superior od\norzuelo en pi oi\n\ndoy cipro dexa  cada 6 hs\ncito a fo en 15 dias\n",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 365,
+        "fecha_creacion": "2025-07-29T17:12:50.798611-03:00"
+    },
+    {
+        "dni": "11348696",
+        "consulta_medica": "control pop\ntodo ok",
+        "fecha_consulta": "2025-07-29",
+        "medico": "Marianela Bobbiesi",
+        "id": 366,
+        "fecha_creacion": "2025-07-29T17:19:38.876872-03:00"
     }
 ]

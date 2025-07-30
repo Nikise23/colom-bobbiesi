@@ -16,8 +16,6 @@ app.secret_key = os.environ.get("SECRET_KEY", "clave_insegura_dev")
 import pytz
 timezone_ar = pytz.timezone('America/Argentina/Buenos_Aires')
 
-
-
 # Rutas de archivo usando el disco persistente
 DATA_FILE = "/data/historias_clinicas.json"
 USUARIOS_FILE = "/data/usuarios.json"
@@ -693,12 +691,16 @@ def registrar_pago():
     if not paciente:
         return jsonify({"error": "Paciente no encontrado"}), 404
     
-    # Verificar si ya existe un pago para este paciente en esta fecha
+    # Verificar si ya existe un pago para este paciente en esta fecha y hora
     pagos = cargar_json(PAGOS_FILE)
-    pago_existente = next((p for p in pagos if p["dni_paciente"] == data["dni_paciente"] and p["fecha"] == data["fecha"]), None)
+    hora = data.get("hora", "")
+    pago_existente = next((p for p in pagos if 
+                          p["dni_paciente"] == data["dni_paciente"] and 
+                          p["fecha"] == data["fecha"] and 
+                          p.get("hora", "") == hora), None)
      
-    if pago_existente:
-        return jsonify({"error": "Ya existe un pago registrado para este paciente en esta fecha"}), 400
+    if pago_existente and hora:
+        return jsonify({"error": "Ya existe un pago registrado para este paciente en esta fecha y hora"}), 400
      
     nuevo_pago = {
         "id": len(pagos) + 1,
@@ -706,6 +708,7 @@ def registrar_pago():
         "nombre_paciente": f"{paciente.get('nombre', '')} {paciente.get('apellido', '')}".strip(),
         "monto": monto,
         "fecha": data["fecha"],
+        "hora": data.get("hora", ""),
         "fecha_registro": datetime.now(timezone_ar).isoformat(),
         "observaciones": data.get("observaciones", ""),
         "obra_social": paciente.get("obra_social", ""),
@@ -1240,6 +1243,114 @@ def limpiar_turnos_vencidos():
             nuevos.append(t)
     guardar_json(TURNOS_FILE, nuevos)
     return jsonify({"eliminados": eliminados, "ok": True})
+
+
+# ========================== HISTORIAS CLÍNICAS ==================
+
+@app.route("/historias-gestion")
+@login_requerido
+@rol_requerido("medico")
+def ver_historias_gestion():
+    return render_template("historias_gestion.html")
+
+@app.route("/api/historias/buscar", methods=["GET"])
+@login_requerido
+@rol_requerido("medico")
+def buscar_historias():
+    historias = cargar_json(DATA_FILE)
+    pacientes = cargar_json(PACIENTES_FILE)
+    
+    # Parámetros de búsqueda
+    busqueda = request.args.get("busqueda", "").strip().lower()
+    pagina = int(request.args.get("pagina", 1))
+    por_pagina = int(request.args.get("por_pagina", 10))
+    ordenar_por = request.args.get("ordenar_por", "apellido")
+    orden = request.args.get("orden", "asc")
+    
+    # Enriquecer historias con datos del paciente
+    historias_enriquecidas = []
+    for historia in historias:
+        paciente = next((p for p in pacientes if p["dni"] == historia["dni"]), None)
+        if paciente:
+            historia_completa = historia.copy()
+            historia_completa["paciente"] = paciente
+            historias_enriquecidas.append(historia_completa)
+    
+    # Filtrar por búsqueda (apellido, nombre o DNI)
+    if busqueda:
+        historias_filtradas = []
+        for h in historias_enriquecidas:
+            paciente = h["paciente"]
+            apellido = paciente.get("apellido", "").lower()
+            nombre = paciente.get("nombre", "").lower()
+            dni = paciente.get("dni", "").lower()
+            
+            if (busqueda in apellido or 
+                busqueda in nombre or 
+                busqueda in dni):
+                historias_filtradas.append(h)
+        historias_enriquecidas = historias_filtradas
+    
+    # Agrupar por paciente y obtener la última consulta de cada uno
+    pacientes_unicos = {}
+    for h in historias_enriquecidas:
+        dni = h["dni"]
+        if dni not in pacientes_unicos:
+            pacientes_unicos[dni] = {
+                "paciente": h["paciente"],
+                "ultima_consulta": h["fecha_consulta"],
+                "total_consultas": 1,
+                "ultima_historia": h
+            }
+        else:
+            pacientes_unicos[dni]["total_consultas"] += 1
+            # Comparar fechas para encontrar la más reciente
+            if h["fecha_consulta"] > pacientes_unicos[dni]["ultima_consulta"]:
+                pacientes_unicos[dni]["ultima_consulta"] = h["fecha_consulta"]
+                pacientes_unicos[dni]["ultima_historia"] = h
+    
+    # Convertir a lista para ordenamiento
+    lista_pacientes = list(pacientes_unicos.values())
+    
+    # Ordenar
+    if ordenar_por == "apellido":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("apellido", "").lower(),
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "nombre":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("nombre", "").lower(),
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "fecha":
+        lista_pacientes.sort(
+            key=lambda x: x["ultima_consulta"],
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "dni":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("dni", ""),
+            reverse=(orden == "desc")
+        )
+    
+    # Paginación
+    total = len(lista_pacientes)
+    inicio = (pagina - 1) * por_pagina
+    fin = inicio + por_pagina
+    pacientes_pagina = lista_pacientes[inicio:fin]
+    
+    total_paginas = (total + por_pagina - 1) // por_pagina
+    
+    return jsonify({
+        "pacientes": pacientes_pagina,
+        "total": total,
+        "pagina": pagina,
+        "total_paginas": total_paginas,
+        "por_pagina": por_pagina
+    })
+
+
 
 # ========================== ADMINISTRADOR ============================
 
