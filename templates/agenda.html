@@ -149,6 +149,9 @@
     </div>
     <h2 class="text-center flex-grow-1">Agenda Médica</h2>
     <div>
+      <a href="/secretaria" class="btn btn-outline-primary me-2">
+        <i class="bi bi-arrow-left me-1"></i>Volver al Panel
+      </a>
       <a href="/pacientes" class="btn btn-primary me-2">Registrar Paciente</a>
       <button class="btn btn-outline-dark" disabled>Ver Agenda</button>
     </div>
@@ -791,7 +794,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
           const modal = bootstrap.Modal.getInstance(document.getElementById("modalTurno"));
           modal.hide();
           
-          // Mostrar mensaje de confirmación personalizado
+          // Mostrar mensaje de confirmación
           const mensaje = `
             ¡Turno asignado exitosamente! 🎉
             
@@ -799,18 +802,15 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
             ⏰ Hora: ${turnoActual.hora}
             👤 Paciente: ${pacienteSeleccionado ? pacienteSeleccionado.nombre + ' ' + pacienteSeleccionado.apellido : dni_paciente}
             👨‍⚕️ Médico: ${turnoActual.medico}
-            
-            ¿Qué deseas hacer ahora?
           `;
           
-          if (confirm(mensaje + "\n\nPresiona OK para registrar otro paciente o Cancelar para quedarte en la agenda")) {
-            window.location.href = "/pacientes";
-           } else {
-            // Recargar datos y actualizar la vista
-            fetchTurnos().then(() => {
-              cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
-            });
-          }
+          // Mostrar mensaje temporal
+          mostrarMensajeTemporal(mensaje, 'success');
+          
+          // Recargar datos y actualizar la vista automáticamente
+          fetchTurnos().then(() => {
+            cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
+          });
         }
       })
       .catch(error => {
@@ -890,19 +890,16 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
           📅 Fecha: ${fechaFormateada}
           ⏰ Hora: ${turnoActual.hora}
           👨‍⚕️ Médico: ${turnoActual.medico}
-          
-          ¿Qué deseas hacer ahora?
         `;
 
-        if (confirm(mensaje + "\n\nPresiona OK para registrar otro paciente o Cancelar para quedarte en la agenda")) {
-          window.location.href = "/pacientes";
-        } else {
-          // Recargar datos y actualizar la vista
-          pacientes.push(datosPaciente); // Agregar a la lista local
-          fetchTurnos().then(() => {
-            cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
-          });
-        }
+        // Mostrar mensaje temporal
+        mostrarMensajeTemporal(mensaje, 'success');
+        
+        // Recargar datos y actualizar la vista automáticamente
+        pacientes.push(datosPaciente); // Agregar a la lista local
+        fetchTurnos().then(() => {
+          cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
+        });
       } catch (error) {
         alert("Error: " + error.message);
       }
@@ -911,6 +908,32 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     async function fetchTurnos() {
       const res = await fetch("/api/turnos");
       turnos = await res.json();
+    }
+
+    function mostrarMensajeTemporal(mensaje, tipo = 'success') {
+      // Crear el elemento del mensaje
+      const mensajeDiv = document.createElement('div');
+      mensajeDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+      mensajeDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;';
+      mensajeDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+          <div class="flex-grow-1">
+            ${mensaje.replace(/\n/g, '<br>')}
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      
+      // Agregar al DOM
+      document.body.appendChild(mensajeDiv);
+      
+      // Auto-remover después de 5 segundos
+      setTimeout(() => {
+        if (mensajeDiv.parentNode) {
+          mensajeDiv.remove();
+        }
+      }, 5000);
     }
 
     async function init() {
@@ -957,6 +980,326 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     }
 
     init();
+  </script>
+
+  <!-- Footer Hermoso -->
+  <footer class="admin-footer">
+      <div class="footer-content">
+          <div class="footer-section">
+              <div class="footer-brand">
+                  <div class="heart-ecg-logo">
+                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <!-- Corazón -->
+                          <path class="heart" d="M50,85 C30,65 10,45 10,30 C10,20 20,15 30,15 C40,15 50,25 50,25 C50,25 60,15 70,15 C80,15 90,20 90,30 C90,45 70,65 50,85 Z"/>
+                          <!-- Línea ECG -->
+                          <path class="ecg-line" d="M20,50 L25,50 L27,40 L30,60 L33,30 L36,70 L39,20 L42,80 L45,10 L50,50 L55,50"/>
+                      </svg>
+                  </div>
+                  <span>Consultorio COLOM-BOBBIESI</span>
+              </div>
+              <p class="footer-description">
+                  Sistema integral de gestión de historias clínicas
+              </p>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Enlaces Rápidos</h6>
+              <ul class="footer-links">
+                  <li><a href="/"><i class="bi bi-house"></i> Inicio</a></li>
+                  <li><a href="/pacientes"><i class="bi bi-people"></i> Pacientes</a></li>
+                  <li><a href="/agenda"><i class="bi bi-calendar"></i> Agenda</a></li>
+              </ul>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Soporte</h6>
+              <ul class="footer-links">
+                  <li><a href="#"><i class="bi bi-telephone"></i> Contacto</a></li>
+                  <li><a href="#"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                  <li><a href="#"><i class="bi bi-shield-check"></i> Privacidad</a></li>
+              </ul>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Información del Sistema</h6>
+              <div class="system-info">
+                  <div class="info-item">
+                      <i class="bi bi-server"></i>
+                      <span>Sistema Online</span>
+                  </div>
+                  <div class="info-item">
+                      <i class="bi bi-shield-check"></i>
+                      <span>Datos Seguros</span>
+                  </div>
+                  <div class="info-item">
+                      <i class="bi bi-clock"></i>
+                      <span id="current-time"></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <div class="footer-bottom">
+          <div class="footer-bottom-content">
+              <div class="copyright">
+                  © 2025 Consultorio COLOM-BOBBIESI. Todos los derechos reservados.<br>
+                  <small>Desarrollado por <strong>Nicolás Fernández</strong></small>
+              </div>
+              <div class="footer-stats">
+                  <span class="stat-item">
+                      <i class="bi bi-people"></i>
+                      <span id="footer-pacientes-count">-</span> Pacientes
+                  </span>
+                  <span class="stat-item">
+                      <i class="bi bi-calendar-check"></i>
+                      <span id="footer-turnos-count">-</span> Turnos Hoy
+                  </span>
+              </div>
+          </div>
+      </div>
+  </footer>
+
+  <style>
+      .admin-footer {
+          background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+          color: white;
+          margin-top: 3rem;
+          border-top: 3px solid #e74c3c;
+      }
+
+      .footer-content {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1.5fr;
+          gap: 2rem;
+          padding: 2rem 0;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding-left: 2rem;
+          padding-right: 2rem;
+      }
+
+      .footer-section h6 {
+          color: #e74c3c;
+          font-weight: 600;
+          margin-bottom: 1rem;
+          font-size: 1rem;
+      }
+
+      .footer-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+      }
+
+      .footer-brand i {
+          color: #e74c3c;
+          font-size: 1.5rem;
+      }
+
+      /* Logo personalizado del corazón con pulso ECG */
+      .heart-ecg-logo {
+          width: 40px;
+          height: 40px;
+          position: relative;
+          display: inline-block;
+      }
+
+      .heart-ecg-logo svg {
+          width: 100%;
+          height: 100%;
+      }
+
+      .heart-ecg-logo .heart {
+          fill: none;
+          stroke: #e74c3c;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+      }
+
+      .heart-ecg-logo .ecg-line {
+          fill: none;
+          stroke: #e74c3c;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+      }
+
+      .footer-description {
+          color: #bdc3c7;
+          font-size: 0.9rem;
+          line-height: 1.4;
+      }
+
+      .footer-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      .footer-links li {
+          margin-bottom: 0.5rem;
+      }
+
+      .footer-links a {
+          color: #bdc3c7;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: color 0.3s ease;
+          font-size: 0.9rem;
+      }
+
+      .footer-links a:hover {
+          color: white;
+      }
+
+      .system-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+      }
+
+      .info-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+          color: #bdc3c7;
+      }
+
+      .info-item i {
+          color: #27ae60;
+          width: 16px;
+      }
+
+      .footer-bottom {
+          background: rgba(0, 0, 0, 0.2);
+          padding: 1rem 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .footer-bottom-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+      }
+
+      .copyright {
+          color: #95a5a6;
+          font-size: 0.9rem;
+      }
+
+      .copyright small {
+          color: #7f8c8d;
+          font-size: 0.8rem;
+      }
+
+      .copyright strong {
+          color: #e74c3c;
+      }
+
+      .footer-stats {
+          display: flex;
+          gap: 2rem;
+      }
+
+      .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #bdc3c7;
+          font-size: 0.9rem;
+      }
+
+      .stat-item i {
+          color: #e74c3c;
+      }
+
+      @media (max-width: 768px) {
+          .footer-content {
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+              text-align: center;
+          }
+
+          .footer-bottom-content {
+              flex-direction: column;
+              gap: 1rem;
+              text-align: center;
+          }
+
+          .footer-stats {
+              justify-content: center;
+          }
+      }
+  </style>
+
+  <script>
+      // Actualizar hora actual
+      function actualizarHora() {
+          const ahora = new Date();
+          const hora = ahora.toLocaleTimeString('es-ES', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              second: '2-digit'
+          });
+          const elementoHora = document.getElementById('current-time');
+          if (elementoHora) {
+              elementoHora.textContent = hora;
+          }
+      }
+
+      // Actualizar estadísticas del footer
+      async function actualizarFooterInfo() {
+          try {
+              // Obtener total de pacientes
+              const responsePacientes = await fetch('/api/pacientes');
+              const pacientes = await responsePacientes.json();
+              const totalPacientes = pacientes.length;
+              
+              // Obtener turnos de hoy
+              const hoy = new Date().toISOString().split('T')[0];
+              const responseTurnos = await fetch(`/api/turnos?fecha=${hoy}`);
+              const turnos = await responseTurnos.json();
+              const turnosHoy = turnos.length;
+              
+              // Actualizar elementos
+              const pacientesElement = document.getElementById('footer-pacientes-count');
+              const turnosElement = document.getElementById('footer-turnos-count');
+              
+              if (pacientesElement) pacientesElement.textContent = totalPacientes;
+              if (turnosElement) turnosElement.textContent = turnosHoy;
+              
+          } catch (error) {
+              console.error('Error actualizando footer info:', error);
+          }
+      }
+
+      // Inicializar
+      document.addEventListener('DOMContentLoaded', function() {
+          actualizarHora();
+          actualizarFooterInfo();
+          
+          // Actualizar hora cada segundo
+          setInterval(actualizarHora, 1000);
+          
+          // Actualizar estadísticas cada 30 segundos
+          setInterval(actualizarFooterInfo, 30000);
+      });
   </script>
 </body>
 </html>

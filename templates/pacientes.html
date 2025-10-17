@@ -3,80 +3,619 @@
 <head>
   <meta charset="UTF-8">
   <title>Gestión de Pacientes</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#4F46E5',
-            secondary: '#06B6D4',
-            success: '#10B981',
-            danger: '#EF4444',
-            warning: '#F59E0B'
-          }
-        }
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .main-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      max-width: 1400px;
+    }
+    
+    .header-section {
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      color: white;
+      padding: 2rem;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-content {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .header-buttons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .btn-header {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+      .header-section {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
       }
-    };
-  </script>
+      
+      .header-content {
+        order: 2;
+      }
+      
+      .header-buttons {
+        order: 1;
+        justify-content: center;
+      }
+      
+      .btn-header {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+      }
+    }
+    
+    .form-card, .list-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .form-card:hover, .list-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-input {
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px 16px;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+    
+    .form-input:focus {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      outline: none;
+    }
+    
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    }
+    
+    .btn-success-custom {
+      background: linear-gradient(135deg, #10B981, #059669);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-success-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .patient-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .patient-card:hover {
+      border-color: #4F46E5;
+      box-shadow: 0 5px 15px rgba(79, 70, 229, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .search-container {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .shape {
+      position: absolute;
+      opacity: 0.1;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .shape:nth-child(1) {
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .shape:nth-child(2) {
+      top: 20%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+    
+    .shape:nth-child(3) {
+      bottom: 20%;
+      left: 15%;
+      animation-delay: 4s;
+    }
+    
+    .shape:nth-child(4) {
+      bottom: 10%;
+      right: 15%;
+      animation-delay: 1s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .success-message {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800 p-6">
-  <h1 class="text-3xl font-bold text-center text-primary mb-6">Gestión de Pacientes</h1>
+<body>
+  <!-- Floating Background Shapes -->
+  <div class="floating-shapes">
+    <div class="shape" style="width: 100px; height: 100px; background: #4F46E5; border-radius: 50%;"></div>
+    <div class="shape" style="width: 80px; height: 80px; background: #7C3AED; border-radius: 20px;"></div>
+    <div class="shape" style="width: 120px; height: 120px; background: #06B6D4; border-radius: 30px;"></div>
+    <div class="shape" style="width: 60px; height: 60px; background: #10B981; border-radius: 50%;"></div>
+  </div>
 
-  <div class="grid md:grid-cols-2 gap-6">
-    <!-- Formulario de registro / modificación -->
-    <div class="bg-white shadow rounded-lg p-4">
-      <h2 class="text-xl font-semibold mb-4" id="form-title">Registrar Paciente</h2>
-      <form id="form-paciente">
-        <input type="text" id="nombre" placeholder="Nombre" class="input" required>
-        <input type="text" id="apellido" placeholder="Apellido" class="input" required>
-        <input type="text" id="dni" placeholder="DNI" class="input" required>
-        <div class="grid grid-cols-2 gap-2">
-          <input type="date" id="fecha_nacimiento" class="input" placeholder="Fecha de Nacimiento" required>
-          <input type="text" id="edad" placeholder="Edad" class="input" readonly>
-        </div>
-        <input type="text" id="obra_social" placeholder="Obra Social" class="input" required>
-        <input type="text" id="numero_obra_social" placeholder="N° Obra Social" class="input" required>
-        <input type="text" id="celular" placeholder="Celular" class="input" required>
+  <div class="main-container">
+    <!-- Header -->
+    <div class="header-section">
+      <div class="header-content">
+        <h1 class="display-4 fw-bold mb-3">
+          <i class="bi bi-people-fill me-3"></i>Gestión de Pacientes
+        </h1>
+        <p class="lead mb-0">Registra y administra la información de tus pacientes de manera eficiente</p>
+      </div>
+      <div class="header-buttons">
+        <a href="/secretaria" class="btn-header">
+          <i class="bi bi-arrow-left"></i>Volver al Panel
+        </a>
+        <a href="/" class="btn-header">
+          <i class="bi bi-house"></i>Inicio
+        </a>
+      </div>
+    </div>
 
-        <div class="flex gap-2 mt-4">
-          <button type="submit" class="bg-primary text-white px-4 py-2 rounded">Guardar</button>
-          <button type="button" onclick="limpiarFormulario()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">Cancelar</button>
+    <!-- Content -->
+    <div class="p-4">
+      <!-- Stats Cards -->
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+          <div class="stats-card">
+            <h3 class="h4 mb-2"><i class="bi bi-people-fill me-2"></i>Total Pacientes</h3>
+            <div class="h2 fw-bold" id="total-pacientes">0</div>
+          </div>
         </div>
+        <div class="col-md-4 mb-3">
+          <div class="stats-card">
+            <h3 class="h4 mb-2"><i class="bi bi-calendar-check me-2"></i>Hoy</h3>
+            <div class="h2 fw-bold" id="pacientes-hoy">0</div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="stats-card">
+            <h3 class="h4 mb-2"><i class="bi bi-clock me-2"></i>Último Registro</h3>
+            <div class="h6 fw-bold" id="ultimo-registro">N/A</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Formulario de registro -->
+        <div class="col-lg-6 mb-4">
+          <div class="form-card p-4">
+            <div class="d-flex align-items-center mb-4">
+              <i class="bi bi-person-plus-fill text-primary me-3 fs-4"></i>
+              <h2 class="h4 mb-0 fw-bold" id="form-title">Registrar Nuevo Paciente</h2>
+            </div>
+            
+            <form id="form-paciente">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="bi bi-person me-2 text-primary"></i>Nombre
+                  </label>
+                  <input type="text" id="nombre" class="form-control form-input" placeholder="Ingrese el nombre" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="bi bi-person me-2 text-primary"></i>Apellido
+                  </label>
+                  <input type="text" id="apellido" class="form-control form-input" placeholder="Ingrese el apellido" required>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-card-text me-2 text-primary"></i>DNI
+                </label>
+                <input type="text" id="dni" class="form-control form-input" placeholder="Ingrese el DNI" required>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="bi bi-calendar me-2 text-primary"></i>Fecha de Nacimiento
+                  </label>
+                  <input type="date" id="fecha_nacimiento" class="form-control form-input" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="bi bi-calendar-heart me-2 text-primary"></i>Edad
+                  </label>
+                  <input type="text" id="edad" class="form-control form-input" placeholder="Se calcula automáticamente" readonly>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-hospital me-2 text-primary"></i>Obra Social
+                </label>
+                <input type="text" id="obra_social" class="form-control form-input" placeholder="Ingrese la obra social" required>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-credit-card me-2 text-primary"></i>Número de Obra Social
+                </label>
+                <input type="text" id="numero_obra_social" class="form-control form-input" placeholder="Ingrese el número de afiliado" required>
+              </div>
+              
+              <div class="mb-4">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-telephone me-2 text-primary"></i>Celular
+                </label>
+                <input type="text" id="celular" class="form-control form-input" placeholder="Ingrese el número de celular" required>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom text-white flex-fill">
+                  <i class="bi bi-check-circle me-2"></i>Guardar Paciente
+                </button>
+                <button type="button" onclick="limpiarFormulario()" class="btn btn-outline-secondary">
+                  <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+              </div>
+              
         <!-- Botones de acción después del registro exitoso -->
-        <div id="acciones-post-registro" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p class="text-green-800 font-semibold mb-3">¡Paciente registrado exitosamente!</p>
-          <div class="flex gap-2 flex-wrap">
-            <button onclick="irAAgenda()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
-              📅 Sacar Turno Ahora
+              <div id="acciones-post-registro" class="success-message mt-4" style="display: none;">
+                <div class="d-flex align-items-center mb-3">
+                  <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                  <h5 class="mb-0 fw-bold">¡Paciente registrado exitosamente!</h5>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button onclick="irAAgenda()" class="btn btn-primary-custom text-white">
+                    <i class="bi bi-calendar-plus me-2"></i>Sacar Turno Ahora
             </button>
-            <button onclick="registrarOtroPaciente()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              👤 Registrar Otro Paciente
+                  <button onclick="registrarOtroPaciente()" class="btn btn-success-custom text-white">
+                    <i class="bi bi-person-plus me-2"></i>Registrar Otro
             </button>
-            <button onclick="verListaPacientes()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-              📋 Ver Lista de Pacientes
+                  <button onclick="verListaPacientes()" class="btn btn-outline-light">
+                    <i class="bi bi-list-ul me-2"></i>Ver Lista
             </button>
           </div>
         </div>
       </form>
-      <p id="mensaje" class="text-sm text-success mt-2"></p>
+            <div id="mensaje" class="mt-3"></div>
+          </div>
     </div>
 
     <!-- Listado de pacientes -->
-    <div class="bg-white shadow rounded-lg p-4">
-      <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
-        <input type="text" id="buscar" placeholder="Buscar por DNI o Apellido" class="border border-gray-300 rounded p-2 w-full md:w-2/3" />
-        <button onclick="cargarPacientes()" class="bg-primary text-white px-4 py-2 rounded w-full md:w-auto">Buscar</button>
+        <div class="col-lg-6">
+          <div class="list-card p-4">
+            <div class="d-flex align-items-center mb-4">
+              <i class="bi bi-search text-primary me-3 fs-4"></i>
+              <h2 class="h4 mb-0 fw-bold">Buscar Pacientes</h2>
+            </div>
+            
+            <div class="search-container">
+              <div class="input-group">
+                <span class="input-group-text bg-primary text-white">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="buscar" class="form-control form-input" placeholder="Buscar por DNI, nombre o apellido...">
+                <button onclick="cargarPacientes()" class="btn btn-primary-custom text-white">
+                  <i class="bi bi-search me-2"></i>Buscar
+                </button>
+              </div>
+            </div>
+            
+            <div id="lista-pacientes" class="max-height-400 overflow-auto">
+              <!-- Los pacientes se cargarán aquí -->
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="lista-pacientes" class="space-y-3 max-h-[400px] overflow-auto"></div>
+      
+      <!-- Nueva sección para búsqueda de turnos -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="list-card p-4">
+            <div class="d-flex align-items-center mb-4">
+              <i class="bi bi-calendar-search text-success me-3 fs-4"></i>
+              <h2 class="h4 mb-0 fw-bold">Búsqueda de Turnos</h2>
+            </div>
+            
+            <div class="search-container">
+              <div class="input-group">
+                <span class="input-group-text bg-success text-white">
+                  <i class="bi bi-calendar-search"></i>
+                </span>
+                <input type="text" id="buscar-turnos" class="form-control form-input" placeholder="Buscar turnos por DNI o apellido...">
+                <button onclick="buscarTurnos()" class="btn btn-success-custom text-white">
+                  <i class="bi bi-search me-2"></i>Buscar Turnos
+                </button>
+              </div>
+            </div>
+            
+            <div id="lista-turnos" class="max-height-400 overflow-auto">
+              <!-- Los turnos se cargarán aquí -->
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5 mt-5" style="border-right: 3px solid #6f42c1;">
+      <div class="container">
+        <div class="row">
+          <!-- Brand Section -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <h5 class="text-white mb-3">
+              <i class="bi bi-heart-pulse text-danger me-2"></i>Consultorio COLOM-BOBBIESI
+            </h5>
+            <p class="text-muted small">
+              Sistema integral de gestión de historias clínicas.
+            </p>
+          </div>
+          
+          <!-- Quick Links -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <h6 class="text-danger mb-3">Enlaces Rápidos</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <i class="bi bi-house text-white me-2"></i>
+                <a href="/" class="text-white text-decoration-none">Inicio</a>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-people text-white me-2"></i>
+                <a href="/pacientes" class="text-white text-decoration-none">Pacientes</a>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-calendar-week text-white me-2"></i>
+                <a href="/agenda" class="text-white text-decoration-none">Agenda</a>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Support -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <h6 class="text-danger mb-3">Soporte</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <i class="bi bi-telephone text-white me-2"></i>
+                <a href="#" class="text-white text-decoration-none">Contacto</a>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-question-circle text-white me-2"></i>
+                <a href="#" class="text-white text-decoration-none">Ayuda</a>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-shield-check text-white me-2"></i>
+                <a href="#" class="text-white text-decoration-none">Privacidad</a>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- System Info -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <h6 class="text-danger mb-3">Información del Sistema</h6>
+            <div class="text-white small">
+              <div class="mb-2">
+                <i class="bi bi-database text-success me-2"></i>
+                Sistema Online
+              </div>
+              <div class="mb-2">
+                <i class="bi bi-shield-check text-success me-2"></i>
+                Datos Seguros
+              </div>
+              <div class="mb-2">
+                <i class="bi bi-clock text-success me-2"></i>
+                Hora Actual
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="text-danger">
+              <strong>Nicolás Fernández</strong>
+            </div>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div class="d-flex justify-content-md-end align-items-center" style="gap: 1rem;">
+              <i class="bi bi-people-fill text-danger" style="font-size: 1.3rem;"></i>
+              <i class="bi bi-calendar-check text-danger" style="font-size: 1.3rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
   </div>
 
-  <a href="/" class="mt-10 block text-center text-primary font-semibold hover:underline">← Volver al inicio</a>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Variable para almacenar el DNI del último paciente registrado
     let ultimoPacienteRegistrado = null;
+    
+    // Función para actualizar información del footer
+    async function actualizarFooterInfo() {
+      try {
+        const response = await fetch('/api/pacientes');
+        const pacientes = await response.json();
+        document.getElementById('footer-total-pacientes').textContent = pacientes.length;
+        
+        // Obtener turnos de hoy
+        const hoy = new Date().toISOString().split('T')[0];
+        const turnosResponse = await fetch(`/api/turnos/dia?fecha=${hoy}`);
+        const turnos = await turnosResponse.json();
+        document.getElementById('footer-turnos-hoy').textContent = turnos.length;
+      } catch (error) {
+        console.error('Error actualizando footer:', error);
+      }
+    }
+    
+    // Función para actualizar la hora
+    function actualizarHora() {
+      const ahora = new Date();
+      const hora = ahora.toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('footer-hora-actual').textContent = hora;
+      
+      // Actualizar cada segundo
+      setTimeout(actualizarHora, 1000);
+    }
+    
+    // Cargar estadísticas al iniciar
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarEstadisticas();
+      cargarPacientes();
+      actualizarFooterInfo();
+      actualizarHora();
+      
+      // Event listener para calcular edad automáticamente
+      document.getElementById('fecha_nacimiento').addEventListener('change', function() {
+        const edad = calcularEdad(this.value);
+        document.getElementById('edad').value = edad;
+      });
+      
+      // Event listener para búsqueda en tiempo real
+      document.getElementById('buscar').addEventListener('input', function() {
+        if (this.value.length >= 2) {
+          cargarPacientes();
+        } else if (this.value.length === 0) {
+          cargarPacientes();
+        }
+      });
+    });
+    
+    // Función para cargar estadísticas
+    async function cargarEstadisticas() {
+      try {
+        const response = await fetch('/api/pacientes');
+        const pacientes = await response.json();
+        
+        // Total de pacientes
+        document.getElementById('total-pacientes').textContent = pacientes.length;
+        
+        // Pacientes registrados hoy
+        const hoy = new Date().toISOString().split('T')[0];
+        const pacientesHoy = pacientes.filter(p => {
+          // Asumiendo que hay un campo fecha_registro o similar
+          return p.fecha_registro && p.fecha_registro.startsWith(hoy);
+        });
+        document.getElementById('pacientes-hoy').textContent = pacientesHoy.length;
+        
+        // Último registro
+        if (pacientes.length > 0) {
+          const ultimoPaciente = pacientes[pacientes.length - 1];
+          document.getElementById('ultimo-registro').textContent = 
+            `${ultimoPaciente.nombre} ${ultimoPaciente.apellido}`;
+        }
+      } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+      }
+    }
     // Función para calcular la edad
     function calcularEdad(fechaNacimiento) {
       if (!fechaNacimiento) return '';
@@ -130,28 +669,284 @@
       const lista = document.getElementById("lista-pacientes");
       lista.innerHTML = "";
 
-      const pacientes = await fetch("/api/pacientes").then(r => r.json());
+      try {
+        const response = await fetch("/api/pacientes");
+        const pacientes = await response.json();
 
-      pacientes
-        .filter(p =>
+        const pacientesFiltrados = pacientes.filter(p =>
           !filtro ||
           p.dni.includes(filtro) ||
-          p.apellido.toLowerCase().includes(filtro)
-        )
-        .forEach(p => {
+          p.apellido.toLowerCase().includes(filtro) ||
+          p.nombre.toLowerCase().includes(filtro)
+        ).slice(0, 5); // Mostrar solo los primeros 5 resultados
+
+        if (pacientesFiltrados.length === 0) {
+          lista.innerHTML = `
+            <div class="text-center py-5">
+              <i class="bi bi-person-x text-muted" style="font-size: 3rem;"></i>
+              <h5 class="text-muted mt-3">No se encontraron pacientes</h5>
+              <p class="text-muted">${filtro ? 'Intenta con otros términos de búsqueda' : 'No hay pacientes registrados'}</p>
+            </div>
+          `;
+          return;
+        }
+
+
+        pacientesFiltrados.forEach(p => {
           const div = document.createElement("div");
-          div.className = "border border-gray-200 p-3 rounded bg-gray-50 shadow-sm";
+          div.className = "patient-card";
           div.innerHTML = `
-            <p class="font-semibold">${p.nombre} ${p.apellido}</p>
-            <p class="text-sm">DNI: ${p.dni} | ${p.edad ? 'Edad: ' + p.edad : ''}</p>
-            <p class="text-sm">Obra Social: ${p.obra_social} | Celular: ${p.celular}</p>
-            <div class="mt-2 flex gap-2">
-              <button onclick='editarPaciente(${JSON.stringify(p)})' class="text-sm text-primary hover:underline">Editar</button>
-              <button onclick='eliminarPaciente("${p.dni}", "${p.nombre} ${p.apellido}")' class="text-sm text-red-600 hover:underline">Eliminar</button>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="fw-bold mb-1 text-primary">
+                  <i class="bi bi-person-circle me-2"></i>${p.nombre} ${p.apellido}
+                </h6>
+                <small class="text-muted">
+                  <i class="bi bi-person-badge me-1"></i>DNI: ${p.dni} | 
+                  <i class="bi bi-calendar3 me-1"></i>${p.edad ? p.edad + ' años' : 'Edad N/A'}
+                </small>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="#" onclick='editarPaciente(${JSON.stringify(p).replace(/"/g, '&quot;')})'>
+                      <i class="bi bi-pencil me-2"></i>Editar
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick='eliminarPaciente("${p.dni}", "${p.nombre} ${p.apellido}")'>
+                      <i class="bi bi-trash me-2 text-danger"></i>Eliminar
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           `;
           lista.appendChild(div);
         });
+
+      } catch (error) {
+        console.error('Error cargando pacientes:', error);
+        lista.innerHTML = `
+          <div class="text-center py-5">
+            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+            <h5 class="text-warning mt-3">Error al cargar pacientes</h5>
+            <p class="text-muted">Intenta recargar la página</p>
+          </div>
+        `;
+      }
+    }
+
+    async function buscarTurnos() {
+      const filtro = document.getElementById("buscar-turnos").value.trim().toLowerCase();
+      const lista = document.getElementById("lista-turnos");
+      lista.innerHTML = "";
+
+      if (!filtro) {
+        lista.innerHTML = `
+          <div class="text-center py-5">
+            <i class="bi bi-calendar-search text-muted" style="font-size: 3rem;"></i>
+            <h5 class="text-muted mt-3">Ingresa DNI o apellido</h5>
+            <p class="text-muted">Busca turnos de hoy o futuros</p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        // Obtener todos los turnos
+        const response = await fetch("/api/turnos");
+        const turnos = await response.json();
+        
+        // Obtener todos los pacientes para hacer el match
+        const responsePacientes = await fetch("/api/pacientes");
+        const pacientes = await responsePacientes.json();
+        
+        // Crear un mapa de DNI a paciente
+        const pacientesMap = {};
+        pacientes.forEach(p => {
+          pacientesMap[p.dni] = p;
+        });
+
+        // Filtrar turnos por DNI o apellido y solo de hoy en adelante
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        const turnosFiltrados = turnos.filter(turno => {
+          const paciente = pacientesMap[turno.dni_paciente];
+          if (!paciente) return false;
+          
+          // Verificar si coincide con el filtro
+          const coincideFiltro = turno.dni_paciente.includes(filtro) || 
+                                paciente.apellido.toLowerCase().includes(filtro);
+          
+          if (!coincideFiltro) return false;
+          
+          // Verificar que sea de hoy o futuro
+          const fechaTurno = new Date(turno.fecha);
+          fechaTurno.setHours(0, 0, 0, 0);
+          
+          return fechaTurno >= hoy;
+        }).slice(0, 10); // Mostrar solo los primeros 10 resultados
+
+        if (turnosFiltrados.length === 0) {
+          lista.innerHTML = `
+            <div class="text-center py-5">
+              <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+              <h5 class="text-muted mt-3">No se encontraron turnos</h5>
+              <p class="text-muted">No hay turnos de hoy o futuros para este paciente</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Mostrar los turnos encontrados
+        turnosFiltrados.forEach(turno => {
+          const paciente = pacientesMap[turno.dni_paciente];
+          const fechaTurno = new Date(turno.fecha);
+          const esHoy = fechaTurno.toDateString() === new Date().toDateString();
+          
+          const div = document.createElement("div");
+          div.className = "patient-card";
+          div.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="fw-bold mb-1 text-primary">
+                  <i class="bi bi-person-circle me-2"></i>${paciente.nombre} ${paciente.apellido}
+                </h6>
+                <small class="text-muted">
+                  <i class="bi bi-person-badge me-1"></i>DNI: ${paciente.dni} | 
+                  <i class="bi bi-calendar3 me-1"></i>${esHoy ? 'Hoy' : fechaTurno.toLocaleDateString('es-ES')} | 
+                  <i class="bi bi-clock me-1"></i>${turno.hora}
+                </small>
+                <br>
+                <small class="text-muted">
+                  <i class="bi bi-person-heart me-1"></i>Dr. ${turno.medico} | 
+                  <i class="bi bi-shield-check me-1"></i>${turno.estado}
+                </small>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge ${esHoy ? 'bg-success' : 'bg-primary'}">
+                  ${esHoy ? 'Hoy' : 'Futuro'}
+                </span>
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item" href="#" onclick='editarTurno(${JSON.stringify(turno).replace(/"/g, '&quot;')})'>
+                        <i class="bi bi-pencil me-2"></i>Editar Turno
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" onclick='cancelarTurno(${JSON.stringify(turno).replace(/"/g, '&quot;')})'>
+                        <i class="bi bi-x-circle me-2 text-danger"></i>Cancelar Turno
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" onclick='marcarAtendido(${JSON.stringify(turno).replace(/"/g, '&quot;')})'>
+                        <i class="bi bi-check-circle me-2 text-success"></i>Marcar Atendido
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          `;
+          lista.appendChild(div);
+        });
+
+      } catch (error) {
+        console.error('Error buscando turnos:', error);
+        lista.innerHTML = `
+          <div class="text-center py-5">
+            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+            <h5 class="text-warning mt-3">Error al buscar turnos</h5>
+            <p class="text-muted">Intenta recargar la página</p>
+          </div>
+        `;
+      }
+    }
+
+    // Funciones para gestionar turnos
+    function editarTurno(turno) {
+      // Redirigir a la página de gestión de turnos
+      const url = `/turnos/gestion?dni=${turno.dni_paciente}&fecha=${turno.fecha}&hora=${turno.hora}`;
+      window.location.href = url;
+    }
+
+    async function cancelarTurno(turno) {
+      if (!confirm(`¿Estás seguro de que quieres cancelar el turno de ${turno.dni_paciente} para el ${turno.fecha} a las ${turno.hora}?`)) {
+        return;
+      }
+
+      try {
+        // Codificar los parámetros para evitar problemas con caracteres especiales
+        const dni = encodeURIComponent(turno.dni_paciente);
+        const fecha = encodeURIComponent(turno.fecha);
+        const hora = encodeURIComponent(turno.hora);
+        
+        const response = await fetch(`/api/turnos/${dni}/${fecha}/${hora}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          mostrarMensaje('Turno cancelado exitosamente', 'success');
+          // Recargar la búsqueda automáticamente
+          setTimeout(() => {
+            buscarTurnos();
+          }, 1000);
+        } else {
+          mostrarMensaje('Error al cancelar el turno: ' + (result.error || 'Turno no encontrado'), 'error');
+        }
+      } catch (error) {
+        console.error('Error cancelando turno:', error);
+        mostrarMensaje('Error de conexión al cancelar el turno', 'error');
+      }
+    }
+
+    async function marcarAtendido(turno) {
+      if (!confirm(`¿Marcar como atendido el turno de ${turno.dni_paciente} para el ${turno.fecha} a las ${turno.hora}?`)) {
+        return;
+      }
+
+      try {
+        // Codificar los parámetros para evitar problemas con caracteres especiales
+        const dni = encodeURIComponent(turno.dni_paciente);
+        const fecha = encodeURIComponent(turno.fecha);
+        const hora = encodeURIComponent(turno.hora);
+        
+        const response = await fetch(`/api/turnos/${dni}/${fecha}/${hora}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            estado: 'atendido'
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          mostrarMensaje('Turno marcado como atendido exitosamente', 'success');
+          // Recargar la búsqueda automáticamente
+          setTimeout(() => {
+            buscarTurnos();
+          }, 1000);
+        } else {
+          mostrarMensaje('Error al marcar el turno: ' + (result.error || 'Turno no encontrado'), 'error');
+        }
+      } catch (error) {
+        console.error('Error marcando turno:', error);
+        mostrarMensaje('Error de conexión al marcar el turno', 'error');
+      }
     }
 
     function editarPaciente(p) {
@@ -243,26 +1038,45 @@
 
       const resultado = await respuesta.json();
       const mensaje = document.getElementById("mensaje");
+      
       if (respuesta.ok) {
-        mensaje.innerText = resultado.mensaje;
-        mensaje.classList.remove("text-danger");
-        mensaje.classList.add("text-success");
+        // Mensaje de éxito
+        mensaje.innerHTML = `
+          <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <div>${resultado.mensaje}</div>
+          </div>
+        `;
         cargarPacientes();
+        cargarEstadisticas(); // Actualizar estadísticas
+        
         // Si es un nuevo paciente (POST), mostrar opciones post-registro
         if (metodo === "POST") {
           ultimoPacienteRegistrado = datos.dni;
           document.getElementById("form-paciente").reset();
           document.getElementById("dni").readOnly = false;
-          document.getElementById('acciones-post-registro').classList.remove('hidden');
+          document.getElementById('acciones-post-registro').style.display = "block";
+          
+          // Scroll suave hacia las acciones
+          setTimeout(() => {
+            document.getElementById("acciones-post-registro").scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }, 500);
         } else {
           // Si es edición, limpiar normalmente
           limpiarFormulario();
         }
 
       } else {
-        mensaje.innerText = resultado.error || "Error";
-        mensaje.classList.remove("text-success");
-        mensaje.classList.add("text-danger");
+        // Mensaje de error
+        mensaje.innerHTML = `
+          <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>${resultado.error || "Error al procesar la solicitud"}</div>
+          </div>
+        `;
       }
     });
 

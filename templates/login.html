@@ -3,103 +3,355 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login - Historias Clínicas</title>
+  <title>Login - Sistema de Historias Clínicas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --success-color: #27ae60;
+      --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --card-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: linear-gradient(135deg, #f2f2f2, #dfe9f3);
+      background: var(--gradient-bg);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 15px;
+      padding: 20px;
+      position: relative;
     }
 
     .login-container {
-      background: white;
-      padding: 2.5rem 2rem 3rem;
-      border-radius: 1rem;
-      box-shadow: 0 0 25px rgba(0,0,0,0.12);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 3rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
       width: 100%;
-      max-width: 400px;
+      max-width: 450px;
       text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo-section {
+      margin-bottom: 2rem;
+    }
+
+    .logo-icon {
+      font-size: 4rem;
+      color: var(--secondary-color);
+      margin-bottom: 1rem;
+      display: block;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
 
     .title {
-      font-size: 1.75rem;
+      font-size: 2rem;
       font-weight: 700;
-      color: #2c3e50;
-      margin-bottom: 0.25rem;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .subtitle {
       font-size: 1.1rem;
-      color: #555;
-      margin-bottom: 2rem;
-      font-weight: 500;
+      color: #6c757d;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
     }
 
-    .form-control {
-      padding-left: 2.75rem;
-    }
-
-    .input-group-text {
-      background-color: #e9ecef;
-      border-right: none;
-      border-radius: 0.375rem 0 0 0.375rem;
-      color: #495057;
-      font-size: 1.2rem;
-    }
-
-    .mb-3 {
+    .form-group {
+      margin-bottom: 1.5rem;
       position: relative;
     }
 
-    .error {
-      color: #d9534f;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
+    .input-wrapper {
+      position: relative;
     }
 
-    button.btn-primary {
+    .form-control {
+      padding: 1rem 1rem 1rem 3.5rem;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+      background: white;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      font-size: 1.2rem;
+      z-index: 10;
+    }
+
+    .error {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
       font-weight: 600;
       font-size: 1.1rem;
-      padding: 0.5rem 0;
-      border-radius: 0.5rem;
-      transition: background-color 0.3s ease;
+      color: white;
+      width: 100%;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
-    button.btn-primary:hover {
-      background-color: #2a7ac1;
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+      background: linear-gradient(135deg, #2980b9, var(--secondary-color));
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login i {
+      margin-right: 0.5rem;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 1rem 0;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-brand {
+      font-weight: 600;
+      color: white;
+    }
+
+    .footer small {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+    }
+
+    .footer strong {
+      color: var(--accent-color);
+    }
+
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+      }
+      
+      .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .footer-links {
+        gap: 1rem;
+      }
+    }
+
+    .floating-shapes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .shape:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      top: 60%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+
+    .shape:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
     }
   </style>
 </head>
 <body>
-  <div class="login-container shadow-sm">
-    <div class="title">
-      <i class="bi bi-person-circle"></i> Consultorio COLOM-BOBBIESI
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div class="login-container">
+    <div class="logo-section">
+      <i class="bi bi-heart-pulse-fill logo-icon"></i>
+      <div class="title">Consultorio COLOM-BOBBIESI</div>
+      <div class="subtitle">Sistema de Historias Clínicas</div>
     </div>
-    <div class="subtitle">Iniciar sesión</div>
 
     <form method="post" novalidate>
       {% if error %}
-        <div class="error"><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</div>
+        <div class="error">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          {{ error }}
+        </div>
       {% endif %}
-      <div class="mb-3 input-group">
-        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-        <input type="text" class="form-control" name="usuario" placeholder="Usuario" required autofocus />
+      
+      <div class="form-group">
+        <div class="input-wrapper">
+          <i class="bi bi-person-fill input-icon"></i>
+          <input type="text" class="form-control" name="usuario" placeholder="Usuario" required autofocus />
+        </div>
       </div>
-      <div class="mb-3 input-group">
-        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-        <input type="password" class="form-control" name="contrasena" placeholder="Contraseña" required />
+      
+      <div class="form-group">
+        <div class="input-wrapper">
+          <i class="bi bi-lock-fill input-icon"></i>
+          <input type="password" class="form-control" name="contrasena" placeholder="Contraseña" required />
+        </div>
       </div>
-      <button type="submit" class="btn btn-primary w-100">
-        <i class="bi bi-box-arrow-in-right"></i> Entrar
+      
+      <button type="submit" class="btn btn-login">
+        <i class="bi bi-box-arrow-in-right"></i>
+        Iniciar Sesión
       </button>
     </form>
   </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <i class="bi bi-heart-pulse"></i> Consultorio COLOM-BOBBIESI
+      </div>
+      <div class="footer-links">
+        <a href="#"><i class="bi bi-telephone"></i> Contacto</a>
+        <a href="#"><i class="bi bi-shield-check"></i> Privacidad</a>
+        <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+      </div>
+      <div>
+        © 2025 - Todos los derechos reservados<br>
+        <small>Desarrollado por <strong>Nicolás Fernández</strong></small>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -252,6 +252,14 @@
                 font-size: 2rem;
             }
         }
+        
+        .text-purple {
+            color: #6f42c1 !important;
+        }
+        
+        .icon.text-purple {
+            color: #6f42c1 !important;
+        }
     </style>
 </head>
 <body>
@@ -286,8 +294,11 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted mb-1">Ingresos del Mes</h6>
-                            <h3 class="mb-0" id="total-mes">$0</h3>
+                            <h3 class="mb-0" id="total-mes">***</h3>
                             <small class="text-muted">Total recaudado</small>
+                            <button class="btn btn-sm btn-outline-primary mt-1" onclick="toggleIngresosMes()" id="toggle-mes-btn">
+                                <i class="bi bi-eye"></i> Mostrar
+                            </button>
                         </div>
                         <i class="bi bi-cash-stack icon text-primary"></i>
                     </div>
@@ -370,6 +381,27 @@
                             <small class="text-muted">Efectivo + Transferencias</small>
                         </div>
                         <i class="bi bi-calculator icon text-warning"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ingresos Anuales -->
+            <div class="stats-grid">
+                <div class="stat-card" style="border-left-color: #6f42c1;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Ingresos del Año</h6>
+                            <h3 class="mb-0" id="total-anual">***</h3>
+                            <small class="text-muted" id="detalle-anual">Total acumulado</small>
+                            <div id="desglose-anual" style="display: none;">
+                                <small class="text-success">Efectivo: <span id="efectivo-anual">$0</span></small><br>
+                                <small class="text-info">Transferencia: <span id="transferencia-anual">$0</span></small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary mt-1" onclick="toggleIngresosAnual()" id="toggle-anual-btn">
+                                <i class="bi bi-eye"></i> Mostrar
+                            </button>
+                        </div>
+                        <i class="bi bi-graph-up icon text-purple"></i>
                     </div>
                 </div>
             </div>
@@ -477,6 +509,10 @@
                                 <i class="bi bi-calendar-month"></i>
                                 Reporte Mensual
                             </button>
+                            <button class="btn-admin btn-warning-admin" onclick="descargarReporteIngresosAnual()">
+                                <i class="bi bi-download"></i>
+                                Ingresos Anual (CSV)
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -563,7 +599,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="medico-filtro" class="form-label">Filtrar por Médico (Opcional)</label>
                                     <select class="form-select" id="medico-filtro">
@@ -571,13 +607,21 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="tipo-reporte" class="form-label">Tipo de Reporte</label>
-                                    <select class="form-select" id="tipo-reporte">
-                                        <option value="turnos">Turnos</option>
-                                        <option value="ocupacion">Ocupación</option>
-                                        <option value="pacientes">Pacientes</option>
+                                    <label for="obra-social-filtro" class="form-label">Filtrar por Obra Social (Opcional)</label>
+                                    <select class="form-select" id="obra-social-filtro">
+                                        <option value="">Todas las obras sociales</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="formato-descarga" class="form-label">Formato de Descarga</label>
+                                    <select class="form-select" id="formato-descarga">
+                                        <option value="json">Ver en Pantalla</option>
+                                        <option value="csv">Descargar CSV</option>
+                                        <option value="excel">Descargar Excel</option>
                                     </select>
                                 </div>
                             </div>
@@ -601,9 +645,11 @@
             const hoy = new Date();
             const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
             document.getElementById('mes-selector').value = mesActual;
-            cargarIngresosMes();
+            // cargarIngresosMes(); // No cargar automáticamente, solo cuando se haga clic en "Mostrar"
             
             cargarMedicosParaFiltros();
+            cargarObrasSocialesParaFiltros();
+            // cargarIngresosAnuales(); // No cargar automáticamente, solo cuando se haga clic en "Mostrar"
             
             // Configurar fechas por defecto para reportes personalizados
             const fechaHoy = hoy.toISOString().split('T')[0];
@@ -615,13 +661,13 @@
         // Cargar lista de médicos para filtros
         async function cargarMedicosParaFiltros() {
             try {
-                const response = await fetch('/api/agenda');
-                const agenda = await response.json();
+                const response = await fetch('/api/medicos');
+                const medicos = await response.json();
                 
                 const medicoSelect = document.getElementById('medico-filtro');
                 medicoSelect.innerHTML = '<option value="">Todos los médicos</option>';
                 
-                Object.keys(agenda).forEach(medico => {
+                medicos.forEach(medico => {
                     const option = document.createElement('option');
                     option.value = medico;
                     option.textContent = medico;
@@ -633,6 +679,27 @@
             }
         }
 
+        // Cargar lista de obras sociales para filtros
+        async function cargarObrasSocialesParaFiltros() {
+            try {
+                const response = await fetch('/api/obras-sociales');
+                const obrasSociales = await response.json();
+                
+                const obraSocialSelect = document.getElementById('obra-social-filtro');
+                obraSocialSelect.innerHTML = '<option value="">Todas las obras sociales</option>';
+                
+                obrasSociales.forEach(obraSocial => {
+                    const option = document.createElement('option');
+                    option.value = obraSocial;
+                    option.textContent = obraSocial;
+                    obraSocialSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error al cargar obras sociales:', error);
+            }
+        }
+
         async function cargarInfoUsuario() {
             try {
                 const response = await fetch('/api/session-info');
@@ -640,6 +707,69 @@
                 document.getElementById('usuario-actual').textContent = data.usuario;
             } catch (error) {
                 console.error('Error cargando información del usuario:', error);
+            }
+        }
+
+        // Cargar ingresos anuales
+        async function cargarIngresosAnuales() {
+            try {
+                const hoy = new Date();
+                const year = hoy.getFullYear();
+                const fechaInicio = `${year}-01-01`;
+                const fechaFin = hoy.toISOString().split('T')[0];
+                
+                const response = await fetch(`/api/reportes/ingresos-anual-data?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('total-anual').textContent = `$${data.total_ingresos}`;
+                    document.getElementById('efectivo-anual').textContent = `$${data.total_efectivo}`;
+                    document.getElementById('transferencia-anual').textContent = `$${data.total_transferencia}`;
+                }
+            } catch (error) {
+                console.error('Error cargando ingresos anuales:', error);
+            }
+        }
+
+        // Toggle para ocultar/mostrar ingresos del mes
+        function toggleIngresosMes() {
+            const totalMes = document.getElementById('total-mes');
+            const toggleBtn = document.getElementById('toggle-mes-btn');
+            
+            if (totalMes.textContent === '***') {
+                // Mostrar
+                cargarIngresosMes();
+                toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i> Ocultar';
+                toggleBtn.className = 'btn btn-sm btn-outline-secondary mt-1';
+            } else {
+                // Ocultar
+                totalMes.textContent = '***';
+                toggleBtn.innerHTML = '<i class="bi bi-eye"></i> Mostrar';
+                toggleBtn.className = 'btn btn-sm btn-outline-primary mt-1';
+            }
+        }
+
+        // Toggle para ocultar/mostrar ingresos anuales
+        function toggleIngresosAnual() {
+            const totalAnual = document.getElementById('total-anual');
+            const toggleBtn = document.getElementById('toggle-anual-btn');
+            const desgloseAnual = document.getElementById('desglose-anual');
+            const detalleAnual = document.getElementById('detalle-anual');
+            
+            if (totalAnual.textContent === '***') {
+                // Mostrar
+                cargarIngresosAnuales();
+                desgloseAnual.style.display = 'block';
+                detalleAnual.textContent = 'Total acumulado';
+                toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i> Ocultar';
+                toggleBtn.className = 'btn btn-sm btn-outline-secondary mt-1';
+            } else {
+                // Ocultar
+                totalAnual.textContent = '***';
+                desgloseAnual.style.display = 'none';
+                detalleAnual.textContent = 'Total acumulado';
+                toggleBtn.innerHTML = '<i class="bi bi-eye"></i> Mostrar';
+                toggleBtn.className = 'btn btn-sm btn-outline-primary mt-1';
             }
         }
 
@@ -838,6 +968,21 @@
             await mostrarReporteTurnos(hoy, hoy, 'Reporte Diario');
         }
 
+        // Función para descargar reporte de ingresos anual
+        async function descargarReporteIngresosAnual() {
+            const year = new Date().getFullYear();
+            const fechaInicio = `${year}-01-01`;
+            const fechaFin = new Date().toISOString().split('T')[0]; // Hasta hoy
+            
+            try {
+                const url = `/api/reportes/ingresos-anual?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+                window.open(url, '_blank');
+                alert('Reporte de ingresos anual descargado correctamente');
+            } catch (error) {
+                alert('Error al descargar el reporte de ingresos anual: ' + error.message);
+            }
+        }
+
         // Función para mostrar reportes de turnos
         async function mostrarReporteTurnos(fechaInicio, fechaFin, titulo) {
             try {
@@ -877,6 +1022,7 @@
                                                 <h6 class="text-muted">Ausentes</h6>
                                                 <h3 class="text-danger">${data.turnos_ausentes}</h3>
                                                 <small>${data.porcentaje_ausencias}%</small>
+                                                ${data.turnos_vencidos > 0 ? `<br><small class="text-warning">(${data.turnos_vencidos} vencidos)</small>` : ''}
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -1228,19 +1374,13 @@
         // Función para mostrar dashboard ejecutivo
         async function mostrarDashboardEjecutivo() {
             try {
-                // Obtener datos de múltiples reportes
-                const [turnosResponse, pacientesResponse, ocupacionResponse, pagosResponse] = await Promise.all([
-                    fetch('/api/reportes/turnos'),
-                    fetch('/api/reportes/pacientes'),
-                    fetch('/api/reportes/ocupacion'),
-                    ]);
-
-                const [turnosData, pacientesData, ocupacionData, pagosData] = await Promise.all([
-                    turnosResponse.json(),
-                    pacientesResponse.json(),
-                    ocupacionResponse.json(),
-                    pagosResponse.json()
-                ]);
+                // Obtener datos del dashboard ejecutivo
+                const response = await fetch('/api/reportes/dashboard-ejecutivo');
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al obtener el dashboard');
+                }
 
                 const modalContent = `
                     <div class="modal fade" id="dashboardEjecutivoModal" tabindex="-1" aria-hidden="true">
@@ -1255,37 +1395,38 @@
                                         <div class="col-md-3">
                                             <div class="stat-card">
                                                 <h6 class="text-muted">Pacientes Registrados</h6>
-                                                <h3 class="text-primary">${pacientesData.total_pacientes}</h3>
+                                                <h3 class="text-primary">${data.total_pacientes}</h3>
                                                 <small>Total en el sistema</small>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="stat-card">
                                                 <h6 class="text-muted">Turnos del Mes</h6>
-                                                <h3 class="text-success">${turnosData.total_turnos}</h3>
-                                                <small>${turnosData.porcentaje_atencion}% atendidos</small>
+                                                <h3 class="text-success">${data.total_turnos_mes}</h3>
+                                                <small>${data.porcentaje_atencion}% atendidos</small>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="stat-card">
                                                 <h6 class="text-muted">Ocupación Promedio</h6>
-                                                <h3 class="text-info">${ocupacionData.ocupacion_promedio}%</h3>
+                                                <h3 class="text-info">${data.ocupacion_promedio}%</h3>
                                                 <small>Última semana</small>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="stat-card">
                                                 <h6 class="text-muted">Ingresos del Mes</h6>
-                                                <h3 class="text-warning">$${pagosData.total_mes}</h3>
-                                                <small>${pagosData.cantidad_pagos_mes} pagos</small>
+                                                <h3 class="text-warning">$${data.total_ingresos_mes}</h3>
+                                                <small>${data.cantidad_pagos_mes} pagos</small>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <h6>Indicadores Clave</h6>
                                             <div class="alert alert-success">
-                                                <strong>Edad promedio pacientes:</strong> ${pacientesData.estadisticas_edad.promedio} años<br>
-                                                <strong>Pacientes activos:</strong> ${pacientesData.total_pacientes - pacientesData.pacientes_sin_turnos}<br>
-                                                <strong>Eficiencia de agenda:</strong> ${ocupacionData.ocupacion_promedio}%
+                                                <strong>Edad promedio pacientes:</strong> ${data.edad_promedio} años<br>
+                                                <strong>Pacientes activos:</strong> ${data.pacientes_activos}<br>
+                                                <strong>Eficiencia de agenda:</strong> ${data.ocupacion_promedio}%<br>
+                                                <strong>Turnos vencidos:</strong> ${data.turnos_vencidos}
                                             </div>
                                         </div>
                                     </div>
@@ -1305,16 +1446,14 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        ${Object.entries(turnosData.stats_por_medico).map(([medico, stats]) => {
-                                                            const eficiencia = stats.total > 0 ? Math.round((stats.atendidos / stats.total) * 100) : 0;
-                                                            const ocupacion = ocupacionData.ocupacion_por_medico[medico]?.porcentaje_ocupacion || 0;
+                                                        ${Object.entries(data.medicos_eficiencia).map(([medico, stats]) => {
                                                             return `
                                                                 <tr>
                                                                     <td>${medico}</td>
                                                                     <td>${stats.total}</td>
                                                                     <td class="text-success">${stats.atendidos}</td>
-                                                                    <td><span class="badge ${eficiencia > 85 ? 'bg-success' : eficiencia > 70 ? 'bg-warning' : 'bg-secondary'}">${eficiencia}%</span></td>
-                                                                    <td><span class="badge ${ocupacion > 80 ? 'bg-success' : ocupacion > 50 ? 'bg-warning' : 'bg-secondary'}">${ocupacion}%</span></td>
+                                                                    <td><span class="badge ${stats.eficiencia > 85 ? 'bg-success' : stats.eficiencia > 70 ? 'bg-warning' : 'bg-secondary'}">${stats.eficiencia}%</span></td>
+                                                                    <td><span class="badge bg-info">${data.ocupacion_promedio}%</span></td>
                                                                 </tr>
                                                             `;
                                                         }).join('')}
@@ -1350,7 +1489,8 @@
             const fechaInicio = document.getElementById('fecha-inicio-custom').value;
             const fechaFin = document.getElementById('fecha-fin-custom').value;
             const medico = document.getElementById('medico-filtro').value;
-            const tipo = document.getElementById('tipo-reporte').value;
+            const obraSocial = document.getElementById('obra-social-filtro').value;
+            const formato = document.getElementById('formato-descarga').value;
 
             if (!fechaInicio || !fechaFin) {
                 alert('Por favor seleccione las fechas de inicio y fin');
@@ -1361,27 +1501,172 @@
                 alert('La fecha de inicio no puede ser mayor que la fecha de fin');
                 return;
             }
+
             try {
-                let url = '';
-                switch (tipo) {
-                    case 'turnos':
-                        url = `/api/reportes/turnos?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
-                        if (medico) url += `&medico=${encodeURIComponent(medico)}`;
-                        await mostrarReporteTurnos(fechaInicio, fechaFin, `Reporte Personalizado de Turnos`);
-                        break;
-                    case 'ocupacion':
-                        await mostrarReporteOcupacionPersonalizado(fechaInicio, fechaFin);
-                        break;
-                    case 'pacientes':
-                        await mostrarReportePacientes();
-                        break;
-                    default:
-                        alert('Tipo de reporte no válido');
-                        return;
+                // Construir URL con parámetros
+                let url = `/api/reportes/personalizado?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+                if (medico) url += `&medico=${encodeURIComponent(medico)}`;
+                if (obraSocial) url += `&obra_social=${encodeURIComponent(obraSocial)}`;
+                url += `&formato=${formato}`;
+
+                if (formato === 'json') {
+                    // Mostrar en pantalla
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Error al obtener el reporte');
+                    }
+
+                    mostrarReportePersonalizadoModal(data);
+                } else {
+                    // Descargar archivo
+                    window.open(url, '_blank');
+                    alert('Reporte descargado correctamente');
                 }
             } catch (error) {
                 alert('Error al generar reporte personalizado: ' + error.message);
             }
+        }
+
+        // Función para mostrar el modal del reporte personalizado
+        function mostrarReportePersonalizadoModal(data) {
+            const modalContent = `
+                <div class="modal fade" id="reportePersonalizadoModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Reporte Personalizado</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="stat-card">
+                                            <h6 class="text-muted">Total Pacientes</h6>
+                                            <h3 class="text-primary">${data.total_pacientes}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-card">
+                                            <h6 class="text-muted">Total Atendidos</h6>
+                                            <h3 class="text-success">${data.total_atendidos}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-card">
+                                            <h6 class="text-muted">Total Consultas</h6>
+                                            <h3 class="text-info">${data.total_consultas}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-card">
+                                            <h6 class="text-muted">Período</h6>
+                                            <h3 class="text-warning">${data.fecha_inicio} a ${data.fecha_fin}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6>Filtros Aplicados:</h6>
+                                    <p class="text-muted">
+                                        ${data.medico_filtro ? `Médico: ${data.medico_filtro} | ` : ''}
+                                        ${data.obra_social_filtro ? `Obra Social: ${data.obra_social_filtro}` : 'Sin filtros adicionales'}
+                                    </p>
+                                </div>
+                                
+                                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                    <table class="table table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>DNI</th>
+                                                <th>Nombre</th>
+                                                <th>Apellido</th>
+                                                <th>Obra Social</th>
+                                                <th>N° Obra Social</th>
+                                                <th>Fecha</th>
+                                                <th>Hora</th>
+                                                <th>Médico</th>
+                                                <th>Estado</th>
+                                                <th>Monto</th>
+                                                <th>Tipo Pago</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${data.datos.map(fila => `
+                                                <tr>
+                                                    <td>${fila.dni}</td>
+                                                    <td>${fila.nombre}</td>
+                                                    <td>${fila.apellido}</td>
+                                                    <td>${fila.obra_social}</td>
+                                                    <td>${fila.numero_obra_social}</td>
+                                                    <td>${fila.fecha_turno}</td>
+                                                    <td>${fila.hora_turno}</td>
+                                                    <td>${fila.medico}</td>
+                                                    <td>
+                                                        <span class="badge ${fila.estado === 'atendido' ? 'bg-success' : 
+                                                                        fila.estado === 'ausente' ? 'bg-danger' : 
+                                                                        fila.estado === 'recepcionado' ? 'bg-warning' : 'bg-secondary'}">
+                                                            ${fila.estado}
+                                                        </span>
+                                                    </td>
+                                                    <td class="${fila.monto_pagado > 0 ? 'text-success' : 'text-info'}">
+                                                        ${fila.monto_pagado > 0 ? `$${fila.monto_pagado}` : 'Obra Social'}
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge ${fila.tipo_pago === 'efectivo' ? 'bg-primary' : 
+                                                                        fila.tipo_pago === 'transferencia' ? 'bg-info' : 'bg-success'}">
+                                                            ${fila.tipo_pago === 'efectivo' ? 'Efectivo' : 
+                                                              fila.tipo_pago === 'transferencia' ? 'Transferencia' : 'Obra Social'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-success" onclick="descargarReportePersonalizado('csv')">
+                                    <i class="bi bi-download"></i> Descargar CSV
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="descargarReportePersonalizado('excel')">
+                                    <i class="bi bi-file-earmark-excel"></i> Descargar Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remover modal existente si hay uno
+            const existingModal = document.getElementById('reportePersonalizadoModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Agregar nuevo modal
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('reportePersonalizadoModal'));
+            modal.show();
+        }
+
+        // Función para descargar reporte personalizado desde el modal
+        function descargarReportePersonalizado(formato) {
+            const fechaInicio = document.getElementById('fecha-inicio-custom').value;
+            const fechaFin = document.getElementById('fecha-fin-custom').value;
+            const medico = document.getElementById('medico-filtro').value;
+            const obraSocial = document.getElementById('obra-social-filtro').value;
+
+            let url = `/api/reportes/personalizado?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+            if (medico) url += `&medico=${encodeURIComponent(medico)}`;
+            if (obraSocial) url += `&obra_social=${encodeURIComponent(obraSocial)}`;
+            url += `&formato=${formato}`;
+
+            window.open(url, '_blank');
         }
 
         async function mostrarReporteOcupacionPersonalizado(fechaInicio, fechaFin) {
@@ -1410,6 +1695,286 @@
                 alert('Error al generar reporte de ocupación personalizado: ' + error.message);
             }
         }                                                          
+    </script>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <i class="bi bi-heart-pulse"></i>
+                    <span>Consultorio COLOM-BOBBIESI</span>
+                </div>
+                <p class="footer-description">
+                    Sistema integral de gestión de historias clínicas
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h6>Enlaces Rápidos</h6>
+                <ul class="footer-links">
+                    <li><a href="/"><i class="bi bi-house"></i> Inicio</a></li>
+                    <li><a href="/pacientes"><i class="bi bi-people"></i> Pacientes</a></li>
+                    <li><a href="/agenda"><i class="bi bi-calendar"></i> Agenda</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h6>Soporte</h6>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="bi bi-telephone"></i> Contacto</a></li>
+                    <li><a href="#"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                    <li><a href="#"><i class="bi bi-shield-check"></i> Privacidad</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h6>Información del Sistema</h6>
+                <div class="system-info">
+                    <div class="info-item">
+                        <i class="bi bi-server"></i>
+                        <span>Sistema Online</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Datos Seguros</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-clock"></i>
+                        <span id="current-time"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="copyright">
+                    © 2025 Consultorio COLOM-BOBBIESI. Todos los derechos reservados.<br>
+                    <small>Desarrollado por <strong>Nicolás Fernández</strong></small>
+                </div>
+                <div class="footer-stats">
+                    <span class="stat-item">
+                        <i class="bi bi-people"></i>
+                        <span id="footer-pacientes-count">-</span> Pacientes
+                    </span>
+                    <span class="stat-item">
+                        <i class="bi bi-calendar-check"></i>
+                        <span id="footer-turnos-count">-</span> Turnos Hoy
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .admin-footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            margin-top: 3rem;
+            border-top: 3px solid var(--accent-color);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .footer-section h6 {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-brand i {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .footer-description {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .system-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        .info-item i {
+            color: var(--success-color);
+            width: 16px;
+        }
+
+        .footer-bottom {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-bottom-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .copyright {
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+
+        .copyright small {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+
+        .copyright strong {
+            color: var(--accent-color);
+        }
+
+        .footer-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        .stat-item i {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .footer-bottom-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .footer-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <script>
+        // Actualizar hora actual
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Actualizar estadísticas del footer
+        async function updateFooterStats() {
+            try {
+                // Obtener estadísticas de pacientes
+                const pacientesResponse = await fetch('/api/pacientes');
+                if (pacientesResponse.ok) {
+                    const pacientes = await pacientesResponse.json();
+                    const pacientesCount = document.getElementById('footer-pacientes-count');
+                    if (pacientesCount) {
+                        pacientesCount.textContent = pacientes.length;
+                    }
+                }
+
+                // Obtener turnos de hoy
+                const hoy = new Date().toISOString().split('T')[0];
+                const turnosResponse = await fetch(`/api/turnos?fecha=${hoy}`);
+                if (turnosResponse.ok) {
+                    const turnos = await turnosResponse.json();
+                    const turnosCount = document.getElementById('footer-turnos-count');
+                    if (turnosCount) {
+                        turnosCount.textContent = turnos.length;
+                    }
+                }
+            } catch (error) {
+                console.error('Error actualizando estadísticas del footer:', error);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentTime();
+            updateFooterStats();
+            
+            // Actualizar hora cada segundo
+            setInterval(updateCurrentTime, 1000);
+            
+            // Actualizar estadísticas cada 5 minutos
+            setInterval(updateFooterStats, 300000);
+        });
     </script>
 </body>
 </html>
