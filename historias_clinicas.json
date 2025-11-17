@@ -15830,5 +15830,173 @@
         "medico": "Marianela Bobbiesi",
         "id": 1979,
         "fecha_creacion": "2025-10-16T10:46:42.567357-03:00"
+    },
+    {
+        "dni": "18516993",
+        "consulta_medica": "estudios normaelss\n",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Francisco Colom",
+        "id": 1980,
+        "fecha_creacion": "2025-11-14T15:56:34.181139-03:00"
+    },
+    {
+        "dni": "35561559",
+        "consulta_medica": "quiere operarse de refractiva le dijeron 14 mil dolares por ojo con lio\n\nusa od -7.50 -2.00 x \noi -10.50 -2.00 x \n ve 10/10 ao\n\ncito a fo + estudios",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1981,
+        "fecha_creacion": "2025-11-14T17:16:18.087484-03:00"
+    },
+    {
+        "dni": "44889433",
+        "consulta_medica": "avmc od 0.50 x 7\noi -0.50 x 165 10/10 ao\nlubricacion",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1982,
+        "fecha_creacion": "2025-11-14T17:23:47.843804-03:00"
+    },
+    {
+        "dni": "28714094",
+        "consulta_medica": "hta\n\navmc od -0.75 x 110\n oi +0.75 -1.25 x 80  10/10 ao\n\ncerca j2 sin correccion",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1983,
+        "fecha_creacion": "2025-11-14T17:37:37.811213-03:00"
+    },
+    {
+        "dni": "32005261",
+        "consulta_medica": "Estudios realizados ",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Julieta Colom",
+        "id": 1984,
+        "fecha_creacion": "2025-11-14T17:39:45.162252-03:00"
+    },
+    {
+        "dni": "38359715",
+        "consulta_medica": "Estudios realizados ",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Julieta Colom",
+        "id": 1985,
+        "fecha_creacion": "2025-11-14T17:39:57.833432-03:00"
+    },
+    {
+        "dni": "54423668",
+        "consulta_medica": "av 10/10 ao\nfo normal ao\nle di anteojos de descanso los usa esta comoda",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1986,
+        "fecha_creacion": "2025-11-14T17:44:05.608338-03:00"
+    },
+    {
+        "dni": "54423668",
+        "consulta_medica": "av 10/10 ao\nfo normal ao\nle di anteojos de descanso los usa esta comoda",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1987,
+        "fecha_creacion": "2025-11-14T17:44:05.654974-03:00"
+    },
+    {
+        "dni": "54423668",
+        "consulta_medica": "av 10/10 ao\nfo normal ao\nle di anteojos de descanso los usa esta comoda",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1988,
+        "fecha_creacion": "2025-11-14T17:44:06.621647-03:00"
+    },
+    {
+        "dni": "32005261",
+        "consulta_medica": "estudios ok\nfo normal ao",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1989,
+        "fecha_creacion": "2025-11-14T17:47:17.062191-03:00"
+    },
+    {
+        "dni": "38359715",
+        "consulta_medica": "estudios ok\nfo normal ao",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1990,
+        "fecha_creacion": "2025-11-14T17:51:32.076988-03:00"
+    },
+    {
+        "dni": "40491366",
+        "consulta_medica": "Estudios realizados ",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Julieta Colom",
+        "id": 1991,
+        "fecha_creacion": "2025-11-14T17:51:48.273061-03:00"
+    },
+    {
+        "dni": "28919370",
+        "consulta_medica": "no usa anteojos\nav1 od 10/10\noi 1/10\n\navmc od -0.75  x 80 10/10\noi +1.50 -4.00 x 110  10/10\ncerca add +1.50 ao j2\n\nsugiero cx refractiva oi",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1992,
+        "fecha_creacion": "2025-11-14T18:02:14.460612-03:00"
+    },
+    {
+        "dni": "56576114",
+        "consulta_medica": "emetrope",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1993,
+        "fecha_creacion": "2025-11-14T18:07:30.986176-03:00"
+    },
+    {
+        "dni": "58738564",
+        "consulta_medica": "emetrope",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1994,
+        "fecha_creacion": "2025-11-14T18:07:43.423279-03:00"
+    },
+    {
+        "dni": "43780016",
+        "consulta_medica": "Estudios realizados ",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Julieta Colom",
+        "id": 1995,
+        "fecha_creacion": "2025-11-14T18:07:47.786675-03:00"
+    },
+    {
+        "dni": "27919592",
+        "consulta_medica": "av 10/10 ao\ncerca ad +1.75 ao j2\n\ncito a estudios + fo",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1996,
+        "fecha_creacion": "2025-11-14T18:12:16.288844-03:00"
+    },
+    {
+        "dni": "35919423",
+        "consulta_medica": "escleritis oi q no responde a corticoides\ndoy efecoryl forte cada 8 hs\nsi no anda bien colocar cada 4\nsi anda bien colocar cada 12\ncontrol en 7 dias\ntuno reumato",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1997,
+        "fecha_creacion": "2025-11-14T18:27:16.865910-03:00"
+    },
+    {
+        "dni": "28326663",
+        "consulta_medica": "av 10/10 ao\ncerca add +1.50 ao j2",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1998,
+        "fecha_creacion": "2025-11-14T18:35:19.494675-03:00"
+    },
+    {
+        "dni": "40491366",
+        "consulta_medica": "estudios y fo ok",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 1999,
+        "fecha_creacion": "2025-11-14T18:38:16.420883-03:00"
+    },
+    {
+        "dni": "43780016",
+        "consulta_medica": "estudios y fo todo ok",
+        "fecha_consulta": "2025-11-14",
+        "medico": "Marianela Bobbiesi",
+        "id": 2000,
+        "fecha_creacion": "2025-11-14T18:40:57.065641-03:00"
     }
 ]
