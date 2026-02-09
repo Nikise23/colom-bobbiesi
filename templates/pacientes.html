@@ -396,7 +396,7 @@
                   <i class="bi bi-search"></i>
                 </span>
                 <input type="text" id="buscar" class="form-control form-input" placeholder="Buscar por DNI, nombre o apellido...">
-                <button onclick="cargarPacientes()" class="btn btn-primary-custom text-white">
+                <button onclick="paginaPacientesActual=1; cargarPacientes()" class="btn btn-primary-custom text-white">
                   <i class="bi bi-search me-2"></i>Buscar
                 </button>
               </div>
@@ -404,6 +404,10 @@
             
             <div id="lista-pacientes" class="max-height-400 overflow-auto">
               <!-- Los pacientes se cargarán aquí -->
+            </div>
+            <div id="paginacion-pacientes" class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="display: none;">
+              <small class="text-muted" id="info-paginacion"></small>
+              <div class="btn-group" id="botones-paginacion"></div>
             </div>
           </div>
         </div>
@@ -534,6 +538,11 @@
   <script>
     // Variable para almacenar el DNI del último paciente registrado
     let ultimoPacienteRegistrado = null;
+    // Paginación de búsqueda de pacientes
+    let paginaPacientesActual = 1;
+    const PACIENTES_POR_PAGINA = 10;
+    let cargarPacientesReqId = 0;
+    let cargarPacientesTimeout = null;
     
     // Función para actualizar información del footer
     async function actualizarFooterInfo() {
@@ -579,38 +588,33 @@
         document.getElementById('edad').value = edad;
       });
       
-      // Event listener para búsqueda en tiempo real
+      // Event listener para búsqueda en tiempo real (con debounce)
       document.getElementById('buscar').addEventListener('input', function() {
-        if (this.value.length >= 2) {
-          cargarPacientes();
-        } else if (this.value.length === 0) {
-          cargarPacientes();
-        }
+        const input = this;
+        paginaPacientesActual = 1;
+        clearTimeout(cargarPacientesTimeout);
+        cargarPacientesTimeout = setTimeout(() => {
+          if (input.value.length >= 2 || input.value.length === 0) {
+            cargarPacientes();
+          }
+        }, 250);
       });
     });
     
-    // Función para cargar estadísticas
+    // Función para cargar estadísticas (usa endpoint que respeta fecha real de registro)
     async function cargarEstadisticas() {
       try {
-        const response = await fetch('/api/pacientes');
-        const pacientes = await response.json();
+        const response = await fetch('/api/pacientes/estadisticas');
+        const stats = await response.json();
         
-        // Total de pacientes
-        document.getElementById('total-pacientes').textContent = pacientes.length;
+        document.getElementById('total-pacientes').textContent = stats.total;
+        document.getElementById('pacientes-hoy').textContent = stats.pacientes_hoy;
         
-        // Pacientes registrados hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        const pacientesHoy = pacientes.filter(p => {
-          // Asumiendo que hay un campo fecha_registro o similar
-          return p.fecha_registro && p.fecha_registro.startsWith(hoy);
-        });
-        document.getElementById('pacientes-hoy').textContent = pacientesHoy.length;
-        
-        // Último registro
-        if (pacientes.length > 0) {
-          const ultimoPaciente = pacientes[pacientes.length - 1];
+        if (stats.ultimo_registro) {
           document.getElementById('ultimo-registro').textContent = 
-            `${ultimoPaciente.nombre} ${ultimoPaciente.apellido}`;
+            `${stats.ultimo_registro.nombre} ${stats.ultimo_registro.apellido}`;
+        } else {
+          document.getElementById('ultimo-registro').textContent = 'N/A';
         }
       } catch (error) {
         console.error('Error cargando estadísticas:', error);
@@ -664,23 +668,32 @@
       });
     });
 
-    async function cargarPacientes() {
+    async function cargarPacientes(paginaEspecifica) {
       const filtro = document.getElementById("buscar").value.trim().toLowerCase();
       const lista = document.getElementById("lista-pacientes");
-      lista.innerHTML = "";
+      const contenedorPaginacion = document.getElementById("paginacion-pacientes");
+      const infoPaginacion = document.getElementById("info-paginacion");
+      const botonesPaginacion = document.getElementById("botones-paginacion");
+      const miReqId = ++cargarPacientesReqId;
+
+      if (paginaEspecifica !== undefined) {
+        paginaPacientesActual = paginaEspecifica;
+      }
 
       try {
-        const response = await fetch("/api/pacientes");
-        const pacientes = await response.json();
+        const params = new URLSearchParams({
+          busqueda: filtro,
+          pagina: String(paginaPacientesActual),
+          por_pagina: String(PACIENTES_POR_PAGINA)
+        });
+        const response = await fetch("/api/pacientes/buscar?" + params, { cache: "no-store" });
+        const data = await response.json();
+        if (miReqId !== cargarPacientesReqId) return;
 
-        const pacientesFiltrados = pacientes.filter(p =>
-          !filtro ||
-          p.dni.includes(filtro) ||
-          p.apellido.toLowerCase().includes(filtro) ||
-          p.nombre.toLowerCase().includes(filtro)
-        ).slice(0, 5); // Mostrar solo los primeros 5 resultados
+        const { pacientes: pacientesPagina, total, pagina: pagActual, total_paginas } = data;
+        paginaPacientesActual = pagActual;
 
-        if (pacientesFiltrados.length === 0) {
+        if (!pacientesPagina || pacientesPagina.length === 0) {
           lista.innerHTML = `
             <div class="text-center py-5">
               <i class="bi bi-person-x text-muted" style="font-size: 3rem;"></i>
@@ -688,18 +701,22 @@
               <p class="text-muted">${filtro ? 'Intenta con otros términos de búsqueda' : 'No hay pacientes registrados'}</p>
             </div>
           `;
+          contenedorPaginacion.style.display = "none";
           return;
         }
 
+        const inicio = (paginaPacientesActual - 1) * PACIENTES_POR_PAGINA;
+        const fin = Math.min(inicio + pacientesPagina.length, total);
 
-        pacientesFiltrados.forEach(p => {
-          const div = document.createElement("div");
-          div.className = "patient-card";
-          div.innerHTML = `
+        const nombreCompleto = (p) => `${(p.nombre || '').replace(/"/g, '&quot;')} ${(p.apellido || '').replace(/"/g, '&quot;')}`.trim();
+        const cardsHtml = pacientesPagina.map(p => {
+          const pEsc = JSON.stringify(p).replace(/"/g, '&quot;');
+          const nomEsc = nombreCompleto(p).replace(/'/g, "\\'");
+          return `<div class="patient-card">
             <div class="d-flex justify-content-between align-items-center">
               <div class="flex-grow-1">
                 <h6 class="fw-bold mb-1 text-primary">
-                  <i class="bi bi-person-circle me-2"></i>${p.nombre} ${p.apellido}
+                  <i class="bi bi-person-circle me-2"></i>${(p.nombre || '')} ${(p.apellido || '')}
                 </h6>
                 <small class="text-muted">
                   <i class="bi bi-person-badge me-1"></i>DNI: ${p.dni} | 
@@ -711,22 +728,41 @@
                   <i class="bi bi-three-dots"></i>
                 </button>
                 <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item" href="#" onclick='editarPaciente(${JSON.stringify(p).replace(/"/g, '&quot;')})'>
-                      <i class="bi bi-pencil me-2"></i>Editar
-                    </a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#" onclick='eliminarPaciente("${p.dni}", "${p.nombre} ${p.apellido}")'>
-                      <i class="bi bi-trash me-2 text-danger"></i>Eliminar
-                    </a>
-                  </li>
+                  <li><a class="dropdown-item" href="#" onclick="editarPaciente(${pEsc})"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="eliminarPaciente('${p.dni}', '${nomEsc}')"><i class="bi bi-trash me-2 text-danger"></i>Eliminar</a></li>
                 </ul>
               </div>
             </div>
-          `;
-          lista.appendChild(div);
-        });
+          </div>`;
+        }).join('');
+        lista.innerHTML = cardsHtml;
+
+        // Siempre mostrar info de paginación cuando hay resultados
+        contenedorPaginacion.style.display = "flex";
+        infoPaginacion.textContent = `Mostrando ${inicio + 1}-${fin} de ${total} pacientes`;
+
+        // Botones de navegación si hay más de una página
+        botonesPaginacion.innerHTML = '';
+        if (total_paginas > 1) {
+          const btnAnterior = document.createElement("button");
+          btnAnterior.className = "btn btn-outline-primary btn-sm";
+          btnAnterior.innerHTML = '<i class="bi bi-chevron-left"></i> Anterior';
+          btnAnterior.disabled = paginaPacientesActual <= 1;
+          btnAnterior.onclick = () => { cargarPacientes(paginaPacientesActual - 1); };
+          botonesPaginacion.appendChild(btnAnterior);
+
+          const spanPagina = document.createElement("span");
+          spanPagina.className = "btn btn-outline-secondary btn-sm disabled mx-1";
+          spanPagina.textContent = `Página ${paginaPacientesActual} de ${total_paginas}`;
+          botonesPaginacion.appendChild(spanPagina);
+
+          const btnSiguiente = document.createElement("button");
+          btnSiguiente.className = "btn btn-outline-primary btn-sm";
+          btnSiguiente.innerHTML = 'Siguiente <i class="bi bi-chevron-right"></i>';
+          btnSiguiente.disabled = paginaPacientesActual >= total_paginas;
+          btnSiguiente.onclick = () => { cargarPacientes(paginaPacientesActual + 1); };
+          botonesPaginacion.appendChild(btnSiguiente);
+        }
 
       } catch (error) {
         console.error('Error cargando pacientes:', error);
@@ -737,6 +773,7 @@
             <p class="text-muted">Intenta recargar la página</p>
           </div>
         `;
+        contenedorPaginacion.style.display = "none";
       }
     }
 
@@ -771,26 +808,31 @@
           pacientesMap[p.dni] = p;
         });
 
-        // Filtrar turnos por DNI o apellido y solo de hoy en adelante
+        // Parsear/fomar fecha YYYY-MM-DD sin problemas de zona horaria
+        function parseFechaLocal(fechaStr) {
+          const [y, m, d] = fechaStr.split('-').map(Number);
+          return new Date(y, m - 1, d);
+        }
+        function formatearFechaDDMM(fechaStr) {
+          const [y, m, d] = fechaStr.split('-');
+          return `${parseInt(d)}/${parseInt(m)}/${y}`;
+        }
+
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
-        
+
         const turnosFiltrados = turnos.filter(turno => {
           const paciente = pacientesMap[turno.dni_paciente];
           if (!paciente) return false;
           
-          // Verificar si coincide con el filtro
           const coincideFiltro = turno.dni_paciente.includes(filtro) || 
                                 paciente.apellido.toLowerCase().includes(filtro);
           
           if (!coincideFiltro) return false;
           
-          // Verificar que sea de hoy o futuro
-          const fechaTurno = new Date(turno.fecha);
-          fechaTurno.setHours(0, 0, 0, 0);
-          
+          const fechaTurno = parseFechaLocal(turno.fecha);
           return fechaTurno >= hoy;
-        }).slice(0, 10); // Mostrar solo los primeros 10 resultados
+        }).slice(0, 10);
 
         if (turnosFiltrados.length === 0) {
           lista.innerHTML = `
@@ -803,11 +845,14 @@
           return;
         }
 
-        // Mostrar los turnos encontrados
+        const h = new Date();
+        const hoyStr = `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`;
+
+        // Mostrar los turnos encontrados (usar fecha_fmt del servidor para evitar desfase por zona horaria)
         turnosFiltrados.forEach(turno => {
           const paciente = pacientesMap[turno.dni_paciente];
-          const fechaTurno = new Date(turno.fecha);
-          const esHoy = fechaTurno.toDateString() === new Date().toDateString();
+          const esHoy = turno.fecha === hoyStr;
+          const fechaMostrar = turno.fecha_fmt || formatearFechaDDMM(turno.fecha);
           
           const div = document.createElement("div");
           div.className = "patient-card";
@@ -819,7 +864,7 @@
                 </h6>
                 <small class="text-muted">
                   <i class="bi bi-person-badge me-1"></i>DNI: ${paciente.dni} | 
-                  <i class="bi bi-calendar3 me-1"></i>${esHoy ? 'Hoy' : fechaTurno.toLocaleDateString('es-ES')} | 
+                  <i class="bi bi-calendar3 me-1"></i>${esHoy ? 'Hoy' : fechaMostrar} | 
                   <i class="bi bi-clock me-1"></i>${turno.hora}
                 </small>
                 <br>
@@ -1079,8 +1124,6 @@
         `;
       }
     });
-
-    cargarPacientes();
   </script>
 
   <style>
@@ -1121,6 +1164,9 @@
     
     .hidden {
       display: none !important;
+    }
+    .max-height-400 {
+      max-height: 400px;
     }
   </style>
 </body>

@@ -301,23 +301,115 @@ def manejar_historia(dni):
 @login_requerido
 @rol_requerido("secretaria")
 def vista_pacientes():
-    return render_template("pacientes.html")
+    r = make_response(render_template("pacientes.html"))
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    return r
 
 
 @app.route("/api/pacientes", methods=["GET"])
 @login_requerido
 @rol_permitido(["secretaria", "medico"])
 def obtener_pacientes():
-    pacientes = cargar_json(PACIENTES_FILE)
-    
+    pacientes_raw = cargar_json(PACIENTES_FILE)
+    # Deduplicar por DNI (mantener primera aparición)
+    vistos = set()
+    pacientes = []
+    for p in pacientes_raw:
+        if p.get("dni") and p["dni"] not in vistos:
+            vistos.add(p["dni"])
+            pacientes.append(p)
+
     # Calcular edad dinámicamente para cada paciente
     for paciente in pacientes:
         if paciente.get("fecha_nacimiento"):
             edad_actual = calcular_edad(paciente["fecha_nacimiento"])
             paciente["edad"] = edad_actual
-    
+
     pacientes.sort(key=lambda p: p.get("apellido", "").lower())
     return jsonify(pacientes)
+
+
+@app.route("/api/pacientes/buscar", methods=["GET"])
+@login_requerido
+@rol_permitido(["secretaria", "medico"])
+def buscar_pacientes_paginado():
+    """Buscar pacientes con paginación (evita cargar todos los datos)"""
+    busqueda = request.args.get("busqueda", "").strip().lower()
+    pagina = int(request.args.get("pagina", 1))
+    por_pagina = min(int(request.args.get("por_pagina", 10)), 50)
+
+    pacientes_raw = cargar_json(PACIENTES_FILE)
+    vistos = set()
+    pacientes = []
+    for p in pacientes_raw:
+        if p.get("dni") and p["dni"] not in vistos:
+            vistos.add(p["dni"])
+            pacientes.append(p)
+
+    for paciente in pacientes:
+        if paciente.get("fecha_nacimiento"):
+            paciente["edad"] = calcular_edad(paciente["fecha_nacimiento"])
+
+    pacientes.sort(key=lambda p: p.get("apellido", "").lower())
+
+    if busqueda:
+        pacientes = [
+            p for p in pacientes
+            if (p.get("dni", "") and busqueda in p["dni"]) or
+               (p.get("apellido", "").lower() and busqueda in p["apellido"].lower()) or
+               (p.get("nombre", "").lower() and busqueda in p["nombre"].lower())
+        ]
+
+    total = len(pacientes)
+    total_paginas = max(1, (total + por_pagina - 1) // por_pagina)
+    pagina = max(1, min(pagina, total_paginas))
+    inicio = (pagina - 1) * por_pagina
+    fin = min(inicio + por_pagina, total)
+    pacientes_pagina = pacientes[inicio:fin]
+
+    return jsonify({
+        "pacientes": pacientes_pagina,
+        "total": total,
+        "pagina": pagina,
+        "total_paginas": total_paginas,
+        "por_pagina": por_pagina,
+    })
+
+
+@app.route("/api/pacientes/estadisticas", methods=["GET"])
+@login_requerido
+@rol_permitido(["secretaria", "medico"])
+def estadisticas_pacientes():
+    """Estadísticas para la vista de pacientes: total, hoy, último registro (por fecha real)"""
+    pacientes_raw = cargar_json(PACIENTES_FILE)
+    vistos = set()
+    pacientes = []
+    for p in pacientes_raw:
+        if p.get("dni") and p["dni"] not in vistos:
+            vistos.add(p["dni"])
+            pacientes.append(p)
+
+    hoy = date.today().isoformat()
+    pacientes_hoy = [p for p in pacientes if (p.get("fecha_registro") or "")[:10] == hoy]
+    total = len(pacientes)
+
+    # Último registro: por fecha_registro si existe, sino por orden en archivo
+    ultimo = None
+    con_fecha = [p for p in pacientes if p.get("fecha_registro")]
+    if con_fecha:
+        ultimo_p = max(con_fecha, key=lambda p: p.get("fecha_registro", ""))
+        ultimo = {"nombre": ultimo_p.get("nombre", ""), "apellido": ultimo_p.get("apellido", "")}
+    elif pacientes:
+        ultimo_p = pacientes[-1]
+        ultimo = {"nombre": ultimo_p.get("nombre", ""), "apellido": ultimo_p.get("apellido", "")}
+
+    return jsonify({
+        "total": total,
+        "pacientes_hoy": len(pacientes_hoy),
+        "ultimo_registro": ultimo
+    })
 
 
 @app.route("/api/pacientes", methods=["POST"])
@@ -336,6 +428,7 @@ def registrar_paciente():
     if any(p["dni"] == data["dni"] for p in pacientes):
         return jsonify({"error": "Ya existe un paciente con ese DNI"}), 400
 
+    data["fecha_registro"] = datetime.now(timezone_ar).isoformat()
     pacientes.append(data)
     guardar_json(PACIENTES_FILE, pacientes)
     return jsonify({"mensaje": "Paciente registrado correctamente"})
@@ -420,6 +513,15 @@ def obtener_turnos():
         paciente = next((p for p in pacientes if p["dni"] == t["dni_paciente"]), None)
         t["paciente"] = paciente
         t["estado"] = t.get("estado", "sin atender")
+        # Formatear fecha DD/M/YYYY en servidor (evita desfase por zona horaria en frontend)
+        if t.get("fecha"):
+            parts = t["fecha"].split("-")
+            if len(parts) >= 3:
+                t["fecha_fmt"] = f"{int(parts[2])}/{int(parts[1])}/{parts[0]}"
+            else:
+                t["fecha_fmt"] = t["fecha"]
+        else:
+            t["fecha_fmt"] = ""
     return jsonify(turnos)
 
 
