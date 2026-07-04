@@ -2,10 +2,14 @@ from datetime import date, datetime
 
 
 def normalizar_fecha_nacimiento(value: str | None) -> str | None:
-    """Convierte dd/mm/yyyy o yyyy-mm-dd a yyyy-mm-dd para almacenamiento."""
+    """Convierte dd/mm/yyyy, yyyy-mm-dd u ISO con hora a yyyy-mm-dd."""
     if not value or not str(value).strip():
         return None
     texto = str(value).strip()
+    if "T" in texto:
+        texto = texto.split("T", 1)[0]
+    elif " " in texto:
+        texto = texto.split(" ", 1)[0]
     for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
         try:
             return datetime.strptime(texto, fmt).date().isoformat()

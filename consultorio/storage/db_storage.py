@@ -43,6 +43,19 @@ def save_usuarios(data: list) -> None:
     db.session.commit()
 
 
+from consultorio.utils.fechas import normalizar_fecha_nacimiento
+
+
+def _fecha_nacimiento_db(value) -> str | None:
+    normalizada = normalizar_fecha_nacimiento(value)
+    if normalizada:
+        return normalizada
+    if value is None:
+        return None
+    texto = str(value).strip()
+    return texto[:30] if texto else None
+
+
 def load_pacientes() -> list:
     return [p.to_dict() for p in Paciente.query.order_by(Paciente.fecha_registro).all()]
 
@@ -60,7 +73,7 @@ def save_pacientes(data: list) -> None:
                 dni=dni,
                 nombre=item.get("nombre", ""),
                 apellido=item.get("apellido", ""),
-                fecha_nacimiento=item.get("fecha_nacimiento"),
+                fecha_nacimiento=_fecha_nacimiento_db(item.get("fecha_nacimiento")),
                 obra_social=item.get("obra_social"),
                 numero_obra_social=item.get("numero_obra_social"),
                 celular=item.get("celular"),
@@ -69,7 +82,9 @@ def save_pacientes(data: list) -> None:
         else:
             row.nombre = item.get("nombre", row.nombre)
             row.apellido = item.get("apellido", row.apellido)
-            row.fecha_nacimiento = item.get("fecha_nacimiento", row.fecha_nacimiento)
+            row.fecha_nacimiento = _fecha_nacimiento_db(
+                item.get("fecha_nacimiento", row.fecha_nacimiento)
+            )
             row.obra_social = item.get("obra_social", row.obra_social)
             row.numero_obra_social = item.get("numero_obra_social", row.numero_obra_social)
             row.celular = item.get("celular", row.celular)

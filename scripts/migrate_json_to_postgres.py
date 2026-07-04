@@ -12,7 +12,24 @@ from flask import Flask
 
 from consultorio.config import get_data_paths
 from consultorio.database import init_db
-from consultorio.storage import db_storage, json_storage
+from consultorio.storage import db_storage
+from consultorio.utils.fechas import normalizar_fecha_nacimiento
+
+
+def _sanitizar_pacientes(data: list) -> list:
+    resultado = []
+    for item in data:
+        if not isinstance(item, dict) or not item.get("dni"):
+            continue
+        copia = dict(item)
+        copia["dni"] = str(copia["dni"]).strip()[:20]
+        fn = normalizar_fecha_nacimiento(copia.get("fecha_nacimiento"))
+        if fn:
+            copia["fecha_nacimiento"] = fn
+        elif copia.get("fecha_nacimiento"):
+            copia["fecha_nacimiento"] = str(copia["fecha_nacimiento"]).strip()[:30]
+        resultado.append(copia)
+    return resultado
 
 
 def load_json_file(path: str, entity: str):
@@ -49,6 +66,8 @@ def migrate(data_dir: str | None = None, dry_run: bool = False) -> None:
     with app.app_context():
         for entity in entities:
             data = load_json_file(paths[entity], entity)
+            if entity == "pacientes" and isinstance(data, list):
+                data = _sanitizar_pacientes(data)
             summary[entity] = len(data) if isinstance(data, (list, dict)) else 0
             if dry_run:
                 continue
