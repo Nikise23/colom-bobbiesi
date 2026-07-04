@@ -43,10 +43,9 @@ def save_usuarios(data: list) -> None:
     db.session.commit()
 
 
-from consultorio.utils.fechas import normalizar_fecha_nacimiento
-
-
 def _fecha_nacimiento_db(value) -> str | None:
+    from consultorio.utils.fechas import normalizar_fecha_nacimiento
+
     normalizada = normalizar_fecha_nacimiento(value)
     if normalizada:
         return normalizada
