@@ -33,6 +33,49 @@ def _sanitizar_pacientes(data: list) -> list:
     return resultado
 
 
+def _sanitizar_turnos(data: list) -> list:
+    vistos: dict[tuple, dict] = {}
+    omitidos = 0
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        dni = str(item.get("dni_paciente", "")).strip()
+        fecha = str(item.get("fecha", "")).strip()
+        hora = _normalizar_hora(item.get("hora"))
+        if not dni or not fecha or not hora:
+            omitidos += 1
+            continue
+        copia = dict(item)
+        copia["dni_paciente"] = dni[:20]
+        copia["fecha"] = fecha[:30]
+        copia["hora"] = hora
+        vistos[(dni, fecha, hora)] = copia
+    if omitidos:
+        print(f"  (turnos: {omitidos} registros omitidos por datos incompletos)")
+    return list(vistos.values())
+
+
+def _sanitizar_pagos(data: list) -> list:
+    vistos: dict[int, dict] = {}
+    sin_id: list[dict] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        pago_id = item.get("id")
+        if pago_id is None:
+            sin_id.append(item)
+            continue
+        try:
+            vistos[int(pago_id)] = item
+        except (TypeError, ValueError):
+            continue
+    resultado = list(vistos.values()) + sin_id
+    duplicados = len(data) - len(resultado)
+    if duplicados > 0:
+        print(f"  (pagos: {duplicados} registros duplicados omitidos por id)")
+    return resultado
+
+
 def load_json_file(path: str, entity: str):
     if not os.path.exists(path):
         return db_storage.DEFAULTS[entity]
@@ -75,6 +118,10 @@ def migrate(data_dir: str | None = None, dry_run: bool = False, only: list[str] 
             data = load_json_file(paths[entity], entity)
             if entity == "pacientes" and isinstance(data, list):
                 data = _sanitizar_pacientes(data)
+            if entity == "turnos" and isinstance(data, list):
+                data = _sanitizar_turnos(data)
+            if entity == "pagos" and isinstance(data, list):
+                data = _sanitizar_pagos(data)
             summary[entity] = len(data) if isinstance(data, (list, dict)) else 0
             if dry_run:
                 continue

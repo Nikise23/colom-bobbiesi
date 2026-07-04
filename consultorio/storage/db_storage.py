@@ -218,6 +218,7 @@ def save_historias(data: list) -> None:
 
     incoming_ids = set()
     existing = {h.id: h for h in HistoriaClinica.query.all()}
+    pending: dict[int, HistoriaClinica] = {}
 
     for item in data:
         historia_id = item.get("id")
@@ -225,10 +226,11 @@ def save_historias(data: list) -> None:
             max_id = db.session.query(db.func.max(HistoriaClinica.id)).scalar() or 0
             historia_id = max_id + 1
         incoming_ids.add(historia_id)
-        row = existing.get(historia_id)
+        row = existing.get(historia_id) or pending.get(historia_id)
         if row is None:
             row = HistoriaClinica(id=historia_id)
             db.session.add(row)
+            pending[historia_id] = row
         row.dni = item.get("dni", row.dni or "")
         row.fecha_consulta = item.get("fecha_consulta")
         row.medico = item.get("medico")
@@ -252,6 +254,7 @@ def save_pagos(data: list) -> None:
 
     incoming_ids = set()
     existing = {p.id: p for p in Pago.query.all()}
+    pending: dict[int, Pago] = {}
 
     for item in data:
         pago_id = item.get("id")
@@ -259,10 +262,11 @@ def save_pagos(data: list) -> None:
             max_id = db.session.query(db.func.max(Pago.id)).scalar() or 0
             pago_id = max_id + 1
         incoming_ids.add(pago_id)
-        row = existing.get(pago_id)
+        row = existing.get(pago_id) or pending.get(pago_id)
         if row is None:
             row = Pago(id=pago_id)
             db.session.add(row)
+            pending[pago_id] = row
         row.dni_paciente = item.get("dni_paciente", row.dni_paciente or "")
         row.nombre_paciente = item.get("nombre_paciente")
         row.monto = item.get("monto", 0)
