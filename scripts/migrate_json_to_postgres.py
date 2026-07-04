@@ -13,6 +13,7 @@ from flask import Flask
 from consultorio.config import get_data_paths
 from consultorio.database import init_db
 from consultorio.storage import db_storage
+from consultorio.storage.db_storage import _normalizar_hora
 from consultorio.utils.fechas import normalizar_fecha_nacimiento
 
 
@@ -108,8 +109,13 @@ def main():
         action="store_true",
         help="Solo mostrar conteos sin escribir en la base",
     )
+    parser.add_argument(
+        "--only",
+        help="Solo importar estas entidades (coma-separadas): usuarios,pacientes,agenda,turnos,historias,pagos",
+    )
     args = parser.parse_args()
-    migrate(data_dir=args.data_dir, dry_run=args.dry_run)
+    only = [e.strip() for e in args.only.split(",")] if args.only else None
+    migrate(data_dir=args.data_dir, dry_run=args.dry_run, only=only)
 
 
 if __name__ == "__main__":

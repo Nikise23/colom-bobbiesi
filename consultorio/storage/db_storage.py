@@ -1,3 +1,5 @@
+import re
+
 from consultorio.config import DIAS_AGENDA
 from consultorio.extensions import db
 from consultorio.models import (
@@ -55,10 +57,20 @@ def _fecha_nacimiento_db(value) -> str | None:
     return texto[:30] if texto else None
 
 
+_HORA_RE = re.compile(r"(\d{1,2}:\d{2})")
+
+
 def _normalizar_hora(hora) -> str:
     if hora is None:
         return ""
-    return str(hora).strip()[:10]
+    texto = str(hora).strip()
+    if not texto:
+        return ""
+    match = _HORA_RE.search(texto)
+    if match:
+        horas, minutos = match.group(1).split(":", 1)
+        return f"{int(horas):02d}:{minutos}"
+    return texto[:10]
 
 
 def load_pacientes() -> list:
@@ -115,6 +127,7 @@ def save_turnos(data: list) -> None:
         (t.dni_paciente, t.fecha, t.hora): t
         for t in Turno.query.all()
     }
+    pending: dict[tuple, Turno] = {}
 
     for item in data:
         hora = _normalizar_hora(item.get("hora"))
@@ -122,7 +135,7 @@ def save_turnos(data: list) -> None:
         if not all(key):
             continue
         incoming_keys.add(key)
-        row = existing.get(key)
+        row = existing.get(key) or pending.get(key)
         if row is None:
             row = Turno(
                 medico=item.get("medico", ""),
@@ -131,6 +144,7 @@ def save_turnos(data: list) -> None:
                 dni_paciente=item["dni_paciente"],
             )
             db.session.add(row)
+            pending[key] = row
         row.medico = item.get("medico", row.medico if row.medico else "")
         row.estado = item.get("estado", "sin atender")
         row.observacion = item.get("observacion")
