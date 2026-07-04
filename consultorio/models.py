@@ -43,12 +43,12 @@ class Turno(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     medico = db.Column(db.String(255), nullable=False)
     fecha = db.Column(db.String(30), nullable=False)
-    hora = db.Column(db.String(5), nullable=False)
+    hora = db.Column(db.String(10), nullable=False)
     dni_paciente = db.Column(db.String(20), nullable=False)
     estado = db.Column(db.String(50), default="sin atender")
     observacion = db.Column(db.Text)
-    hora_recepcion = db.Column(db.String(5))
-    hora_sala_espera = db.Column(db.String(5))
+    hora_recepcion = db.Column(db.String(10))
+    hora_sala_espera = db.Column(db.String(10))
     pago_registrado = db.Column(db.Boolean)
     monto_pagado = db.Column(db.Float)
     observacion_pago = db.Column(db.Text)
@@ -92,7 +92,7 @@ class AgendaHorario(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     medico = db.Column(db.String(255), nullable=False)
     dia = db.Column(db.String(20), nullable=False)
-    hora = db.Column(db.String(5), nullable=False)
+    hora = db.Column(db.String(10), nullable=False)
 
     __table_args__ = (
         db.UniqueConstraint("medico", "dia", "hora", name="uq_agenda_medico_dia_hora"),
@@ -131,7 +131,7 @@ class Pago(db.Model):
     nombre_paciente = db.Column(db.String(255))
     monto = db.Column(db.Float, default=0)
     fecha = db.Column(db.String(30), nullable=False)
-    hora = db.Column(db.String(5))
+    hora = db.Column(db.String(10))
     tipo_pago = db.Column(db.String(50))
     obra_social = db.Column(db.String(255))
     observaciones = db.Column(db.Text)

@@ -55,6 +55,12 @@ def _fecha_nacimiento_db(value) -> str | None:
     return texto[:30] if texto else None
 
 
+def _normalizar_hora(hora) -> str:
+    if hora is None:
+        return ""
+    return str(hora).strip()[:10]
+
+
 def load_pacientes() -> list:
     return [p.to_dict() for p in Paciente.query.order_by(Paciente.fecha_registro).all()]
 
@@ -111,7 +117,8 @@ def save_turnos(data: list) -> None:
     }
 
     for item in data:
-        key = (item.get("dni_paciente"), item.get("fecha"), item.get("hora"))
+        hora = _normalizar_hora(item.get("hora"))
+        key = (item.get("dni_paciente"), item.get("fecha"), hora)
         if not all(key):
             continue
         incoming_keys.add(key)
@@ -120,15 +127,15 @@ def save_turnos(data: list) -> None:
             row = Turno(
                 medico=item.get("medico", ""),
                 fecha=item["fecha"],
-                hora=item["hora"],
+                hora=hora,
                 dni_paciente=item["dni_paciente"],
             )
             db.session.add(row)
         row.medico = item.get("medico", row.medico if row.medico else "")
         row.estado = item.get("estado", "sin atender")
         row.observacion = item.get("observacion")
-        row.hora_recepcion = item.get("hora_recepcion")
-        row.hora_sala_espera = item.get("hora_sala_espera")
+        row.hora_recepcion = _normalizar_hora(item.get("hora_recepcion")) or None
+        row.hora_sala_espera = _normalizar_hora(item.get("hora_sala_espera")) or None
         row.pago_registrado = item.get("pago_registrado")
         row.monto_pagado = item.get("monto_pagado")
         row.observacion_pago = item.get("observacion_pago")
@@ -172,10 +179,13 @@ def save_agenda(data: dict) -> None:
             if not isinstance(horas, list):
                 continue
             for hora in horas:
-                key = (medico, dia, hora)
+                hora_norm = _normalizar_hora(hora)
+                if not hora_norm:
+                    continue
+                key = (medico, dia, hora_norm)
                 incoming_keys.add(key)
                 if key not in existing:
-                    db.session.add(AgendaHorario(medico=medico, dia=dia, hora=hora))
+                    db.session.add(AgendaHorario(medico=medico, dia=dia, hora=hora_norm))
 
     for key, row in existing.items():
         if key not in incoming_keys:
@@ -243,7 +253,7 @@ def save_pagos(data: list) -> None:
         row.nombre_paciente = item.get("nombre_paciente")
         row.monto = item.get("monto", 0)
         row.fecha = item.get("fecha", row.fecha or "")
-        row.hora = item.get("hora")
+        row.hora = _normalizar_hora(item.get("hora")) or None
         row.tipo_pago = item.get("tipo_pago")
         row.obra_social = item.get("obra_social")
         row.observaciones = item.get("observaciones")

@@ -44,7 +44,7 @@ def load_json_file(path: str, entity: str):
     return data
 
 
-def migrate(data_dir: str | None = None, dry_run: bool = False) -> None:
+def migrate(data_dir: str | None = None, dry_run: bool = False, only: list[str] | None = None) -> None:
     if not os.environ.get("DATABASE_URL"):
         print("Error: DATABASE_URL no está configurada.")
         print("Ejemplo: postgresql://usuario:clave@localhost:5432/colom_bobbiesi")
@@ -61,6 +61,12 @@ def migrate(data_dir: str | None = None, dry_run: bool = False) -> None:
     init_db(app)
 
     entities = ["usuarios", "pacientes", "agenda", "turnos", "historias", "pagos"]
+    if only:
+        invalid = [e for e in only if e not in entities]
+        if invalid:
+            print(f"Entidades inválidas: {', '.join(invalid)}")
+            sys.exit(1)
+        entities = only
     summary = {}
 
     with app.app_context():
