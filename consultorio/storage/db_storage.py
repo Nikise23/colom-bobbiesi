@@ -1,5 +1,7 @@
 import re
 
+from sqlalchemy import func
+
 from consultorio.config import DIAS_AGENDA
 from consultorio.extensions import db
 from consultorio.models import (
@@ -10,7 +12,7 @@ from consultorio.models import (
     Turno,
     Usuario,
 )
-from consultorio.utils.fechas import enriquecer_paciente
+from consultorio.utils.fechas import enriquecer_paciente, normalizar_fecha_dia
 
 
 def _agenda_vacia_medico() -> dict:
@@ -286,12 +288,22 @@ def save_pagos(data: list) -> None:
 
 
 def load_turnos_fecha(fecha: str) -> list:
-    rows = Turno.query.filter_by(fecha=fecha).order_by(Turno.hora).all()
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    rows = (
+        Turno.query.filter(func.substr(Turno.fecha, 1, 10) == f)
+        .order_by(Turno.hora)
+        .all()
+    )
     return [t.to_dict() for t in rows]
 
 
 def load_pagos_fecha(fecha: str) -> list:
-    rows = Pago.query.filter_by(fecha=fecha).order_by(Pago.id).all()
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    rows = (
+        Pago.query.filter(func.substr(Pago.fecha, 1, 10) == f)
+        .order_by(Pago.id)
+        .all()
+    )
     return [p.to_dict() for p in rows]
 
 
@@ -387,12 +399,13 @@ def next_pago_id() -> int:
 
 def insert_pago(item: dict) -> dict:
     pago_id = item.get("id") or next_pago_id()
+    fecha = normalizar_fecha_dia(item.get("fecha")) or str(item.get("fecha", "")).strip()[:10]
     row = Pago(
         id=pago_id,
         dni_paciente=item["dni_paciente"],
         nombre_paciente=item.get("nombre_paciente"),
         monto=item.get("monto", 0),
-        fecha=item["fecha"],
+        fecha=fecha,
         hora=_normalizar_hora(item.get("hora")) or None,
         tipo_pago=item.get("tipo_pago"),
         obra_social=item.get("obra_social"),
@@ -405,7 +418,11 @@ def insert_pago(item: dict) -> dict:
 
 
 def pago_existe(dni: str, fecha: str, hora: str | None = None) -> bool:
-    query = Pago.query.filter_by(dni_paciente=dni, fecha=fecha)
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    query = Pago.query.filter(
+        Pago.dni_paciente == dni,
+        func.substr(Pago.fecha, 1, 10) == f,
+    )
     if hora:
         query = query.filter_by(hora=_normalizar_hora(hora))
     return query.first() is not None

@@ -1,5 +1,21 @@
 from datetime import date, datetime
 
+from consultorio.paths import timezone_ar
+
+
+def hoy_ar() -> date:
+    """Fecha calendario en Argentina (turnos/pagos del día)."""
+    return datetime.now(timezone_ar).date()
+
+
+def hoy_ar_iso() -> str:
+    return hoy_ar().isoformat()
+
+
+def normalizar_fecha_dia(value: str | None) -> str | None:
+    """Normaliza turnos/pagos a YYYY-MM-DD."""
+    return normalizar_fecha_nacimiento(value)
+
 
 def normalizar_fecha_nacimiento(value: str | None) -> str | None:
     """Convierte dd/mm/yyyy, yyyy-mm-dd u ISO con hora a yyyy-mm-dd."""
@@ -47,7 +63,7 @@ def calcular_edad(fecha_nacimiento: str | None):
         return None
     try:
         fecha_nac = datetime.strptime(iso, "%Y-%m-%d").date()
-        hoy = date.today()
+        hoy = hoy_ar()
         return hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
     except ValueError:
         return None

@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from consultorio.paths import PACIENTES_FILE, timezone_ar
 from consultorio.storage import cargar_json
-from consultorio.utils.fechas import calcular_edad, enriquecer_paciente
+from consultorio.utils.fechas import calcular_edad, enriquecer_paciente, normalizar_fecha_dia
 
 
 def enriquecer_turnos(turnos, pacientes, pagos):
@@ -30,7 +30,11 @@ def enriquecer_turnos(turnos, pacientes, pagos):
 def calcular_estadisticas_pagos(pagos, fecha_dia, mes_param=None):
     if mes_param is None:
         mes_param = fecha_dia.strftime("%Y-%m")
-    pagos_hoy = [p for p in pagos if p["fecha"] == fecha_dia.isoformat()]
+    dia_iso = fecha_dia.isoformat()
+    pagos_hoy = [
+        p for p in pagos
+        if (normalizar_fecha_dia(p.get("fecha")) or str(p.get("fecha", "")).strip()[:10]) == dia_iso
+    ]
     total_dia = sum(p["monto"] for p in pagos_hoy)
     pagos_mes = [p for p in pagos if p["fecha"].startswith(mes_param)]
     total_mes = sum(p["monto"] for p in pagos_mes)
@@ -79,11 +83,17 @@ def calcular_estadisticas_pagos(pagos, fecha_dia, mes_param=None):
 
 
 def listar_recepcionados(turnos, pacientes, pagos, fecha):
+    fecha_iso = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
     pacientes_por_dni = {p["dni"]: p for p in pacientes if p.get("dni")}
-    dnis_con_pago = {p["dni_paciente"] for p in pagos if p["fecha"] == fecha}
+    dnis_con_pago = {
+        p["dni_paciente"]
+        for p in pagos
+        if (normalizar_fecha_dia(p.get("fecha")) or str(p.get("fecha", "")).strip()[:10]) == fecha_iso
+    }
     resultado = []
     for turno in turnos:
-        if turno.get("fecha") != fecha or turno.get("estado") != "recepcionado":
+        turno_fecha = normalizar_fecha_dia(turno.get("fecha")) or str(turno.get("fecha", "")).strip()[:10]
+        if turno_fecha != fecha_iso or turno.get("estado") != "recepcionado":
             continue
         if turno["dni_paciente"] in dnis_con_pago:
             continue
@@ -105,11 +115,17 @@ def listar_recepcionados(turnos, pacientes, pagos, fecha):
 
 
 def listar_sala_espera(turnos, pacientes, pagos, fecha):
+    fecha_iso = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
     pacientes_por_dni = {p["dni"]: p for p in pacientes if p.get("dni")}
-    pagos_por_dni = {p["dni_paciente"]: p for p in pagos if p["fecha"] == fecha}
+    pagos_por_dni = {
+        p["dni_paciente"]: p
+        for p in pagos
+        if (normalizar_fecha_dia(p.get("fecha")) or str(p.get("fecha", "")).strip()[:10]) == fecha_iso
+    }
     resultado = []
     for turno in turnos:
-        if turno.get("fecha") != fecha or turno.get("estado") != "sala de espera":
+        turno_fecha = normalizar_fecha_dia(turno.get("fecha")) or str(turno.get("fecha", "")).strip()[:10]
+        if turno_fecha != fecha_iso or turno.get("estado") != "sala de espera":
             continue
         paciente = pacientes_por_dni.get(turno["dni_paciente"])
         pago = pagos_por_dni.get(turno["dni_paciente"])

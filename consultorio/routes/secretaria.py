@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from flask import Blueprint, jsonify, render_template, request
 
@@ -11,6 +11,7 @@ from consultorio.storage.queries import (
     load_pagos_mes,
     load_turnos_fecha,
 )
+from consultorio.utils.fechas import hoy_ar, hoy_ar_iso, normalizar_fecha_dia
 from consultorio.utils.helpers import (
     calcular_estadisticas_pagos,
     enriquecer_turnos,
@@ -33,12 +34,14 @@ def vista_secretaria():
 @rol_permitido(["secretaria", "administrador"])
 def secretaria_inicio():
     """Carga inicial optimizada: solo datos del día y del mes en curso."""
-    fecha_param = request.args.get("fecha", date.today().isoformat())
+    fecha_param = request.args.get("fecha", hoy_ar_iso())
     try:
-        fecha_dia = datetime.strptime(fecha_param, "%Y-%m-%d").date()
+        iso = normalizar_fecha_dia(fecha_param) or fecha_param
+        fecha_dia = datetime.strptime(iso, "%Y-%m-%d").date()
+        fecha_param = iso
     except ValueError:
-        fecha_dia = date.today()
-        fecha_param = fecha_dia.isoformat()
+        fecha_dia = hoy_ar()
+        fecha_param = hoy_ar_iso()
 
     mes_param = fecha_dia.strftime("%Y-%m")
     turnos_raw = load_turnos_fecha(fecha_param)

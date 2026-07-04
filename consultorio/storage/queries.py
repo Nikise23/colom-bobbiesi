@@ -8,7 +8,7 @@ from datetime import date
 from consultorio.config import get_data_paths, use_database
 from consultorio.paths import PACIENTES_FILE, PAGOS_FILE, TURNOS_FILE
 from consultorio.storage import cargar_json, guardar_json
-from consultorio.utils.fechas import enriquecer_paciente
+from consultorio.utils.fechas import enriquecer_paciente, normalizar_fecha_dia
 
 _PATHS = get_data_paths()
 
@@ -26,6 +26,8 @@ def insert_pago(pago: dict) -> dict:
     pagos = cargar_json(PAGOS_FILE)
     nuevo = copy.deepcopy(pago)
     nuevo["id"] = _max_pago_id(pagos) + 1
+    if nuevo.get("fecha"):
+        nuevo["fecha"] = normalizar_fecha_dia(nuevo["fecha"]) or str(nuevo["fecha"]).strip()[:10]
     pagos.append(nuevo)
     guardar_json(PAGOS_FILE, pagos)
     return nuevo
@@ -65,7 +67,12 @@ def load_pagos_fecha(fecha: str) -> list:
 
         return db_storage.load_pagos_fecha(fecha)
 
-    return [p for p in cargar_json(PAGOS_FILE) if p.get("fecha") == fecha]
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    return [
+        p
+        for p in cargar_json(PAGOS_FILE)
+        if (normalizar_fecha_dia(p.get("fecha")) or str(p.get("fecha", "")).strip()[:10]) == f
+    ]
 
 
 def load_pagos_mes(mes: str) -> list:

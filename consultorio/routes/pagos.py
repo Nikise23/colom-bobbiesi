@@ -1,20 +1,22 @@
 import csv
 import io
-from datetime import date, datetime
+from datetime import datetime
 
 from flask import Blueprint, jsonify, make_response, request
 
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
 from consultorio.paths import PAGOS_FILE, timezone_ar
-from consultorio.storage import cargar_json
+from consultorio.storage import cargar_json, guardar_json
 from consultorio.storage.queries import (
     insert_pago,
     load_pagos_fecha,
     load_pagos_mes,
+    load_turnos_fecha,
     obtener_paciente,
     pago_existe,
     update_turno,
 )
+from consultorio.utils.fechas import hoy_ar, normalizar_fecha_dia
 from consultorio.utils.helpers import calcular_estadisticas_pagos, normalizar_texto_obs
 
 bp = Blueprint("pagos", __name__)
@@ -25,6 +27,10 @@ def _registrar_pago_interno(data: dict, requiere_hora_unica: bool = False):
     for campo in campos_requeridos:
         if not data.get(campo):
             return {"error": f"El campo '{campo}' es requerido"}, 400
+
+    fecha = normalizar_fecha_dia(data.get("fecha"))
+    if not fecha:
+        return {"error": "Fecha inválida (use YYYY-MM-DD)"}, 400
 
     try:
         monto = float(data.get("monto", 0))
@@ -44,9 +50,9 @@ def _registrar_pago_interno(data: dict, requiere_hora_unica: bool = False):
         return {"error": "Paciente no encontrado"}, 404
 
     hora = data.get("hora", "")
-    if requiere_hora_unica and hora and pago_existe(data["dni_paciente"], data["fecha"], hora):
+    if requiere_hora_unica and hora and pago_existe(data["dni_paciente"], fecha, hora):
         return {"error": "Ya existe un pago registrado para este paciente en esta fecha y hora"}, 400
-    if not requiere_hora_unica and pago_existe(data["dni_paciente"], data["fecha"]):
+    if not requiere_hora_unica and pago_existe(data["dni_paciente"], fecha):
         return {"error": "Ya existe un pago registrado para este paciente en esta fecha"}, 400
 
     nuevo_pago = insert_pago(
@@ -54,7 +60,7 @@ def _registrar_pago_interno(data: dict, requiere_hora_unica: bool = False):
             "dni_paciente": data["dni_paciente"],
             "nombre_paciente": f"{paciente.get('nombre', '')} {paciente.get('apellido', '')}".strip(),
             "monto": monto,
-            "fecha": data["fecha"],
+            "fecha": fecha,
             "hora": hora,
             "fecha_registro": datetime.now(timezone_ar).isoformat(),
             "observaciones": data.get("observaciones", ""),
@@ -72,7 +78,7 @@ def obtener_pagos():
     fecha = request.args.get("fecha")
     if fecha:
         return jsonify(load_pagos_fecha(fecha))
-    mes = request.args.get("mes", date.today().strftime("%Y-%m"))
+    mes = request.args.get("mes", hoy_ar().strftime("%Y-%m"))
     return jsonify(load_pagos_mes(mes))
 
 
@@ -93,8 +99,6 @@ def eliminar_pago(pago_id):
     if len(pagos_filtrados) == len(pagos):
         return jsonify({"error": "Pago no encontrado"}), 404
 
-    from consultorio.storage import guardar_json
-
     guardar_json(PAGOS_FILE, pagos_filtrados)
     return jsonify({"mensaje": "Pago eliminado correctamente"})
 
@@ -103,15 +107,12 @@ def eliminar_pago(pago_id):
 @login_requerido
 @rol_requerido("secretaria")
 def obtener_estadisticas_pagos():
-    hoy = date.today()
     fecha_param = request.args.get("fecha")
     if fecha_param:
-        try:
-            fecha_dia = datetime.strptime(fecha_param, "%Y-%m-%d").date()
-        except ValueError:
-            fecha_dia = hoy
+        iso = normalizar_fecha_dia(fecha_param) or fecha_param
+        fecha_dia = datetime.strptime(iso, "%Y-%m-%d").date()
     else:
-        fecha_dia = hoy
+        fecha_dia = hoy_ar()
     mes_param = request.args.get("mes", fecha_dia.strftime("%Y-%m"))
     pagos = load_pagos_mes(mes_param)
     return jsonify(calcular_estadisticas_pagos(pagos, fecha_dia, mes_param))
@@ -123,12 +124,10 @@ def obtener_estadisticas_pagos():
 def exportar_pagos_csv():
     fecha_param = request.args.get("fecha")
     if fecha_param:
-        try:
-            fecha_dia = datetime.strptime(fecha_param, "%Y-%m-%d").date()
-        except ValueError:
-            fecha_dia = date.today()
+        iso = normalizar_fecha_dia(fecha_param) or fecha_param
+        fecha_dia = datetime.strptime(iso, "%Y-%m-%d").date()
     else:
-        fecha_dia = date.today()
+        fecha_dia = hoy_ar()
 
     pagos_dia = load_pagos_fecha(fecha_dia.isoformat())
     subtotal_efectivo = sum(p["monto"] for p in pagos_dia if p.get("tipo_pago") == "efectivo")
@@ -173,10 +172,11 @@ def exportar_pagos_csv():
 def cobrar_y_mover_a_sala():
     data = request.json or {}
     dni_paciente = data.get("dni_paciente")
-    fecha = data.get("fecha")
+    fecha_raw = data.get("fecha")
     monto = data.get("monto", 0)
     observaciones = normalizar_texto_obs(data.get("observaciones", ""))
 
+    fecha = normalizar_fecha_dia(fecha_raw)
     if not all([dni_paciente, fecha]):
         return jsonify({"error": "DNI y fecha son requeridos"}), 400
 
@@ -186,8 +186,6 @@ def cobrar_y_mover_a_sala():
             return jsonify({"error": "El monto no puede ser negativo"}), 400
     except (ValueError, TypeError):
         return jsonify({"error": "Monto inválido"}), 400
-
-    from consultorio.storage.queries import load_turnos_fecha
 
     turno_encontrado = next(
         (
@@ -206,10 +204,12 @@ def cobrar_y_mover_a_sala():
         {
             "dni_paciente": dni_paciente,
             "fecha": fecha,
+            "hora": turno_encontrado.get("hora", ""),
             "monto": monto,
             "tipo_pago": data.get("tipo_pago", "efectivo"),
             "observaciones": observaciones,
-        }
+        },
+        requiere_hora_unica=True,
     )
     if status != 201:
         return jsonify(payload), status
