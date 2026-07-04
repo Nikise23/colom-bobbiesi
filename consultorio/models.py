@@ -15,7 +15,7 @@ class Usuario(db.Model):
 class Paciente(db.Model):
     __tablename__ = "pacientes"
 
-    dni = db.Column(db.String(8), primary_key=True)
+    dni = db.Column(db.String(20), primary_key=True)
     nombre = db.Column(db.String(255), nullable=False)
     apellido = db.Column(db.String(255), nullable=False)
     fecha_nacimiento = db.Column(db.String(10))
@@ -44,7 +44,7 @@ class Turno(db.Model):
     medico = db.Column(db.String(255), nullable=False)
     fecha = db.Column(db.String(10), nullable=False)
     hora = db.Column(db.String(5), nullable=False)
-    dni_paciente = db.Column(db.String(8), nullable=False)
+    dni_paciente = db.Column(db.String(20), nullable=False)
     estado = db.Column(db.String(50), default="sin atender")
     observacion = db.Column(db.Text)
     hora_recepcion = db.Column(db.String(5))
@@ -103,7 +103,7 @@ class HistoriaClinica(db.Model):
     __tablename__ = "historias_clinicas"
 
     id = db.Column(db.Integer, primary_key=True)
-    dni = db.Column(db.String(8), nullable=False, index=True)
+    dni = db.Column(db.String(20), nullable=False, index=True)
     fecha_consulta = db.Column(db.String(10))
     medico = db.Column(db.String(255))
     consulta_medica = db.Column(db.Text)
@@ -127,7 +127,7 @@ class Pago(db.Model):
     __tablename__ = "pagos"
 
     id = db.Column(db.Integer, primary_key=True)
-    dni_paciente = db.Column(db.String(8), nullable=False, index=True)
+    dni_paciente = db.Column(db.String(20), nullable=False, index=True)
     nombre_paciente = db.Column(db.String(255))
     monto = db.Column(db.Float, default=0)
     fecha = db.Column(db.String(10), nullable=False)
