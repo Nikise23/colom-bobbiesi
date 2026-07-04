@@ -427,6 +427,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
 <!-- Fin tabla editable -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/fecha_nacimiento.js"></script>
   <script>
     let agenda = {};
     let turnos = [];
@@ -907,11 +908,13 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
       if (!fecha) return alert("Debe seleccionar una fecha");
 
       // Recopilar datos del nuevo paciente
+      const fechaNacInput = document.getElementById("nuevo-fecha-nacimiento");
+      fechaNacInput.value = formatearFechaInput(fechaNacInput.value);
       const datosPaciente = {
         nombre: document.getElementById("nuevo-nombre").value.trim(),
         apellido: document.getElementById("nuevo-apellido").value.trim(),
         dni: document.getElementById("nuevo-dni").value.trim(),
-        fecha_nacimiento: document.getElementById("nuevo-fecha-nacimiento").value,
+        fecha_nacimiento: fechaNacInput.value,
         obra_social: document.getElementById("nuevo-obra-social").value.trim(),
         numero_obra_social: document.getElementById("nuevo-numero-obra-social").value.trim(),
         celular: document.getElementById("nuevo-celular").value.trim()
@@ -1040,6 +1043,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
         // Actualizar estadísticas y renderizar
         actualizarEstadisticasDia();
         renderAgenda();
+        bindFechaNacimientoInput('nuevo-fecha-nacimiento');
         
         // Mostrar mensaje si viene desde registro de paciente
         const urlParams = new URLSearchParams(window.location.search);

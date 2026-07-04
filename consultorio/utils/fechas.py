@@ -10,6 +10,12 @@ def normalizar_fecha_nacimiento(value: str | None) -> str | None:
         texto = texto.split("T", 1)[0]
     elif " " in texto:
         texto = texto.split(" ", 1)[0]
+    digits = "".join(ch for ch in texto if ch.isdigit())
+    if len(digits) == 8:
+        try:
+            return datetime.strptime(digits, "%d%m%Y").date().isoformat()
+        except ValueError:
+            pass
     for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
         try:
             return datetime.strptime(texto, fmt).date().isoformat()

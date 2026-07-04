@@ -549,6 +549,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/fecha_nacimiento.js"></script>
   <script>
     // Variable para almacenar el DNI del último paciente registrado
     let ultimoPacienteRegistrado = null;
@@ -603,12 +604,8 @@
       actualizarFooterInfo();
       actualizarHora();
       
-      // Event listener para calcular edad automáticamente
-      document.getElementById('fecha_nacimiento').addEventListener('input', function() {
-        this.value = formatearFechaInput(this.value);
-        const edad = calcularEdad(this.value);
-        document.getElementById('edad').value = edad !== '' ? edad + ' años' : '';
-      });
+      // Máscara dd/mm/aaaa (barras automáticas)
+      bindFechaNacimientoInput('fecha_nacimiento', 'edad');
       
       // Event listener para búsqueda en tiempo real (con debounce)
       document.getElementById('buscar').addEventListener('input', function() {
@@ -642,38 +639,6 @@
         console.error('Error cargando estadísticas:', error);
       }
     }
-    // Función para calcular la edad
-    function parseFechaNacimiento(valor) {
-      if (!valor) return null;
-      const partes = valor.trim().split('/');
-      if (partes.length !== 3) return null;
-      const [dia, mes, anio] = partes.map(Number);
-      if (!dia || !mes || !anio || partes[2].length !== 4) return null;
-      return new Date(anio, mes - 1, dia);
-    }
-
-    function formatearFechaInput(valor) {
-      const digits = valor.replace(/\D/g, '').slice(0, 8);
-      if (digits.length <= 2) return digits;
-      if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-    }
-
-    function calcularEdad(fechaNacimiento) {
-      const fechaNac = parseFechaNacimiento(fechaNacimiento);
-      if (!fechaNac || isNaN(fechaNac.getTime())) return '';
-
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - fechaNac.getFullYear();
-      const mesActual = hoy.getMonth();
-      const mesNacimiento = fechaNac.getMonth();
-
-      if (mesActual < mesNacimiento || (mesActual === mesNacimiento && hoy.getDate() < fechaNac.getDate())) {
-        edad--;
-      }
-
-      return edad >= 0 ? edad : '';
-    }
     // Función para ir a la agenda con el paciente preseleccionado
     function irAAgenda() {
       if (ultimoPacienteRegistrado) {
@@ -695,17 +660,6 @@
       cargarPacientes();
       document.getElementById('acciones-post-registro').classList.add('hidden');
     }
-    // Event listener para calcular edad automáticamente
-    document.addEventListener('DOMContentLoaded', function() {
-      const fechaNacInput = document.getElementById('fecha_nacimiento');
-      const edadInput = document.getElementById('edad');
-      
-      fechaNacInput.addEventListener('input', function() {
-        this.value = formatearFechaInput(this.value);
-        const edad = calcularEdad(this.value);
-        edadInput.value = edad !== '' ? edad + ' años' : '';
-      });
-    });
 
     async function cargarPacientes(paginaEspecifica) {
       const filtro = document.getElementById("buscar").value.trim().toLowerCase();
@@ -1091,7 +1045,9 @@
 
     document.getElementById("form-paciente").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fechaNacimiento = document.getElementById("fecha_nacimiento").value;
+      const fechaInput = document.getElementById("fecha_nacimiento");
+      fechaInput.value = formatearFechaInput(fechaInput.value);
+      const fechaNacimiento = fechaInput.value;
       const edad = calcularEdad(fechaNacimiento);
 
       const datos = {

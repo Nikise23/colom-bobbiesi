@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import date, datetime, timedelta
 
 from consultorio.paths import AGENDA_FILE, PACIENTES_FILE, TURNOS_FILE, timezone_ar
@@ -16,6 +17,8 @@ DIA_EN_ES = {
 
 ESTADOS_CANCELABLES = {"sin atender", "recepcionado", "sala de espera", "llamado"}
 
+_RANGO_CACHE: dict[tuple[str, str, str], tuple[float, dict]] = {}
+
 
 def max_dias_reserva() -> int:
     try:
@@ -24,11 +27,31 @@ def max_dias_reserva() -> int:
         return 60
 
 
-def fecha_a_dia_agenda(fecha_str: str) -> tuple[date | None, str | None, str | None]:
+def max_dias_por_request() -> int:
     try:
-        fecha_dt = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+        return min(31, max(1, int(os.environ.get("PUBLIC_API_MAX_DIAS_RANGO", "31"))))
     except ValueError:
-        return None, None, "Formato de fecha inválido (usar YYYY-MM-DD)"
+        return 31
+
+
+def cache_segundos_rango() -> int:
+    try:
+        return max(0, int(os.environ.get("PUBLIC_API_CACHE_SECONDS", "45")))
+    except ValueError:
+        return 45
+
+
+def parse_fecha(fecha_str: str) -> tuple[date | None, str | None]:
+    try:
+        return datetime.strptime(fecha_str, "%Y-%m-%d").date(), None
+    except ValueError:
+        return None, "Formato de fecha inválido (usar YYYY-MM-DD)"
+
+
+def fecha_a_dia_agenda(fecha_str: str) -> tuple[date | None, str | None, str | None]:
+    fecha_dt, err = parse_fecha(fecha_str)
+    if err:
+        return None, None, err
 
     dia_semana = fecha_dt.strftime("%A").upper()
     dia_es = DIA_EN_ES.get(dia_semana)
@@ -47,6 +70,31 @@ def validar_fecha_reservable(fecha_dt: date) -> str | None:
     return None
 
 
+def validar_rango_fechas(desde_dt: date, hasta_dt: date) -> str | None:
+    if hasta_dt < desde_dt:
+        return "La fecha 'hasta' no puede ser anterior a 'desde'"
+
+    dias_en_rango = (hasta_dt - desde_dt).days + 1
+    if dias_en_rango > max_dias_por_request():
+        return (
+            f"El rango no puede superar {max_dias_por_request()} días por request "
+            f"(solicitados: {dias_en_rango})"
+        )
+
+    err = validar_fecha_reservable(desde_dt)
+    if err:
+        return err
+    return validar_fecha_reservable(hasta_dt)
+
+
+def iter_dias_habiles(desde_dt: date, hasta_dt: date):
+    actual = desde_dt
+    while actual <= hasta_dt:
+        if actual.weekday() != 6:
+            yield actual
+        actual += timedelta(days=1)
+
+
 def horarios_ocupados(turnos: list, medico: str, fecha: str) -> set[str]:
     return {
         t["hora"]
@@ -55,11 +103,45 @@ def horarios_ocupados(turnos: list, medico: str, fecha: str) -> set[str]:
     }
 
 
+def ocupados_por_fecha_en_rango(
+    turnos: list, medico: str, desde: str, hasta: str
+) -> dict[str, set[str]]:
+    resultado: dict[str, set[str]] = {}
+    for turno in turnos:
+        if turno.get("medico") != medico:
+            continue
+        fecha = turno.get("fecha", "")
+        if fecha < desde or fecha > hasta:
+            continue
+        hora = turno.get("hora")
+        if hora:
+            resultado.setdefault(fecha, set()).add(hora)
+    return resultado
+
+
 def filtrar_horarios_futuros(fecha_dt: date, horarios: list[str]) -> list[str]:
     if fecha_dt != date.today():
         return horarios
     ahora = datetime.now(timezone_ar).strftime("%H:%M")
     return [h for h in horarios if h >= ahora]
+
+
+def _agenda_medico(medico: str) -> tuple[dict | None, str | None]:
+    agenda = cargar_json(AGENDA_FILE)
+    if medico not in agenda:
+        return None, "Médico no encontrado"
+    return agenda[medico], None
+
+
+def _horarios_libres_dia(
+    medico_agenda: dict,
+    fecha_dt: date,
+    dia_es: str,
+    horas_ocupadas: set[str],
+) -> list[str]:
+    todos = medico_agenda.get(dia_es, [])
+    libres = [h for h in todos if h not in horas_ocupadas]
+    return filtrar_horarios_futuros(fecha_dt, libres)
 
 
 def slots_disponibles(medico: str, fecha_str: str) -> tuple[list[str], str | None]:
@@ -71,15 +153,85 @@ def slots_disponibles(medico: str, fecha_str: str) -> tuple[list[str], str | Non
     if err:
         return [], err
 
-    agenda = cargar_json(AGENDA_FILE)
-    if medico not in agenda:
-        return [], "Médico no encontrado"
+    medico_agenda, err = _agenda_medico(medico)
+    if err:
+        return [], err
 
     turnos = cargar_json(TURNOS_FILE)
-    todos = agenda[medico].get(dia_es, [])
     ocupados = horarios_ocupados(turnos, medico, fecha_str)
-    libres = filtrar_horarios_futuros(fecha_dt, [h for h in todos if h not in ocupados])
-    return libres, None
+    return _horarios_libres_dia(medico_agenda, fecha_dt, dia_es, ocupados), None
+
+
+def slots_disponibles_rango(
+    medico: str, desde_str: str, hasta_str: str
+) -> tuple[dict | None, str | None]:
+    desde_dt, err = parse_fecha(desde_str)
+    if err:
+        return None, err
+    hasta_dt, err = parse_fecha(hasta_str)
+    if err:
+        return None, err
+
+    err = validar_rango_fechas(desde_dt, hasta_dt)
+    if err:
+        return None, err
+
+    medico_agenda, err = _agenda_medico(medico)
+    if err:
+        return None, err
+
+    turnos = cargar_json(TURNOS_FILE)
+    ocupados_map = ocupados_por_fecha_en_rango(
+        turnos, medico, desde_str, hasta_str
+    )
+
+    dias = []
+    total_dias_con_turno = 0
+    for fecha_dt in iter_dias_habiles(desde_dt, hasta_dt):
+        _, dia_es, _ = fecha_a_dia_agenda(fecha_dt.isoformat())
+        fecha_iso = fecha_dt.isoformat()
+        libres = _horarios_libres_dia(
+            medico_agenda,
+            fecha_dt,
+            dia_es,
+            ocupados_map.get(fecha_iso, set()),
+        )
+        if libres:
+            total_dias_con_turno += 1
+        dias.append(
+            {
+                "fecha": fecha_iso,
+                "horarios_disponibles": libres,
+                "total": len(libres),
+            }
+        )
+
+    return (
+        {
+            "medico": medico,
+            "desde": desde_str,
+            "hasta": hasta_str,
+            "dias": dias,
+            "total_dias_con_turno": total_dias_con_turno,
+        },
+        None,
+    )
+
+
+def slots_disponibles_rango_cached(
+    medico: str, desde_str: str, hasta_str: str
+) -> tuple[dict | None, str | None]:
+    ttl = cache_segundos_rango()
+    clave = (medico, desde_str, hasta_str)
+    if ttl > 0 and clave in _RANGO_CACHE:
+        ts, payload = _RANGO_CACHE[clave]
+        if time.time() - ts < ttl:
+            return payload, None
+
+    payload, err = slots_disponibles_rango(medico, desde_str, hasta_str)
+    if not err and ttl > 0:
+        _RANGO_CACHE[clave] = (time.time(), payload)
+    return payload, err
 
 
 def listar_medicos() -> list[str]:

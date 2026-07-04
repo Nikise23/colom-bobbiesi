@@ -8,9 +8,11 @@ from consultorio.utils.turnos_publicos import (
     cancelar_turno,
     listar_medicos,
     listar_turnos_paciente,
+    max_dias_por_request,
     max_dias_reserva,
     reservar_turno,
     slots_disponibles,
+    slots_disponibles_rango_cached,
 )
 
 bp = Blueprint("public_api", __name__)
@@ -84,9 +86,14 @@ def public_api_info():
             "cors": "Solo orígenes listados en PUBLIC_API_CORS_ORIGIN",
             "registro_pacientes": "Pacientes nuevos pueden reservar y registrarse en la misma operación",
             "max_dias_reserva": max_dias_reserva(),
+            "max_dias_por_request": max_dias_por_request(),
             "endpoints": {
                 "medicos": "GET /api/public/v1/medicos",
                 "disponibilidad": "GET /api/public/v1/disponibilidad?medico=...&fecha=YYYY-MM-DD",
+                "disponibilidad_rango": (
+                    "GET /api/public/v1/disponibilidad-rango?"
+                    "medico=...&desde=YYYY-MM-DD&hasta=YYYY-MM-DD"
+                ),
                 "reservar": "POST /api/public/v1/turnos",
                 "consultar": "GET /api/public/v1/turnos?dni=...",
                 "cancelar": "DELETE /api/public/v1/turnos",
@@ -122,6 +129,29 @@ def public_disponibilidad():
             "total": len(horarios),
         }
     )
+
+
+@bp.route(
+    "/api/public/v1/disponibilidad-rango",
+    methods=["GET"],
+    endpoint="public_disponibilidad_rango",
+)
+@public_api_auth
+def public_disponibilidad_rango():
+    medico = (request.args.get("medico") or "").strip()
+    desde = (request.args.get("desde") or "").strip()
+    hasta = (request.args.get("hasta") or "").strip()
+    if not medico or not desde or not hasta:
+        return jsonify(
+            {"error": "Parámetros 'medico', 'desde' y 'hasta' son obligatorios"}
+        ), 400
+
+    payload, err = slots_disponibles_rango_cached(medico, desde, hasta)
+    if err:
+        status = 404 if err == "Médico no encontrado" else 400
+        return jsonify({"error": err}), status
+
+    return jsonify(payload)
 
 
 @bp.route("/api/public/v1/turnos", methods=["GET"], endpoint="public_listar_turnos")
