@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pacientes en Sala de Espera</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 font-sans">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Pacientes en Sala de Espera</h1>
+    <div id="lista-turnos" class="space-y-4">
+      <p>Cargando turnos...</p>
+    </div>
+    <a href="/" class="inline-block mt-4 text-blue-600 hover:underline">Volver al inicio</a>
+  </div>
+
+  <script>
+    async function cargarTurnos() {
+      const res = await fetch("/api/turnos/medico/recepcionados");
+      const turnos = await res.json();
+      const contenedor = document.getElementById("lista-turnos");
+      contenedor.innerHTML = "";
+
+      if (turnos.length === 0) {
+        contenedor.innerHTML = "<p class='text-gray-600'>No hay pacientes en sala de espera.</p>";
+        return;
+      }
+
+      turnos.forEach(t => {
+        const div = document.createElement("div");
+        div.className = "p-4 bg-gray-50 rounded border";
+        div.innerHTML = `
+          <p><strong>Nombre:</strong> ${t.paciente.nombre} ${t.paciente.apellido}</p>
+          <p><strong>DNI:</strong> ${t.paciente.dni}</p>
+          <p><strong>Hora:</strong> ${t.hora}</p>
+          <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onclick="llamarPaciente('${t.paciente.dni}')">
+            Llamar
+          </button>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    function llamarPaciente(dni) {
+      window.location.href = `/historias?dni=${dni}`;
+    }
+
+    cargarTurnos();
+  </script>
+</body>
+</html>

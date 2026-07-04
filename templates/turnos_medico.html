@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Pacientes - Médico</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .patient-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+    }
+    
+    .patient-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .waiting-room {
+      border-left-color: #0d6efd !important;
+      background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+    }
+    
+    .called {
+      border-left-color: #6f42c1 !important;
+      background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 100%);
+    }
+    
+    .attended {
+      border-left-color: #198754 !important;
+      background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%);
+    }
+
+    .attending {
+      border-left-color: #6c757d !important;
+      background: linear-gradient(135deg, #f1f3f5 0%, #ffffff 100%);
+    }
+
+    .section-header-attending {
+      background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px 10px 0 0;
+      margin-bottom: 0;
+    }
+    
+    .section-header {
+      background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px 10px 0 0;
+      margin-bottom: 0;
+    }
+    
+    .section-content {
+      background: white;
+      border-radius: 0 0 10px 10px;
+      min-height: 300px;
+      padding: 20px;
+    }
+    
+    .action-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: white;
+      border-radius: 15px;
+    }
+    
+    .patient-info {
+      font-size: 0.9em;
+    }
+    #attended-section {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .collapse-toggle {
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .empty-state {
+      text-align: center;
+      color: #6c757d;
+      padding: 40px 20px;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    /* Observaciones: sombra suave, alineado con la tarjeta */
+    .obs-sombreado {
+      padding: 0.4rem 0.55rem;
+      border-radius: 6px;
+      margin-top: 0.35rem;
+    }
+    .obs-sombreado-turno {
+      background: rgba(13, 110, 253, 0.07);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07), inset 0 0 0 1px rgba(13, 110, 253, 0.1);
+    }
+    .obs-sombreado-pago {
+      background: rgba(25, 135, 84, 0.08);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07), inset 0 0 0 1px rgba(25, 135, 84, 0.1);
+    }
+    .d-flex.flex-column.gap-2 > .obs-sombreado {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid py-4">
+    
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2><i class="bi bi-person-heart"></i> Gestión de Pacientes</h2>
+            <p class="text-muted mb-0">Panel del médico para gestionar el flujo de pacientes</p>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="text-end">
+              <div class="fw-bold" id="usuario-actual">Usuario</div>
+              <small class="text-muted">Médico</small>
+            </div>
+            <div class="d-flex gap-2">
+            <a href="/historias-gestion" class="btn btn-info">
+              <i class="bi bi-file-medical-fill"></i> Historias Clínicas
+            </a>
+            <button class="btn btn-outline-primary" onclick="actualizarDatos()">
+              <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+            <a href="/" class="btn btn-outline-secondary">
+              <i class="bi bi-house"></i> Inicio
+            </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+      <div class="col">
+        <div class="card stats-card h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-people-fill fs-1"></i>
+            <h3 id="total-waiting" class="mt-2">0</h3>
+            <small>En Sala de Espera</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card bg-warning text-dark h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-bell-fill fs-1"></i>
+            <h3 id="total-called" class="mt-2">0</h3>
+            <small>Llamados</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card bg-secondary text-white h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-pencil-square fs-1"></i>
+            <h3 id="total-attending" class="mt-2">0</h3>
+            <small>En atención (HC)</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card bg-success text-white h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-check-circle-fill fs-1"></i>
+            <h3 id="total-attended" class="mt-2">0</h3>
+            <small>Atendidos Hoy</small>
+          </div>
+         </div>
+      </div>
+      <div class="col">
+        <div class="card bg-info text-white h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-clock-fill fs-1"></i>
+            <h3 id="tiempo-promedio" class="mt-2">-</h3>
+            <small>Tiempo Promedio</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Pacientes -->
+    <div class="row">
+      
+      <!-- Sala de Espera -->
+      <div class="col-lg-6 mb-4">
+        <div class="section-header">
+          <h5 class="mb-0">
+            <i class="bi bi-people-fill"></i> Sala de Espera
+            <span class="badge bg-light text-dark ms-2" id="badge-waiting">0</span>
+          </h5>
+        </div>
+        <div class="section-content">
+          <div id="waiting-room-patients">
+            <div class="empty-state">
+              <i class="bi bi-people"></i>
+              <p>No hay pacientes en sala de espera</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Llamados -->
+      <div class="col-lg-6 mb-4">
+        <div class="section-header">
+          <h5 class="mb-0">
+            <i class="bi bi-bell-fill"></i> Pacientes Llamados
+            <span class="badge bg-light text-dark ms-2" id="badge-called">0</span>
+          </h5>
+        </div>
+        <div class="section-content">
+          <div id="called-patients">
+            <div class="empty-state">
+              <i class="bi bi-bell"></i>
+              <p>No hay pacientes llamados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- En atención: historia clínica en curso -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="section-header-attending">
+          <h5 class="mb-0">
+            <i class="bi bi-pencil-square"></i> En atención (redactando historia)
+            <span class="badge bg-light text-dark ms-2" id="badge-attending">0</span>
+          </h5>
+        </div>
+        <div class="section-content border border-top-0 rounded-bottom">
+          <div id="attending-patients">
+            <div class="empty-state py-3">
+              <i class="bi bi-clipboard-check"></i>
+              <p class="mb-0">No hay pacientes con historia en curso</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pacientes Atendidos (Desplegable) -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header collapse-toggle" data-bs-toggle="collapse" data-bs-target="#attended-collapse">
+            <h5 class="mb-0">
+              <i class="bi bi-check-circle-fill text-success"></i> 
+              Pacientes Atendidos Hoy 
+              <span class="badge bg-success ms-2" id="badge-attended">0</span>
+              <i class="bi bi-chevron-down float-end"></i>
+            </h5>
+          </div>
+          <div class="collapse" id="attended-collapse">
+            <div class="card-body">
+              <div id="attended-patients">
+                <div class="empty-state">
+                  <i class="bi bi-check-circle"></i>
+                  <p>No hay pacientes atendidos hoy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal para Historia Clínica -->
+  <div class="modal fade" id="historiaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-file-medical"></i> Historia Clínica
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="patient-info"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="abrirHistoriaCompleta()">
+            <i class="bi bi-file-earmark-plus"></i> Editar Historia
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let pacientesData = [];
+    let usuarioMedico = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      obtenerUsuario();
+      actualizarDatos();
+      
+      // Auto-actualizar cada 30 segundos
+      setInterval(actualizarDatos, 30000);
+    });
+
+    function escapeHtmlMedico(text) {
+      if (text == null || text === '') return '';
+      const el = document.createElement('div');
+      el.textContent = text;
+      return el.innerHTML;
+    }
+
+    async function obtenerUsuario() {
+      try {
+        const response = await fetch('/api/session-info');
+        const data = await response.json();
+        usuarioMedico = data.usuario;
+        
+        // Actualizar el nombre del usuario en la interfaz
+        const usuarioElement = document.getElementById('usuario-actual');
+        if (usuarioElement && data.usuario) {
+          usuarioElement.textContent = data.usuario;
+        }
+      } catch (error) {
+        console.error('Error obteniendo usuario:', error);
+      }
+    }
+
+    async function actualizarDatos() {
+      try {
+        const hoy = new Date().toISOString().split('T')[0];
+        const response = await fetch(`/api/turnos/dia?fecha=${hoy}`);
+        const turnos = await response.json();
+        
+        // Filtrar solo turnos del médico logueado
+        const turnosMedico = turnos.filter(t => t.medico === usuarioMedico);
+        
+        // Separar por estados
+        const enSalaEspera = turnosMedico.filter(t => t.estado === 'sala de espera');
+        const llamados = turnosMedico.filter(t => t.estado === 'llamado');
+        const atendiendo = turnosMedico.filter(t => t.estado === 'atendiendo');
+        const atendidos = turnosMedico.filter(t => t.estado === 'atendido');
+        
+        // Actualizar estadísticas
+        document.getElementById('total-waiting').textContent = enSalaEspera.length;
+        document.getElementById('total-called').textContent = llamados.length;
+        document.getElementById('total-attending').textContent = atendiendo.length;
+        document.getElementById('total-attended').textContent = atendidos.length;
+        
+        document.getElementById('badge-waiting').textContent = enSalaEspera.length;
+        document.getElementById('badge-called').textContent = llamados.length;
+        document.getElementById('badge-attending').textContent = atendiendo.length;
+        document.getElementById('badge-attended').textContent = atendidos.length;
+        
+        // Renderizar pacientes
+        renderizarPacientes('waiting-room-patients', enSalaEspera, 'waiting-room', 'sala de espera');
+        renderizarPacientes('called-patients', llamados, 'called', 'llamado');
+        renderizarPacientes('attending-patients', atendiendo, 'attending', 'atendiendo');
+        renderizarPacientes('attended-patients', atendidos, 'attended', 'atendido');
+        
+        // Calcular tiempo promedio
+        calcularTiempoPromedio(atendidos);
+        
+      } catch (error) {
+        console.error('Error actualizando datos:', error);
+        mostrarError('Error al cargar los datos de pacientes');
+      }
+    }
+
+    function renderizarPacientes(containerId, pacientes, cardClass, estado) {
+      const container = document.getElementById(containerId);
+      
+      if (pacientes.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-${getIconForState(estado)}"></i>
+            <p>No hay pacientes ${getStateDescription(estado)}</p>
+          </div>
+        `;
+        return;
+      }
+      let html = '';
+      pacientes.forEach(paciente => {
+        const info = paciente.paciente || {};
+        const nombreCompleto = `${info.nombre || ''} ${info.apellido || ''}`.trim() || `DNI: ${paciente.dni_paciente}`;
+        const edad = info.edad ? `${info.edad} años` : 'Edad no disponible';
+        
+        html += `
+          <div class="patient-card card mb-3 ${cardClass}" onclick="mostrarDetallesPaciente('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <h6 class="card-title mb-1">${nombreCompleto}</h6>
+                  <div class="patient-info text-muted">
+                    <div><i class="bi bi-person-badge"></i> DNI: ${paciente.dni_paciente}</div>
+                    <div><i class="bi bi-calendar"></i> ${edad}</div>
+                    <div><i class="bi bi-hospital"></i> ${info.obra_social || 'No especificada'}</div>
+                    <div><i class="bi bi-clock"></i> Turno: ${paciente.hora}</div>
+                    ${paciente.observacion ? `<div class="small obs-sombreado obs-sombreado-turno"><i class="bi bi-chat-quote text-primary"></i> <span>Obs. turno:</span> <span class="fw-semibold text-body">${escapeHtmlMedico(paciente.observacion)}</span></div>` : ''}
+                    ${paciente.observacion_pago ? `<div class="small obs-sombreado obs-sombreado-pago"><i class="bi bi-cash-coin text-success"></i> <span>Obs. pago:</span> <span class="fw-semibold text-body">${escapeHtmlMedico(paciente.observacion_pago)}</span></div>` : ''}
+                  </div>
+                </div>
+                <div class="text-end">
+                  ${generarBotones(paciente, estado)}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    function generarBotones(paciente, estado) {
+      if (estado === 'sala de espera') {
+        return `
+          <button class="btn btn-warning btn-sm action-btn mb-1" onclick="event.stopPropagation(); llamarPaciente('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <i class="bi bi-bell"></i> Llamar
+          </button><br>
+          <button class="btn btn-success btn-sm action-btn mb-1" onclick="event.stopPropagation(); marcarAtendido('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <i class="bi bi-check"></i> Atender
+          </button><br>
+          <button class="btn btn-danger btn-sm action-btn" onclick="event.stopPropagation(); marcarAusente('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <i class="bi bi-x"></i> Ausente
+          </button>
+        `;
+      } else if (estado === 'llamado') {
+        return `
+          <button class="btn btn-success btn-sm action-btn mb-1" onclick="event.stopPropagation(); marcarAtendido('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <i class="bi bi-check"></i> Atender
+          </button><br>
+          <button class="btn btn-danger btn-sm action-btn" onclick="event.stopPropagation(); marcarAusente('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <i class="bi bi-x"></i> Ausente
+          </button>
+        `;
+      } else if (estado === 'atendiendo') {
+        const hcUrl = `/historias?dni=${encodeURIComponent(paciente.dni_paciente)}&fecha=${encodeURIComponent(paciente.fecha)}&hora=${encodeURIComponent(paciente.hora)}`;
+        return `
+          <a class="btn btn-primary btn-sm action-btn mb-1" href="${hcUrl}" onclick="event.stopPropagation();">
+            <i class="bi bi-file-earmark-text"></i> Continuar HC
+          </a><br>
+          <button type="button" class="btn btn-success btn-sm action-btn" onclick="event.stopPropagation(); finalizarAtencion('${paciente.dni_paciente}', '${paciente.fecha}', '${paciente.hora}')">
+            <i class="bi bi-check2-all"></i> Finalizar
+          </button>
+        `;
+      } else if (estado === 'atendido') {
+        return `
+          <span class="badge bg-success">
+            <i class="bi bi-check-circle"></i> Atendido
+          </span>
+        `;
+      }
+      return '';
+    }
+    function getIconForState(estado) {
+      const icons = {
+        'sala de espera': 'people',
+        'llamado': 'bell',
+        'atendiendo': 'clipboard2-pulse',
+        'atendido': 'check-circle'
+      };
+      return icons[estado] || 'person';
+    }
+
+    function getStateDescription(estado) {
+      const descriptions = {
+        'sala de espera': 'en sala de espera',
+        'llamado': 'llamados',
+        'atendiendo': 'con historia en curso',
+        'atendido': 'atendidos'
+      };
+      return descriptions[estado] || estado;
+    }
+
+    async function llamarPaciente(dni, fecha, hora) {
+      await cambiarEstadoPaciente(dni, fecha, hora, 'llamado');
+    }
+
+    async function marcarAtendido(dni, fecha, hora) {
+      const ok = await cambiarEstadoPaciente(dni, fecha, hora, 'atendiendo', true);
+      if (ok) {
+        window.location.href = `/historias?dni=${encodeURIComponent(dni)}&fecha=${encodeURIComponent(fecha)}&hora=${encodeURIComponent(hora)}`;
+      }
+    }
+
+    async function finalizarAtencion(dni, fecha, hora) {
+      if (!confirm('¿Finalizar atención? Se guardará automáticamente lo que escribiste en la historia clínica.')) return;
+      try {
+        const response = await fetch(
+          `/api/turnos/${encodeURIComponent(dni)}/${encodeURIComponent(fecha)}/${encodeURIComponent(hora)}/finalizar-atencion`,
+          { method: 'POST', headers: { 'Content-Type': 'application/json' } }
+        );
+        const result = await response.json();
+        if (response.ok) {
+          mostrarNotificacion(result.mensaje, 'success');
+          actualizarDatos();
+        } else {
+          mostrarError(result.error || 'Error al finalizar la atención');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarError('Error de conexión al finalizar');
+      }
+    }
+
+    async function marcarAusente(dni, fecha, hora) {
+      if (confirm('¿Está seguro de marcar este paciente como ausente?')) {
+        await cambiarEstadoPaciente(dni, fecha, hora, 'ausente');
+      }
+    }
+
+    async function cambiarEstadoPaciente(dni, fecha, hora, nuevoEstado, omitirRefresco) {
+      try {
+        const response = await fetch('/api/turnos/estado', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dni_paciente: dni,
+            fecha: fecha,
+            hora: hora,
+            estado: nuevoEstado
+          })
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          if (!omitirRefresco) {
+            mostrarNotificacion(`Paciente marcado como ${nuevoEstado}`, 'success');
+            actualizarDatos();
+          }
+          return true;
+        } else {
+          mostrarError(result.error || 'Error al actualizar estado');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarError('Error de conexión');
+        return false;
+      }
+    }
+    async function mostrarDetallesPaciente(dni, fechaTurno, horaTurno) {
+      try {
+        // Cargar información del paciente
+        const [pacienteRes, historiaRes] = await Promise.all([
+          fetch('/api/pacientes'),
+          fetch(`/historias/${dni}`).catch(() => null)
+        ]);
+        
+        const pacientes = await pacienteRes.json();
+        const paciente = pacientes.find(p => p.dni === dni);
+        
+        if (!paciente) {
+          mostrarError('Paciente no encontrado');
+          return;
+        }
+        
+        let historia = null;
+        if (historiaRes && historiaRes.ok) {
+          historia = await historiaRes.json();
+        }
+
+        let obsTurno = '';
+        let obsPago = '';
+        if (fechaTurno && horaTurno) {
+          const tr = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(fechaTurno)}`);
+          if (tr.ok) {
+            const lista = await tr.json();
+            const tur = lista.find(t => t.dni_paciente === dni && t.hora === horaTurno);
+            if (tur) {
+              obsTurno = tur.observacion || '';
+              obsPago = tur.observacion_pago || '';
+            }
+          }
+        }
+        
+        const infoContainer = document.getElementById('patient-info');
+        infoContainer.innerHTML = `
+          <div class="row">
+            <div class="col-md-6">
+              <h6><i class="bi bi-person-fill"></i> Información Personal</h6>
+              <ul class="list-unstyled">
+                <li><strong>Nombre:</strong> ${paciente.nombre} ${paciente.apellido}</li>
+                <li><strong>DNI:</strong> ${paciente.dni}</li>
+                <li><strong>Edad:</strong> ${paciente.edad || 'No especificada'} años</li>
+                <li><strong>Teléfono:</strong> ${paciente.celular}</li>
+                <li><strong>Obra Social:</strong> ${paciente.obra_social}</li>
+                <li><strong>N° Obra Social:</strong> ${paciente.numero_obra_social}</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6><i class="bi bi-file-medical"></i> Historia Clínica</h6>
+              ${historia ? `
+                <ul class="list-unstyled">
+                  <li><strong>Último diagnóstico:</strong> ${historia.diagnostico}</li>
+                  <li><strong>Tratamiento:</strong> ${historia.tratamiento || 'No especificado'}</li>
+                  <li><strong>Última consulta:</strong> ${historia.fecha_consulta || 'No registrada'}</li>
+                  <li><strong>Observaciones:</strong> ${historia.observaciones || 'Ninguna'}</li>
+                </ul>
+              ` : `
+                <p class="text-muted">No hay historia clínica registrada</p>
+              `}
+            </div>
+            ${(obsTurno || obsPago) ? `
+            <div class="col-12 mt-3 pt-3 border-top">
+              <h6 class="mb-2"><i class="bi bi-clipboard2-pulse"></i> Este turno</h6>
+              <div class="d-flex flex-column gap-2 small text-muted">
+                ${obsTurno ? `<div class="obs-sombreado obs-sombreado-turno mb-0"><i class="bi bi-chat-quote text-primary me-1"></i>Obs. turno: <span class="fw-semibold text-body">${escapeHtmlMedico(obsTurno)}</span></div>` : ''}
+                ${obsPago ? `<div class="obs-sombreado obs-sombreado-pago mb-0"><i class="bi bi-cash-coin text-success me-1"></i>Obs. pago: <span class="fw-semibold text-body">${escapeHtmlMedico(obsPago)}</span></div>` : ''}
+              </div>
+            </div>
+            ` : ''}
+          </div>
+        `;
+        
+        // Guardar DNI para el botón de editar
+        window.currentPatientDNI = dni;
+        
+        // Mostrar modal
+        new bootstrap.Modal(document.getElementById('historiaModal')).show();
+        
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarError('Error al cargar detalles del paciente');
+      }
+    }
+    function abrirHistoriaCompleta() {
+      if (window.currentPatientDNI) {
+        window.location.href = `/historias?dni=${window.currentPatientDNI}`;
+      }
+    }
+
+    function calcularTiempoPromedio(atendidos) {
+      // Implementación simple - se puede mejorar con timestamps reales
+      const tiempoElement = document.getElementById('tiempo-promedio');
+      if (atendidos.length > 0) {
+        tiempoElement.textContent = '~15min';
+      } else {
+        tiempoElement.textContent = '-';
+      }
+    }
+
+    function mostrarNotificacion(mensaje, tipo = 'info') {
+      // Crear toast notification
+      const toast = document.createElement('div');
+      toast.className = `alert alert-${tipo} position-fixed top-0 end-0 m-3`;
+      toast.style.zIndex = '9999';
+      toast.style.minWidth = '300px';
+      toast.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close float-end" onclick="this.parentElement.remove()"></button>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 3000);
+    }
+
+    function mostrarError(mensaje) {
+      mostrarNotificacion(mensaje, 'danger');
+    }
+  </script>
+
+  <!-- Footer -->
+  <footer class="admin-footer">
+      <div class="footer-content">
+          <div class="footer-section">
+              <div class="footer-brand">
+                  <i class="bi bi-heart-pulse"></i>
+                  <span>Consultorio COLOM-BOBBIESI</span>
+              </div>
+              <p class="footer-description">
+                  Sistema integral de gestión de historias clínicas
+              </p>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Enlaces Rápidos</h6>
+              <ul class="footer-links">
+                  <li><a href="/"><i class="bi bi-house"></i> Inicio</a></li>
+                  <li><a href="/pacientes"><i class="bi bi-people"></i> Pacientes</a></li>
+                  <li><a href="/agenda"><i class="bi bi-calendar"></i> Agenda</a></li>
+              </ul>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Soporte</h6>
+              <ul class="footer-links">
+                  <li><a href="#"><i class="bi bi-telephone"></i> Contacto</a></li>
+                  <li><a href="#"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                  <li><a href="#"><i class="bi bi-shield-check"></i> Privacidad</a></li>
+              </ul>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Información del Sistema</h6>
+              <div class="system-info">
+                  <div class="info-item">
+                      <i class="bi bi-server"></i>
+                      <span>Sistema Online</span>
+                  </div>
+                  <div class="info-item">
+                      <i class="bi bi-shield-check"></i>
+                      <span>Datos Seguros</span>
+                  </div>
+                  <div class="info-item">
+                      <i class="bi bi-clock"></i>
+                      <span id="current-time"></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <div class="footer-bottom">
+          <div class="footer-bottom-content">
+              <div class="copyright">
+                  © 2025 Consultorio COLOM-BOBBIESI. Todos los derechos reservados.<br>
+                  <small>Desarrollado por <strong>Nicolás Fernández</strong></small>
+              </div>
+              <div class="footer-stats">
+                  <span class="stat-item">
+                      <i class="bi bi-people"></i>
+                      <span id="footer-pacientes-count">-</span> Pacientes
+                  </span>
+                  <span class="stat-item">
+                      <i class="bi bi-calendar-check"></i>
+                      <span id="footer-turnos-count">-</span> Turnos Hoy
+                  </span>
+              </div>
+          </div>
+      </div>
+  </footer>
+
+  <style>
+      .admin-footer {
+          background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+          color: white;
+          margin-top: 3rem;
+          border-top: 3px solid #e74c3c;
+      }
+
+      .footer-content {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1.5fr;
+          gap: 2rem;
+          padding: 2rem 0;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding-left: 2rem;
+          padding-right: 2rem;
+      }
+
+      .footer-section h6 {
+          color: #e74c3c;
+          font-weight: 600;
+          margin-bottom: 1rem;
+          font-size: 1rem;
+      }
+
+      .footer-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+      }
+
+      .footer-brand i {
+          color: #e74c3c;
+          font-size: 1.5rem;
+      }
+
+      .footer-description {
+          color: #bdc3c7;
+          font-size: 0.9rem;
+          line-height: 1.4;
+      }
+
+      .footer-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      .footer-links li {
+          margin-bottom: 0.5rem;
+      }
+
+      .footer-links a {
+          color: #bdc3c7;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: color 0.3s ease;
+          font-size: 0.9rem;
+      }
+
+      .footer-links a:hover {
+          color: white;
+      }
+
+      .system-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+      }
+
+      .info-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+          color: #bdc3c7;
+      }
+
+      .info-item i {
+          color: #27ae60;
+          width: 16px;
+      }
+
+      .footer-bottom {
+          background: rgba(0, 0, 0, 0.2);
+          padding: 1rem 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .footer-bottom-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+      }
+
+      .copyright {
+          color: #95a5a6;
+          font-size: 0.9rem;
+      }
+
+      .copyright small {
+          color: #7f8c8d;
+          font-size: 0.8rem;
+      }
+
+      .copyright strong {
+          color: #e74c3c;
+      }
+
+      .footer-stats {
+          display: flex;
+          gap: 2rem;
+      }
+
+      .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #bdc3c7;
+          font-size: 0.9rem;
+      }
+
+      .stat-item i {
+          color: #e74c3c;
+      }
+
+      @media (max-width: 768px) {
+          .footer-content {
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+              text-align: center;
+          }
+
+          .footer-bottom-content {
+              flex-direction: column;
+              gap: 1rem;
+              text-align: center;
+          }
+
+          .footer-stats {
+              justify-content: center;
+          }
+      }
+  </style>
+
+  <script>
+      // Actualizar hora actual
+      function updateCurrentTime() {
+          const now = new Date();
+          const timeString = now.toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+          });
+          const timeElement = document.getElementById('current-time');
+          if (timeElement) {
+              timeElement.textContent = timeString;
+          }
+      }
+
+      // Actualizar estadísticas del footer
+      async function updateFooterStats() {
+          try {
+              // Obtener estadísticas de pacientes
+              const pacientesResponse = await fetch('/api/pacientes');
+              if (pacientesResponse.ok) {
+                  const pacientes = await pacientesResponse.json();
+                  const pacientesCount = document.getElementById('footer-pacientes-count');
+                  if (pacientesCount) {
+                      pacientesCount.textContent = pacientes.length;
+                  }
+              }
+
+              // Obtener turnos de hoy
+              const hoy = new Date().toISOString().split('T')[0];
+              const turnosResponse = await fetch(`/api/turnos?fecha=${hoy}`);
+              if (turnosResponse.ok) {
+                  const turnos = await turnosResponse.json();
+                  const turnosCount = document.getElementById('footer-turnos-count');
+                  if (turnosCount) {
+                      turnosCount.textContent = turnos.length;
+                  }
+              }
+          } catch (error) {
+              console.error('Error actualizando estadísticas del footer:', error);
+          }
+      }
+
+      // Inicializar
+      document.addEventListener('DOMContentLoaded', function() {
+          updateCurrentTime();
+          updateFooterStats();
+          
+          // Actualizar hora cada segundo
+          setInterval(updateCurrentTime, 1000);
+          
+          // Actualizar estadísticas cada 5 minutos
+          setInterval(updateFooterStats, 300000);
+      });
+  </script>
+</body>
+</html>

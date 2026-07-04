@@ -1,0 +1,227 @@
+from datetime import datetime
+
+from flask import Blueprint, jsonify, render_template, request
+
+from consultorio.auth.decorators import login_requerido, rol_requerido
+from consultorio.paths import DATA_FILE, PACIENTES_FILE, TURNOS_FILE, timezone_ar
+from consultorio.storage import cargar_json, guardar_json
+from consultorio.utils.helpers import validar_historia
+
+bp = Blueprint("historias", __name__)
+
+
+@bp.route("/historias", methods=["GET"], endpoint="ver_historia_clinica")
+@login_requerido
+@rol_requerido("medico")
+def ver_historia_clinica():
+    dni = request.args.get("dni", "").strip()
+    if not dni:
+        return "DNI no especificado", 400
+    fecha_turno = request.args.get("fecha", "").strip()
+    hora_turno = request.args.get("hora", "").strip()
+    return render_template(
+        "historia_clinica.html",
+        dni=dni,
+        fecha_turno=fecha_turno,
+        hora_turno=hora_turno,
+    )
+
+
+
+@bp.route("/api/historias", methods=["GET"], endpoint="obtener_todas_las_historias")
+@login_requerido
+@rol_requerido("medico")
+def obtener_todas_las_historias():
+    historias = cargar_json(DATA_FILE)
+    return jsonify(historias)
+
+
+
+@bp.route("/historias", methods=["POST"], endpoint="crear_historia")
+@login_requerido
+@rol_requerido("medico")
+def crear_historia():
+    historias = cargar_json(DATA_FILE)
+    nueva = dict(request.json or {})
+    fecha_turno = nueva.pop("fecha_turno", None)
+    hora_turno = nueva.pop("hora_turno", None)
+
+    valido, mensaje = validar_historia(nueva)
+    if not valido:
+        return jsonify({"error": mensaje}), 400
+
+
+    # Agregar ID único para la consulta
+    nueva["id"] = len(historias) + 1
+    nueva["fecha_creacion"] = datetime.now(timezone_ar).isoformat()
+
+
+    historias.append(nueva)
+    guardar_json(DATA_FILE, historias)
+
+    if fecha_turno and hora_turno:
+        turnos = cargar_json(TURNOS_FILE)
+        for t in turnos:
+            if (
+                t.get("dni_paciente") == nueva.get("dni")
+                and t.get("fecha") == fecha_turno
+                and t.get("hora") == hora_turno
+            ):
+                t.pop("borrador_consulta", None)
+                t.pop("borrador_fecha_consulta", None)
+                t.pop("borrador_actualizado", None)
+                break
+        guardar_json(TURNOS_FILE, turnos)
+
+    return jsonify({"mensaje": "Consulta registrada correctamente"}), 201
+
+
+
+@bp.route("/historias/<dni>", methods=["GET", "PUT", "DELETE"], endpoint="manejar_historia")
+@login_requerido
+@rol_requerido("medico")
+def manejar_historia(dni):
+    historias = cargar_json(DATA_FILE)
+
+
+    if request.method == "GET":
+        for h in historias:
+            if h["dni"] == dni:
+                return jsonify(h)
+        return jsonify({"error": "Historia no encontrada"}), 404
+
+
+    if request.method == "PUT":
+        datos = request.json
+        valido, mensaje = validar_historia(datos)
+        if not valido:
+            return jsonify({"error": mensaje}), 400
+
+
+        for h in historias:
+            if h["dni"] == dni:
+                h.update(datos)
+                guardar_json(DATA_FILE, historias)
+                return jsonify({"mensaje": "Historia modificada"})
+        return jsonify({"error": "Historia no encontrada"}), 404
+
+
+    if request.method == "DELETE":
+        nuevas = [h for h in historias if h["dni"] != dni]
+        if len(nuevas) == len(historias):
+            return jsonify({"error": "Historia no encontrada"}), 404
+        guardar_json(DATA_FILE, nuevas)
+        return jsonify({"mensaje": "Historia eliminada"})
+
+
+# ========================== SECRETARIA ============================
+
+
+
+@bp.route("/historias-gestion", endpoint="ver_historias_gestion")
+@login_requerido
+@rol_requerido("medico")
+def ver_historias_gestion():
+    return render_template("historias_gestion.html")
+
+
+@bp.route("/api/historias/buscar", methods=["GET"], endpoint="buscar_historias")
+@login_requerido
+@rol_requerido("medico")
+def buscar_historias():
+    historias = cargar_json(DATA_FILE)
+    pacientes = cargar_json(PACIENTES_FILE)
+    
+    # Parámetros de búsqueda
+    busqueda = request.args.get("busqueda", "").strip().lower()
+    pagina = int(request.args.get("pagina", 1))
+    por_pagina = int(request.args.get("por_pagina", 10))
+    ordenar_por = request.args.get("ordenar_por", "apellido")
+    orden = request.args.get("orden", "asc")
+    
+    # Enriquecer historias con datos del paciente
+    historias_enriquecidas = []
+    for historia in historias:
+        paciente = next((p for p in pacientes if p["dni"] == historia["dni"]), None)
+        if paciente:
+            historia_completa = historia.copy()
+            historia_completa["paciente"] = paciente
+            historias_enriquecidas.append(historia_completa)
+    
+    # Filtrar por búsqueda (apellido, nombre o DNI)
+    if busqueda:
+        historias_filtradas = []
+        for h in historias_enriquecidas:
+            paciente = h["paciente"]
+            apellido = paciente.get("apellido", "").lower()
+            nombre = paciente.get("nombre", "").lower()
+            dni = paciente.get("dni", "").lower()
+            
+            if (busqueda in apellido or 
+                busqueda in nombre or 
+                busqueda in dni):
+                historias_filtradas.append(h)
+        historias_enriquecidas = historias_filtradas
+    
+    # Agrupar por paciente y obtener la última consulta de cada uno
+    pacientes_unicos = {}
+    for h in historias_enriquecidas:
+        dni = h["dni"]
+        if dni not in pacientes_unicos:
+            pacientes_unicos[dni] = {
+                "paciente": h["paciente"],
+                "ultima_consulta": h["fecha_consulta"],
+                "total_consultas": 1,
+                "ultima_historia": h
+            }
+        else:
+            pacientes_unicos[dni]["total_consultas"] += 1
+            # Comparar fechas para encontrar la más reciente
+            if h["fecha_consulta"] > pacientes_unicos[dni]["ultima_consulta"]:
+                pacientes_unicos[dni]["ultima_consulta"] = h["fecha_consulta"]
+                pacientes_unicos[dni]["ultima_historia"] = h
+    
+    # Convertir a lista para ordenamiento
+    lista_pacientes = list(pacientes_unicos.values())
+    
+    # Ordenar
+    if ordenar_por == "apellido":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("apellido", "").lower(),
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "nombre":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("nombre", "").lower(),
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "fecha":
+        lista_pacientes.sort(
+            key=lambda x: x["ultima_consulta"],
+            reverse=(orden == "desc")
+        )
+    elif ordenar_por == "dni":
+        lista_pacientes.sort(
+            key=lambda x: x["paciente"].get("dni", ""),
+            reverse=(orden == "desc")
+        )
+    
+    # Paginación
+    total = len(lista_pacientes)
+    inicio = (pagina - 1) * por_pagina
+    fin = inicio + por_pagina
+    pacientes_pagina = lista_pacientes[inicio:fin]
+    
+    total_paginas = (total + por_pagina - 1) // por_pagina
+    
+    return jsonify({
+        "pacientes": pacientes_pagina,
+        "total": total,
+        "pagina": pagina,
+        "total_paginas": total_paginas,
+        "por_pagina": por_pagina
+    })
+
+
+
+# ========================== ADMINISTRADOR ============================

@@ -1,0 +1,1386 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agenda Médica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .hora-disponible { 
+      background-color: #d4edda !important; 
+      color: #155724 !important;
+      cursor: pointer; 
+      transition: all 0.3s ease;
+      border: 2px solid #28a745 !important;
+      min-height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .hora-disponible:hover { 
+      background-color: #28a745 !important; 
+      color: white !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+    
+    .hora-ocupada { 
+      background-color: #f8d7da !important;
+      color: #721c24 !important;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid #dc3545 !important;
+      min-height: 70px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    .hora-ocupada:hover {
+      background-color: #dc3545 !important; 
+      color: white !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+    
+    .hora-ocupada small {
+      font-size: 0.7em;
+      line-height: 1.1;
+    }
+    
+    .hora-ocupada .obra-en-tarjeta {
+      font-size: 0.65em;
+      font-weight: 600;
+      opacity: 0.92;
+      line-height: 1.15;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .conteo-os-dia .badge {
+      font-size: 0.75em;
+      font-weight: 500;
+    }
+    
+    .hora {
+      padding: 8px 16px;
+      margin: 4px;
+      border-radius: 8px;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .top-bar h2 {
+      margin: 0;
+    }
+    
+    /* Indicador visual para clicks */
+    .hora-disponible:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(23, 162, 184, 0.5);
+    }
+    
+    /* Mejorar el acordeón */
+    .accordion-button:not(.collapsed) {
+      background-color: #e3f2fd !important;
+      color: #1976d2 !important;
+    }
+    
+    /* Destacar días con horarios */
+    .text-primary {
+      font-weight: 600;
+    }
+    
+    /* Animación de entrada para horarios */
+    .hora-disponible {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Estilos para el selector de fecha */
+    #fecha-agenda {
+      font-weight: 600;
+      border: 2px solid #007bff;
+    }
+    
+    #fecha-agenda:focus {
+      border-color: #0056b3;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    /* Mejorar las estadísticas */
+    #estadisticas-dia .badge {
+      font-size: 1.2em;
+      padding: 0.5em 0.75em;
+    }
+    
+    /* Destacar los días de fin de semana */
+    .weekend-warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffecb5;
+      color: #856404;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+    
+    /* Estilos para mejor legibilidad */
+    .hora {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Animación para cambio de fecha */
+    #agenda-container {
+      transition: all 0.3s ease;
+    }
+    
+    /* Mejorar tooltips */
+    .tooltip-inner {
+      max-width: 300px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body class="container py-4">
+  <div class="top-bar">
+    <div>
+      <a href="/" class="btn btn-outline-secondary me-2">← Volver al inicio</a>
+    </div>
+    <h2 class="text-center flex-grow-1">Agenda Médica</h2>
+    <div>
+      <a href="/secretaria" class="btn btn-outline-primary me-2">
+        <i class="bi bi-arrow-left me-1"></i>Volver al Panel
+      </a>
+      <a href="/pacientes" class="btn btn-primary me-2">Registrar Paciente</a>
+      <button class="btn btn-outline-dark" disabled>Ver Agenda</button>
+    </div>
+  </div>
+
+  <!-- Mensaje de bienvenida desde registro -->
+  <div id="mensaje-desde-registro" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+    <strong>¡Perfecto!</strong> <span id="mensaje-paciente"></span> 
+    <br><br>
+    <strong>Instrucciones:</strong>
+    <ol class="mb-0 mt-2">
+      <li>Expande el médico deseado haciendo clic en su nombre</li>
+      <li>Selecciona un horario disponible (los botones azules con 📅)</li>
+      <li>Confirma la fecha del turno en el modal</li>
+      <li>El paciente ya estará preseleccionado automáticamente</li>
+    </ol>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <!-- Instrucciones generales siempre visibles -->
+  <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+    <div>
+      <strong>💡 Cómo usar la agenda:</strong> 
+      Selecciona una fecha, expande el médico y ve los horarios: 
+      <span class="badge bg-success">🟢 Disponible</span> 
+      <span class="badge bg-danger">🔴 Ocupado</span>
+    </div>
+  </div>
+
+  <!-- Selector de fecha y estadísticas -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">📅 Seleccionar Fecha</h6>
+          <input type="date" id="fecha-agenda" class="form-control" onchange="cargarAgendaParaFecha()">
+          <small class="text-muted">Selecciona una fecha para ver la disponibilidad</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">📊 Resumen del Día</h6>
+          <div id="estadisticas-dia">
+            <small class="text-muted">Selecciona una fecha para ver las estadísticas</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="agenda-container" class="accordion mb-5"></div>
+
+  <!-- Modal para asignar turno -->
+  <div class="modal fade" id="modalTurno" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Asignar Turno</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="info-turno" class="mb-3"></p>
+          <div class="mb-3">
+            <label for="fecha-turno" class="form-label">Fecha del Turno:</label>
+            <input type="date" id="fecha-turno" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label for="observacion-turno" class="form-label">Observación <span class="text-muted">(opcional)</span></label>
+            <textarea id="observacion-turno" class="form-control" rows="2" maxlength="500" placeholder="Ej.: motivo de consulta, recordatorio interno…"></textarea>
+          </div>
+
+          <!-- Pestañas para elegir entre buscar paciente o registrar nuevo -->
+          <ul class="nav nav-tabs mb-3" id="turno-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="buscar-tab" data-bs-toggle="tab" data-bs-target="#buscar-paciente" type="button" role="tab">
+                🔍 Buscar Paciente Existente
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="registrar-tab" data-bs-toggle="tab" data-bs-target="#registrar-paciente" type="button" role="tab">
+                👤 Registrar Nuevo Paciente
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="turno-tab-content">
+            <!-- Pestaña: Buscar Paciente Existente -->
+            <div class="tab-pane fade show active" id="buscar-paciente" role="tabpanel">
+              <form id="form-turno-existente">
+                <div class="mb-3">
+                  <label for="buscar-paciente-input" class="form-label">Buscar por DNI o Apellido:</label>
+                  <input type="text" id="buscar-paciente-input" class="form-control" placeholder="Escriba DNI o apellido..." oninput="filtrarPacientes()">
+                </div>
+                <div class="mb-3">
+                  <label for="paciente-select" class="form-label">Seleccionar Paciente:</label>
+                  <select id="paciente-select" class="form-select" required></select>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">Asignar Turno</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Pestaña: Registrar Nuevo Paciente -->
+            <div class="tab-pane fade" id="registrar-paciente" role="tabpanel">
+              <form id="form-nuevo-paciente">
+                <div class="alert alert-info">
+                  <small><i class="bi bi-info-circle"></i> Complete los datos del nuevo paciente. Al guardar se creará el paciente y se asignará automáticamente al turno.</small>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="nuevo-nombre" class="form-label">Nombre:</label>
+                      <input type="text" id="nuevo-nombre" class="form-control" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="nuevo-apellido" class="form-label">Apellido:</label>
+                      <input type="text" id="nuevo-apellido" class="form-control" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="nuevo-dni" class="form-label">DNI:</label>
+                      <input type="text" id="nuevo-dni" class="form-control" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="nuevo-fecha-nacimiento" class="form-label">Fecha de Nacimiento:</label>
+                      <input type="text" id="nuevo-fecha-nacimiento" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="nuevo-obra-social" class="form-label">Obra Social:</label>
+                      <input type="text" id="nuevo-obra-social" class="form-control" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="nuevo-numero-obra-social" class="form-label">N° Obra Social:</label>
+                      <input type="text" id="nuevo-numero-obra-social" class="form-control" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="nuevo-celular" class="form-label">Celular:</label>
+                  <input type="text" id="nuevo-celular" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary">Registrar y Asignar Turno</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla editable de agenda para secretaria -->
+{% if session['rol'] == 'secretaria' %}
+<div class="card mb-4">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Editar Agenda de Médicos</h5>
+    <small>Modifica los horarios de cada médico y día. Usa coma para separar los horarios (ej: 14:05, 14:10, ...)</small>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center" id="tabla-agenda-editable">
+        <thead class="table-light">
+          <tr>
+            <th>Médico</th>
+            <th>LUNES</th>
+            <th>MARTES</th>
+            <th>MIERCOLES</th>
+            <th>JUEVES</th>
+            <th>VIERNES</th>
+            <th>SÁBADO</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-agenda-editable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+function renderTablaEditableAgenda() {
+  fetch('/api/agenda')
+    .then(r => r.json())
+    .then(agenda => {
+      const tbody = document.getElementById('tbody-agenda-editable');
+      tbody.innerHTML = '';
+      for (const medico in agenda) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${medico}</strong></td>
+          ${['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'].map(dia => `
+            <td><input type="text" class="form-control form-control-sm" id="input-${medico}-${dia}" value="${(agenda[medico][dia]||[]).join(', ')}"></td>
+          `).join('')}
+          <td>
+            <button class="btn btn-success btn-sm me-1" onclick="guardarHorarios('${medico}')"><i class="bi bi-save"></i> Guardar</button>
+            <button class="btn btn-secondary btn-sm" onclick="restaurarHorarios('${medico}')"><i class="bi bi-arrow-clockwise"></i> Restaurar</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      }
+      // Guardar copia original para restaurar
+      window._agendaOriginal = JSON.parse(JSON.stringify(agenda));
+    });
+}
+async function guardarHorarios(medico) {
+  const dias = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'];
+  const diasPayload = {};
+  for (const dia of dias) {
+    const val = document.getElementById(`input-${medico}-${dia}`).value.trim();
+    diasPayload[dia] = val ? val.split(',').map(h => h.trim()).filter(Boolean) : [];
+  }
+  try {
+    const res = await fetch(`/api/agenda/${encodeURIComponent(medico)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dias: diasPayload })
+    });
+    const data = await res.json();
+    if (res.ok && data.mensaje) {
+      window._agendaOriginal[medico] = { ...window._agendaOriginal[medico], ...diasPayload };
+      alert(`Horarios de ${medico} guardados correctamente.`);
+    } else {
+      alert('Error al guardar horarios: ' + (data.error || res.status));
+    }
+  } catch (e) {
+    alert('Error al guardar horarios: ' + e.message);
+  }
+}
+function restaurarHorarios(medico) {
+  const agenda = window._agendaOriginal;
+  const dias = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'];
+  for (const dia of dias) {
+    document.getElementById(`input-${medico}-${dia}`).value = (agenda[medico][dia]||[]).join(', ');
+  }
+}
+document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
+</script>
+{% endif %}
+<!-- Fin tabla editable -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let agenda = {};
+    let turnos = [];
+    let pacientes = [];
+    let turnoActual = { medico: "", hora: "" };
+    let fechaSeleccionada = null;
+    let turnosDelDia = [];
+    
+    /** Misma lógica que reportes en servidor: particular vs nombre normalizado */
+    function normalizarObraSocial(paciente) {
+      const raw = paciente && paciente.obra_social != null
+        ? String(paciente.obra_social).trim()
+        : '';
+      if (!raw || raw === '0') return 'Particular';
+      return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+    }
+    
+    function contarObrasPorTurnos(listaTurnos) {
+      const counts = {};
+      for (const t of listaTurnos) {
+        const p = t.paciente || pacientes.find(pp => pp.dni === t.dni_paciente) || {};
+        const label = normalizarObraSocial(p);
+        counts[label] = (counts[label] || 0) + 1;
+      }
+      return counts;
+    }
+    
+    function htmlBadgesObraSocial(counts) {
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+      if (!entries.length) {
+        return '<span class="text-muted">Sin turnos ocupados</span>';
+      }
+      return entries.map(([nombre, n]) =>
+        `<span class="badge bg-secondary me-1 mb-1" title="${escapeAttr(nombre)}">${escapeHtml(nombre)}: ${n}</span>`
+      ).join('');
+    }
+    
+    function escapeAttr(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    }
+    
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+    
+    // Función auxiliar para crear fechas sin problemas de timezone
+    function crearFechaSegura(fechaString) {
+      const [year, month, day] = fechaString.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    
+    // Función auxiliar para formatear fecha a string local
+    function formatearFechaLocal(fechaString) {
+      return crearFechaSegura(fechaString).toLocaleDateString('es-ES');
+    }
+    
+    // Función para obtener la fecha actual en zona horaria de Argentina
+    function obtenerFechaArgentina() {
+      const hoy = new Date();
+      // Obtener la fecha local en la zona horaria del navegador
+      const year = hoy.getFullYear();
+      const month = String(hoy.getMonth() + 1).padStart(2, '0');
+      const day = String(hoy.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Función centralizada para obtener el día de la semana
+    function obtenerDiaSemana(fechaString) {
+      const fecha = crearFechaSegura(fechaString);
+      const diasSemana = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+      
+      // Log temporal para debug
+      if (fechaString === '2025-07-10') {
+        console.log('🔍 DEBUG para 2025-07-10:');
+        console.log('fecha creada:', fecha);
+        console.log('getDay():', fecha.getDay());
+        console.log('nombreDia:', diasSemana[fecha.getDay()]);
+      }
+      
+      return {
+        numerodia: fecha.getDay(),
+        nombreDia: diasSemana[fecha.getDay()],
+        fecha: fecha
+      };
+    }
+
+    function renderAgenda() {
+      const container = document.getElementById("agenda-container");
+      container.innerHTML = "";
+
+      let isFirst = true;
+      for (const med in agenda) {
+        const collapseId = `collapse-${med.replace(/\s/g, "")}`;
+        const card = document.createElement("div");
+        card.className = "accordion-item mb-3 shadow-sm";
+        
+        // Para el primer médico, expandir automáticamente si viene desde registro
+        const urlParams = new URLSearchParams(window.location.search);
+        const shouldExpand = isFirst && urlParams.get('dni');
+        const buttonClass = shouldExpand ? "accordion-button bg-light fw-bold" : "accordion-button collapsed bg-light fw-bold";
+        const collapseClass = shouldExpand ? "accordion-collapse collapse show" : "accordion-collapse collapse";
+        
+        card.innerHTML = `
+          <h2 class="accordion-header">
+            <button class="${buttonClass}" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+              ${med} <span class="text-muted small ms-2">(Haz clic en un horario para asignar turno)</span>
+            </button>
+          </h2>
+          <div id="${collapseId}" class="${collapseClass}">
+            <div class="accordion-body">
+              ${renderDias(med)}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+        isFirst = false;
+      }
+
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    }
+
+    function renderDias(medico) {
+      if (!fechaSeleccionada) {
+        return "<p class='text-muted'>Selecciona una fecha para ver los horarios disponibles</p>";
+      }
+
+      // Obtener el día de la semana usando función centralizada
+      const infoFecha = obtenerDiaSemana(fechaSeleccionada);
+      const diaSeleccionado = infoFecha.nombreDia;
+      
+      // Solo mostrar el día seleccionado
+      const horas = agenda[medico][diaSeleccionado] || [];
+      
+      if (horas.length === 0) {
+        return `<p class='text-muted'>No hay horarios configurados para ${diaSeleccionado.toLowerCase()}</p>`;
+      }
+
+      let html = `<h6 class="mt-3 mb-2 text-primary">${diaSeleccionado} - ${formatearFechaLocal(fechaSeleccionada)}</h6><div class="mb-3">`;
+      
+      let disponibles = 0;
+      let ocupados = 0;
+      
+      for (const hora of horas) {
+        // Verificar si este horario está ocupado
+        const turnoExistente = turnosDelDia.find(t => 
+          t.medico === medico && 
+          t.hora === hora && 
+          t.fecha === fechaSeleccionada
+        );
+        
+        if (turnoExistente) {
+          // Horario ocupado - rojo
+          const paciente = turnoExistente.paciente || pacientes.find(p => p.dni === turnoExistente.dni_paciente);
+          const nombrePaciente = paciente ? `${paciente.nombre} ${paciente.apellido}` : turnoExistente.dni_paciente;
+          const obraLabel = normalizarObraSocial(paciente || {});
+          const estadoEmoji = {
+            'sin atender': '⏳',
+            'recepcionado': '📋', 
+            'sala de espera': '🪑',
+            'llamado': '📢',
+            'atendiendo': '📝',
+            'atendido': '✅',
+            'ausente': '❌'
+          }[turnoExistente.estado] || '⏳';
+          const titleTip = `Ocupado: ${nombrePaciente} — ${obraLabel} — Estado: ${turnoExistente.estado}`;
+          
+          html += `<span class="hora hora-ocupada btn btn-danger btn-sm me-2 mb-2" 
+                        title="${escapeAttr(titleTip)}"
+                        data-bs-toggle="tooltip"
+                        onclick="verDetallesTurno('${medico}', '${hora}', '${turnoExistente.dni_paciente}')">
+                       🔴 ${hora} <br><small>${estadoEmoji} ${nombrePaciente}</small>
+                       <br><span class="obra-en-tarjeta" title="${escapeAttr(obraLabel)}">🏥 ${escapeHtml(obraLabel)}</span>
+                     </span>`;
+          ocupados++;
+        } else {
+          // Horario disponible - verde
+          html += `<span class="hora hora-disponible btn btn-success btn-sm me-2 mb-2"
+                        title="Disponible - Clic para asignar turno a las ${hora}"
+                        data-bs-toggle="tooltip"
+                        onclick="toggleHora('${medico}', '${hora}')">
+                       🟢 ${hora}
+                     </span>`;
+         disponibles++;
+        }
+      }
+      
+      html += "</div>";
+      
+      const turnosMedicoDia = turnosDelDia.filter(t => t.medico === medico);
+      const conteoOsMedico = contarObrasPorTurnos(turnosMedicoDia);
+      const badgesOsMedico = ocupados > 0
+        ? `<div class="conteo-os-dia mt-1">${htmlBadgesObraSocial(conteoOsMedico)}</div>`
+        : '';
+      
+      // Agregar estadísticas del médico
+      html += `<div class="mt-2 p-2 bg-light rounded">
+                 <small class="text-muted">
+                   📊 Estadísticas: 
+                   <span class="badge bg-success">${disponibles} disponibles</span> 
+                   <span class="badge bg-danger">${ocupados} ocupados</span>
+                   <span class="badge bg-info">${Math.round((ocupados/(disponibles+ocupados))*100) || 0}% ocupación</span>
+                 </small>
+                 ${badgesOsMedico ? `<div class="mt-2 small text-muted"><strong class="text-secondary">Obra social (este médico):</strong>${badgesOsMedico}</div>` : ''}
+               </div>`;
+      
+      return html;
+    }
+
+    function toggleHora(medico, hora) {
+      turnoActual = { medico, hora };
+      mostrarModalTurno();
+    }
+    
+    function verDetallesTurno(medico, hora, dni_paciente) {
+      const turno = turnosDelDia.find(t => t.medico === medico && t.hora === hora && t.dni_paciente === dni_paciente);
+      const paciente = (turno && turno.paciente) || pacientes.find(p => p.dni === dni_paciente);
+      
+      if (turno && paciente) {
+        const mensaje = `
+          📋 Detalles del Turno
+          
+          👨‍⚕️ Médico: ${medico}
+          ⏰ Hora: ${hora}
+          📅 Fecha: ${formatearFechaLocal(fechaSeleccionada)}
+          
+          👤 Paciente: ${paciente.nombre} ${paciente.apellido}
+          🆔 DNI: ${paciente.dni}
+          📞 Teléfono: ${paciente.celular}
+          🏥 Obra Social: ${paciente.obra_social}
+          
+          🔄 Estado: ${turno.estado}
+          
+          ¿Qué deseas hacer?
+        `;
+        
+        if (confirm(mensaje + "\n\nPresiona OK para editar/cancelar el turno o Cancelar para cerrar")) {
+          // Aquí podrías abrir un modal de edición o redirigir a la gestión de turnos
+          window.location.href = `/turnos/gestion?dni=${dni_paciente}&fecha=${fechaSeleccionada}&hora=${hora}`;
+        }
+      }
+    }
+    
+    function cargarAgendaParaFecha() {
+      fechaSeleccionada = document.getElementById('fecha-agenda').value;
+      if (!fechaSeleccionada) return;
+      
+      // Verificar si es fin de semana usando función centralizada
+      const infoFecha = obtenerDiaSemana(fechaSeleccionada);
+      const diaSemana = infoFecha.numerodia; // 0 = domingo, 6 = sábado
+      
+      // Eliminar advertencia anterior
+      const advertenciaAnterior = document.querySelector('.weekend-warning');
+      if (advertenciaAnterior) {
+        advertenciaAnterior.remove();
+      }
+
+      if (diaSemana === 0) {
+        const container = document.getElementById('agenda-container');
+        const advertencia = document.createElement('div');
+        advertencia.className = 'weekend-warning';
+        advertencia.innerHTML = `
+          <strong>⚠️ Domingo</strong><br>
+          Has seleccionado un domingo. No hay atención médica los domingos.
+        `;
+        container.parentNode.insertBefore(advertencia, container);
+      }
+      
+      // Filtrar turnos para la fecha seleccionada
+      turnosDelDia = turnos.filter(t => t.fecha === fechaSeleccionada);
+      
+      // Actualizar estadísticas generales
+      actualizarEstadisticasDia();
+      
+      // Re-renderizar la agenda
+      renderAgenda();
+    }
+    
+    function actualizarEstadisticasDia() {
+      if (!fechaSeleccionada) return;
+      
+      // Obtener el día de la semana usando función centralizada
+      const infoFecha = obtenerDiaSemana(fechaSeleccionada);
+      const diaSeleccionado = infoFecha.nombreDia;
+      
+      let totalDisponibles = 0;
+      let totalOcupados = turnosDelDia.length;
+      
+      // Calcular total de horarios disponibles para todos los médicos
+      for (const medico in agenda) {
+        const horas = agenda[medico][diaSeleccionado] || [];
+        totalDisponibles += horas.length;
+      }
+      
+      const totalLibres = totalDisponibles - totalOcupados;
+      const porcentajeOcupacion = totalDisponibles > 0 ? Math.round((totalOcupados/totalDisponibles)*100) : 0;
+      const conteoOsDia = contarObrasPorTurnos(turnosDelDia);
+      
+      const estadisticas = document.getElementById('estadisticas-dia');
+      estadisticas.innerHTML = `
+        <div class="row text-center">
+          <div class="col-4">
+            <div class="badge bg-success fs-6">${totalLibres}</div>
+            <div><small>Libres</small></div>
+          </div>
+          <div class="col-4">
+            <div class="badge bg-danger fs-6">${totalOcupados}</div>
+            <div><small>Ocupados</small></div>
+          </div>
+          <div class="col-4">
+            <div class="badge bg-info fs-6">${porcentajeOcupacion}%</div>
+            <div><small>Ocupación</small></div>
+          </div>
+        </div>
+        <div class="mt-2">
+          <small class="text-muted">
+            ${diaSeleccionado} - ${formatearFechaLocal(fechaSeleccionada)}
+          </small>
+        </div>
+        <div class="mt-3 text-start conteo-os-dia border-top pt-2">
+          <div class="small fw-semibold text-secondary mb-1">Obra social del día (turnos ocupados)</div>
+          <div class="d-flex flex-wrap align-items-center">${htmlBadgesObraSocial(conteoOsDia)}</div>
+        </div>
+      `;
+    }
+
+    function mostrarModalTurno() {
+      const fechaFormateada = formatearFechaLocal(fechaSeleccionada);
+      
+      document.getElementById("info-turno").innerHTML = `
+        <strong>Turno para ${turnoActual.medico} a las ${turnoActual.hora}</strong><br>
+        <small class="text-info">📅 Fecha: ${fechaFormateada}</small>
+      `;
+
+      // Pre-llenar la fecha del turno
+      document.getElementById("fecha-turno").value = fechaSeleccionada;
+
+      // Resetear pestañas - activar la primera (buscar paciente existente)
+      const buscarTab = document.getElementById("buscar-tab");
+      const registrarTab = document.getElementById("registrar-tab");
+      const buscarPane = document.getElementById("buscar-paciente");
+      const registrarPane = document.getElementById("registrar-paciente");
+      
+      buscarTab.classList.add("active");
+      registrarTab.classList.remove("active");
+      buscarPane.classList.add("show", "active");
+      registrarPane.classList.remove("show", "active");
+
+      // Limpiar formularios
+      document.getElementById("form-turno-existente").reset();
+      document.getElementById("form-nuevo-paciente").reset();
+      document.getElementById("buscar-paciente-input").value = "";
+      
+      // Re-llenar la fecha en ambos casos ya que reset() la limpia
+      document.getElementById("fecha-turno").value = fechaSeleccionada;
+      document.getElementById("observacion-turno").value = "";
+
+      // Inicializar select de pacientes
+      const select = document.getElementById("paciente-select");
+      select.innerHTML = pacientes.map(p =>
+        `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
+      ).join("");
+      
+      // Preseleccionar paciente si viene en URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const dniPreseleccionado = urlParams.get('dni');
+      if (dniPreseleccionado) {
+        select.value = dniPreseleccionado;
+        const pacienteSeleccionado = pacientes.find(p => p.dni === dniPreseleccionado);
+        if (pacienteSeleccionado) {
+          // Resaltar que el paciente está preseleccionado
+          select.style.border = "3px solid #28a745";
+          select.style.backgroundColor = "#d4edda";
+          
+          // Agregar un mensaje temporal
+          const infoTurno = document.getElementById("info-turno");
+          infoTurno.innerHTML = `
+            <strong>Turno para ${turnoActual.medico} a las ${turnoActual.hora}</strong><br>
+            <small class="text-info">📅 Fecha: ${fechaFormateada}</small><br>
+            <small class="text-success">✅ Paciente preseleccionado: ${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}</small>
+          `;
+        }
+        // Limpiar el parámetro de la URL después de usarlo
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        // Restablecer estilos normales
+        select.style.border = "";
+        select.style.backgroundColor = "";
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById("modalTurno"));
+      modal.show();
+    }
+
+    // Función para filtrar pacientes en tiempo real
+    function filtrarPacientes() {
+      const filtro = document.getElementById("buscar-paciente-input").value.toLowerCase();
+      const select = document.getElementById("paciente-select");
+      
+      if (!filtro) {
+        // Mostrar todos los pacientes
+        select.innerHTML = pacientes.map(p =>
+          `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
+        ).join("");
+      } else {
+        // Filtrar pacientes por DNI o apellido
+        const pacientesFiltrados = pacientes.filter(p => 
+          p.dni.includes(filtro) || 
+          p.apellido.toLowerCase().includes(filtro) ||
+          p.nombre.toLowerCase().includes(filtro)
+        );
+        
+        select.innerHTML = pacientesFiltrados.map(p =>
+          `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
+        ).join("");
+      }
+    }
+
+    // Event listener para asignar turno a paciente existente
+    document.getElementById("form-turno-existente").addEventListener("submit", e => {
+      e.preventDefault();
+      const dni_paciente = document.getElementById("paciente-select").value;
+      const fecha = document.getElementById("fecha-turno").value;
+      if (!fecha) return alert("Debe seleccionar una fecha");
+
+      const pacienteSeleccionado = pacientes.find(p => p.dni === dni_paciente);
+      const fechaFormateada = formatearFechaLocal(fecha);
+
+      const observacion = document.getElementById("observacion-turno").value.trim().slice(0, 500);
+      fetch("/api/turnos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...turnoActual, fecha, dni_paciente, observacion })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert("Error: " + data.error);
+        } else {
+          // Cerrar el modal primero
+          const modal = bootstrap.Modal.getInstance(document.getElementById("modalTurno"));
+          modal.hide();
+          
+          // Mostrar mensaje de confirmación
+          const mensaje = `
+            ¡Turno asignado exitosamente! 🎉
+            
+            📅 Fecha: ${fechaFormateada}
+            ⏰ Hora: ${turnoActual.hora}
+            👤 Paciente: ${pacienteSeleccionado ? pacienteSeleccionado.nombre + ' ' + pacienteSeleccionado.apellido : dni_paciente}
+            👨‍⚕️ Médico: ${turnoActual.medico}
+          `;
+          
+          // Mostrar mensaje temporal
+          mostrarMensajeTemporal(mensaje, 'success');
+          
+          // Recargar datos y actualizar la vista automáticamente
+          fetchTurnos().then(() => {
+            cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
+          });
+        }
+      })
+      .catch(error => {
+        alert("Error de conexión: " + error.message);
+      });
+    });
+
+    // Event listener para registrar nuevo paciente y asignar turno
+    document.getElementById("form-nuevo-paciente").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const fecha = document.getElementById("fecha-turno").value;
+      if (!fecha) return alert("Debe seleccionar una fecha");
+
+      // Recopilar datos del nuevo paciente
+      const datosPaciente = {
+        nombre: document.getElementById("nuevo-nombre").value.trim(),
+        apellido: document.getElementById("nuevo-apellido").value.trim(),
+        dni: document.getElementById("nuevo-dni").value.trim(),
+        fecha_nacimiento: document.getElementById("nuevo-fecha-nacimiento").value,
+        obra_social: document.getElementById("nuevo-obra-social").value.trim(),
+        numero_obra_social: document.getElementById("nuevo-numero-obra-social").value.trim(),
+        celular: document.getElementById("nuevo-celular").value.trim()
+      };
+
+      // Calcular edad (formato dd/mm/aaaa)
+      const partesFecha = datosPaciente.fecha_nacimiento.split('/');
+      if (partesFecha.length === 3) {
+        const [dia, mes, anio] = partesFecha.map(Number);
+        const fechaNac = new Date(anio, mes - 1, dia);
+        if (!isNaN(fechaNac.getTime())) {
+          const hoy = new Date();
+          let edad = hoy.getFullYear() - fechaNac.getFullYear();
+          if (hoy.getMonth() < fechaNac.getMonth() || (hoy.getMonth() === fechaNac.getMonth() && hoy.getDate() < fechaNac.getDate())) {
+            edad--;
+          }
+        }
+      }
+
+      try {
+        // 1. Registrar el nuevo paciente
+        const respuestaPaciente = await fetch("/api/pacientes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datosPaciente)
+        });
+
+        const resultadoPaciente = await respuestaPaciente.json();
+
+        if (!respuestaPaciente.ok) {
+          throw new Error(resultadoPaciente.error || "Error al registrar paciente");
+        }
+
+        // 2. Asignar el turno al nuevo paciente
+        const observacion = document.getElementById("observacion-turno").value.trim().slice(0, 500);
+        const respuestaTurno = await fetch("/api/turnos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...turnoActual, fecha, dni_paciente: datosPaciente.dni, observacion })
+        });
+
+        const resultadoTurno = await respuestaTurno.json();
+
+        if (!respuestaTurno.ok) {
+          throw new Error(resultadoTurno.error || "Error al asignar turno");
+        }
+
+        // 3. Cerrar modal y mostrar confirmación
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalTurno"));
+        modal.hide();
+
+        const fechaFormateada = formatearFechaLocal(fecha);
+        const mensaje = `
+          ¡Paciente registrado y turno asignado exitosamente! 🎉
+          
+          👤 Nuevo Paciente: ${datosPaciente.nombre} ${datosPaciente.apellido}
+          🆔 DNI: ${datosPaciente.dni}
+          📅 Fecha: ${fechaFormateada}
+          ⏰ Hora: ${turnoActual.hora}
+          👨‍⚕️ Médico: ${turnoActual.medico}
+        `;
+
+        // Mostrar mensaje temporal
+        mostrarMensajeTemporal(mensaje, 'success');
+        
+        // Recargar datos y actualizar la vista automáticamente
+        pacientes.push(datosPaciente); // Agregar a la lista local
+        fetchTurnos().then(() => {
+          cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
+        });
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+
+    async function fetchTurnos() {
+      const res = await fetch("/api/turnos");
+      turnos = await res.json();
+    }
+
+    function mostrarMensajeTemporal(mensaje, tipo = 'success') {
+      // Crear el elemento del mensaje
+      const mensajeDiv = document.createElement('div');
+      mensajeDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+      mensajeDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;';
+      mensajeDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+          <div class="flex-grow-1">
+            ${mensaje.replace(/\n/g, '<br>')}
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      
+      // Agregar al DOM
+      document.body.appendChild(mensajeDiv);
+      
+      // Auto-remover después de 5 segundos
+      setTimeout(() => {
+        if (mensajeDiv.parentNode) {
+          mensajeDiv.remove();
+        }
+      }, 5000);
+    }
+
+    async function init() {
+      try {
+        const res = await fetch("/api/agenda/inicio");
+        if (!res.ok) {
+          throw new Error(`Error al cargar agenda: ${res.status}`);
+        }
+        const data = await res.json();
+        agenda = data.agenda;
+        pacientes = data.pacientes;
+        turnos = data.turnos;
+        
+        // Establecer fecha de hoy por defecto - usando timezone de Argentina
+        const fechaHoy = obtenerFechaArgentina();
+        document.getElementById('fecha-agenda').value = fechaHoy;
+        fechaSeleccionada = fechaHoy;
+      
+       // Filtrar turnos para hoy
+        turnosDelDia = turnos.filter(t => t.fecha === fechaSeleccionada);
+        
+        // Actualizar estadísticas y renderizar
+        actualizarEstadisticasDia();
+        renderAgenda();
+        
+        // Mostrar mensaje si viene desde registro de paciente
+        const urlParams = new URLSearchParams(window.location.search);
+        const dniDesdeRegistro = urlParams.get('dni');
+        if (dniDesdeRegistro) {
+          const paciente = pacientes.find(p => p.dni === dniDesdeRegistro);
+          if (paciente) {
+            document.getElementById('mensaje-paciente').textContent = 
+              `El paciente ${paciente.nombre} ${paciente.apellido} (DNI: ${paciente.dni}) ha sido registrado exitosamente.`;
+            document.getElementById('mensaje-desde-registro').classList.remove('d-none');
+          }
+        }
+      } catch (error) {
+        console.error('Error al inicializar la agenda:', error);
+        alert('Error al cargar la agenda: ' + error.message);
+      }
+    }
+
+    init();
+  </script>
+
+  <!-- Footer Hermoso -->
+  <footer class="admin-footer">
+      <div class="footer-content">
+          <div class="footer-section">
+              <div class="footer-brand">
+                  <div class="heart-ecg-logo">
+                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <!-- Corazón -->
+                          <path class="heart" d="M50,85 C30,65 10,45 10,30 C10,20 20,15 30,15 C40,15 50,25 50,25 C50,25 60,15 70,15 C80,15 90,20 90,30 C90,45 70,65 50,85 Z"/>
+                          <!-- Línea ECG -->
+                          <path class="ecg-line" d="M20,50 L25,50 L27,40 L30,60 L33,30 L36,70 L39,20 L42,80 L45,10 L50,50 L55,50"/>
+                      </svg>
+                  </div>
+                  <span>Consultorio COLOM-BOBBIESI</span>
+              </div>
+              <p class="footer-description">
+                  Sistema integral de gestión de historias clínicas
+              </p>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Enlaces Rápidos</h6>
+              <ul class="footer-links">
+                  <li><a href="/"><i class="bi bi-house"></i> Inicio</a></li>
+                  <li><a href="/pacientes"><i class="bi bi-people"></i> Pacientes</a></li>
+                  <li><a href="/agenda"><i class="bi bi-calendar"></i> Agenda</a></li>
+              </ul>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Soporte</h6>
+              <ul class="footer-links">
+                  <li><a href="#"><i class="bi bi-telephone"></i> Contacto</a></li>
+                  <li><a href="#"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                  <li><a href="#"><i class="bi bi-shield-check"></i> Privacidad</a></li>
+              </ul>
+          </div>
+          
+          <div class="footer-section">
+              <h6>Información del Sistema</h6>
+              <div class="system-info">
+                  <div class="info-item">
+                      <i class="bi bi-server"></i>
+                      <span>Sistema Online</span>
+                  </div>
+                  <div class="info-item">
+                      <i class="bi bi-shield-check"></i>
+                      <span>Datos Seguros</span>
+                  </div>
+                  <div class="info-item">
+                      <i class="bi bi-clock"></i>
+                      <span id="current-time"></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <div class="footer-bottom">
+          <div class="footer-bottom-content">
+              <div class="copyright">
+                  © 2025 Consultorio COLOM-BOBBIESI. Todos los derechos reservados.<br>
+                  <small>Desarrollado por <strong>Nicolás Fernández</strong></small>
+              </div>
+              <div class="footer-stats">
+                  <span class="stat-item">
+                      <i class="bi bi-people"></i>
+                      <span id="footer-pacientes-count">-</span> Pacientes
+                  </span>
+                  <span class="stat-item">
+                      <i class="bi bi-calendar-check"></i>
+                      <span id="footer-turnos-count">-</span> Turnos Hoy
+                  </span>
+              </div>
+          </div>
+      </div>
+  </footer>
+
+  <style>
+      .admin-footer {
+          background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+          color: white;
+          margin-top: 3rem;
+          border-top: 3px solid #e74c3c;
+      }
+
+      .footer-content {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1.5fr;
+          gap: 2rem;
+          padding: 2rem 0;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding-left: 2rem;
+          padding-right: 2rem;
+      }
+
+      .footer-section h6 {
+          color: #e74c3c;
+          font-weight: 600;
+          margin-bottom: 1rem;
+          font-size: 1rem;
+      }
+
+      .footer-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+      }
+
+      .footer-brand i {
+          color: #e74c3c;
+          font-size: 1.5rem;
+      }
+
+      /* Logo personalizado del corazón con pulso ECG */
+      .heart-ecg-logo {
+          width: 40px;
+          height: 40px;
+          position: relative;
+          display: inline-block;
+      }
+
+      .heart-ecg-logo svg {
+          width: 100%;
+          height: 100%;
+      }
+
+      .heart-ecg-logo .heart {
+          fill: none;
+          stroke: #e74c3c;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+      }
+
+      .heart-ecg-logo .ecg-line {
+          fill: none;
+          stroke: #e74c3c;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+      }
+
+      .footer-description {
+          color: #bdc3c7;
+          font-size: 0.9rem;
+          line-height: 1.4;
+      }
+
+      .footer-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      .footer-links li {
+          margin-bottom: 0.5rem;
+      }
+
+      .footer-links a {
+          color: #bdc3c7;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: color 0.3s ease;
+          font-size: 0.9rem;
+      }
+
+      .footer-links a:hover {
+          color: white;
+      }
+
+      .system-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+      }
+
+      .info-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+          color: #bdc3c7;
+      }
+
+      .info-item i {
+          color: #27ae60;
+          width: 16px;
+      }
+
+      .footer-bottom {
+          background: rgba(0, 0, 0, 0.2);
+          padding: 1rem 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .footer-bottom-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+      }
+
+      .copyright {
+          color: #95a5a6;
+          font-size: 0.9rem;
+      }
+
+      .copyright small {
+          color: #7f8c8d;
+          font-size: 0.8rem;
+      }
+
+      .copyright strong {
+          color: #e74c3c;
+      }
+
+      .footer-stats {
+          display: flex;
+          gap: 2rem;
+      }
+
+      .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #bdc3c7;
+          font-size: 0.9rem;
+      }
+
+      .stat-item i {
+          color: #e74c3c;
+      }
+
+      @media (max-width: 768px) {
+          .footer-content {
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+              text-align: center;
+          }
+
+          .footer-bottom-content {
+              flex-direction: column;
+              gap: 1rem;
+              text-align: center;
+          }
+
+          .footer-stats {
+              justify-content: center;
+          }
+      }
+  </style>
+
+  <script>
+      // Actualizar hora actual
+      function actualizarHora() {
+          const ahora = new Date();
+          const hora = ahora.toLocaleTimeString('es-ES', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              second: '2-digit'
+          });
+          const elementoHora = document.getElementById('current-time');
+          if (elementoHora) {
+              elementoHora.textContent = hora;
+          }
+      }
+
+      // Actualizar estadísticas del footer
+      async function actualizarFooterInfo() {
+          try {
+              // Obtener total de pacientes
+              const responsePacientes = await fetch('/api/pacientes');
+              const pacientes = await responsePacientes.json();
+              const totalPacientes = pacientes.length;
+              
+              // Obtener turnos de hoy
+              const hoy = new Date().toISOString().split('T')[0];
+              const responseTurnos = await fetch(`/api/turnos?fecha=${hoy}`);
+              const turnos = await responseTurnos.json();
+              const turnosHoy = turnos.length;
+              
+              // Actualizar elementos
+              const pacientesElement = document.getElementById('footer-pacientes-count');
+              const turnosElement = document.getElementById('footer-turnos-count');
+              
+              if (pacientesElement) pacientesElement.textContent = totalPacientes;
+              if (turnosElement) turnosElement.textContent = turnosHoy;
+              
+          } catch (error) {
+              console.error('Error actualizando footer info:', error);
+          }
+      }
+
+      // Inicializar
+      document.addEventListener('DOMContentLoaded', function() {
+          actualizarHora();
+          actualizarFooterInfo();
+          
+          // Actualizar hora cada segundo
+          setInterval(actualizarHora, 1000);
+          
+          // Actualizar estadísticas cada 30 segundos
+          setInterval(actualizarFooterInfo, 30000);
+      });
+  </script>
+</body>
+</html>
+
+

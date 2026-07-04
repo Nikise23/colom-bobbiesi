@@ -1,0 +1,37 @@
+[
+    {
+        "usuario": "Marianela Bobbiesi",
+        "contrasena": "scrypt:32768:8:1$wAF4AIMxtW75Y7ho$f6928ae4e64b426779bd3231d247231ab5f683e4f1d5f9778810aa815e5dd0c7068bdaf0c1e8399bf0fb7c98de0e0a491d1c8965d3143684dcb77e0cc893cf77",
+        "rol": "medico"
+    },
+    {
+        "usuario": "Agustina",
+        "contrasena": "scrypt:32768:8:1$qyOtmItMo39qOpDg$f37f6fbe66c3373694c5fb873b5bef183b55cd407d19116cbf654a2bb106a8fa02e9784c787f0f6e1ea5066d80f4f2afde46b2b2a560fa6f25c39b40a7841182",
+        "rol": "secretaria"
+    },
+    {
+        "usuario": "Francisco Colom",
+        "contrasena": "scrypt:32768:8:1$MTwKi7QXT19emYkg$45ef2ace03d00f06649ccdd46a8267b2b9f2220114a7c7141957c33938e8a2780be875814371f588b5089f773abd72378e7dcacfc868ec5714fb6001f2851096",
+        "rol": "medico"
+    },
+    {
+        "usuario": "Juan Julian",
+        "contrasena": "scrypt:32768:8:1$8fazmq7SXU9t2jhb$75eb03e02349126f2d1af330edcff517d0a69c766f30fcaa93216346fe27f7cfbf683975f9c116886fc9823a9355f78e97714037f60271da0842e42996d98269",
+        "rol": "medico"
+    },
+    {
+        "usuario": "Julieta Colom",
+        "contrasena": "scrypt:32768:8:1$OFAvrSmMFFRqUa1L$b7e223e768b5e35ad96216bdcd9af8bf7bd97df9f1909b3eef2dcfe13da66a7b43726e72d1cafaf8d1dcd8c8277ae24056265d70f5903d4e7aff125f8141452c",
+        "rol": "medico"
+    },
+    {
+        "usuario": "colom-bobbiesi",
+        "contrasena": "scrypt:32768:8:1$ciS19VG8rrD6SDWA$fd7ecca2cec435aac6a440053392017dd5c03caf2084ae318a01fc67b0478a2b7868377b68196e77d66a0a4e21ec2360b695d30703618dd7cd45f277c5e3e2f8",
+        "rol": "administrador"
+    },
+    {
+        "usuario": "Nicolas Fernandez",
+        "contrasena": "scrypt:32768:8:1$3URCCwKmkbvtQEAX$53cdd15398d370e3bd980919724f851ed8b0a8d66d06926e93c1447417966bb2d1d53e562a0b536def557336c526d73d9610d3c4e032668110402ad6ab788f03",
+        "rol": "medico"
+    }
+]

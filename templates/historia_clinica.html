@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historia Clínica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .patient-info {
+      background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+      border-left: 4px solid #2196f3;
+    }
+    .history-entry {
+      background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 100%);
+      border-left: 4px solid #9c27b0;
+      transition: all 0.3s ease;
+    }
+    .history-entry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .consultation-actions {
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    .history-entry:hover .consultation-actions {
+      opacity: 1;
+    }
+    .btn-download {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      border: none;
+      color: white;
+    }
+    .btn-download:hover {
+      background: linear-gradient(45deg, #45a049, #4CAF50);
+      transform: translateY(-1px);
+    }
+    .consultation-content {
+      line-height: 1.6;
+    }
+    .consultation-content u {
+      text-decoration: underline;
+    }
+    .editor-toolbar .btn.active {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+      color: #fff;
+    }
+    .editor-area {
+      min-height: 220px;
+      max-height: 420px;
+      overflow-y: auto;
+      background: #fff;
+    }
+    .editor-area:focus {
+      border-color: #86b7fe;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      outline: 0;
+    }
+    .editor-area:empty::before {
+      content: attr(data-placeholder);
+      color: #6c757d;
+      pointer-events: none;
+    }
+    .patient-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+    .stats-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .stats-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .obs-sombreado-hc {
+      padding: 0.4rem 0.55rem;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .obs-sombreado-hc-turno {
+      background: rgba(13, 110, 253, 0.08);
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    }
+    .obs-sombreado-hc-pago {
+      background: rgba(25, 135, 84, 0.09);
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    }
+  </style>
+</head>
+<body class="p-4">
+  <div class="container-fluid">
+    
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2><i class="bi bi-file-medical"></i> Historia Clínica</h2>
+            <p class="text-muted mb-0">Registro de consulta médica</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-success" onclick="descargarHistoriaCompleta()">
+              <i class="bi bi-download"></i> Descargar PDF Completo
+            </button>
+            <a href="/turnos" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Volver a Turnos
+            </a>
+          </div>
+        </div>
+      <div>
+    </div>    
+
+
+    <!-- Información del Paciente -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="patient-header">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div id="patient-data">
+                <div class="text-center">
+                  <i class="bi bi-hourglass-split fs-1"></i>
+                  <p>Cargando datos del paciente...</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row">
+                <div class="col-6">
+                  <div class="stats-card">
+                    <div class="stats-number" id="totalConsultas">-</div>
+                    <small>Consultas</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="stats-card">
+                    <div class="stats-number" id="ultimaConsulta">-</div>
+                    <small>Última</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+    </div>
+
+    <!-- Observaciones del turno (desde recepción / pago) -->
+    <div class="row mb-3" id="fila-obs-turno" style="display: none;">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body py-3">
+            <h6 class="text-muted mb-2"><i class="bi bi-info-circle"></i> Observaciones de este turno</h6>
+            <div id="contenido-obs-turno"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de Consulta -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Nueva consulta</h5>
+            <small id="autosave-status" class="text-muted"></small>
+          </div>
+          <div class="card-body">
+            <form id="formHistoria">
+              <input type="hidden" id="dni" name="dni" value="{{ dni }}">
+              
+              <div class="mb-3">
+                <label class="form-label">
+                  <strong>Consulta Médica:</strong>
+                </label>
+                <div class="editor-toolbar btn-group mb-2" role="group" aria-label="Formato de texto">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-negrita" title="Negrita (Ctrl+B)">
+                    <i class="bi bi-type-bold"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-cursiva" title="Cursiva (Ctrl+I)">
+                    <i class="bi bi-type-italic"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-subrayado" title="Subrayado (Ctrl+U)">
+                    <i class="bi bi-type-underline"></i>
+                  </button>
+                </div>
+                <div
+                  id="consulta_medica_editor"
+                  class="form-control editor-area"
+                  contenteditable="true"
+                  role="textbox"
+                  aria-multiline="true"
+                  data-placeholder="Describa la consulta médica realizada..."
+                ></div>
+                <div class="form-text">
+                  Use la barra para <strong>negrita</strong>, <em>cursiva</em> y <u>subrayado</u>. Incluya motivo, examen, diagnóstico y tratamiento.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="fecha_consulta" class="form-label">
+                  <strong>Fecha de Consulta:</strong>
+                </label>
+                <input 
+                  type="date" 
+                  id="fecha_consulta" 
+                  name="fecha_consulta" 
+                  class="form-control"
+                >
+              </div>
+
+              <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-primary" id="btn-guardar-hc">
+                  <i class="bi bi-save"></i> Guardar historia clínica
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="btn-guardar-cerrar">
+                  <i class="bi bi-box-arrow-left"></i> Guardar y cerrar
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="limpiarFormulario()">
+                  <i class="bi bi-arrow-clockwise"></i> Limpiar borrador en pantalla
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      <div>
+        
+
+      
+
+
+    
+  </div>
+  <!-- Historial de Consultas -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Consultas</h5>
+          </div>
+          <div class="card-body">
+            <div id="historiasPrevias">
+              <div class="text-center">
+                <i class="bi bi-hourglass-split fs-1 text-muted"></i>
+                <p class="text-muted">Cargando historial...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const dni = "{{ dni }}";
+    const fechaTurnoCtx = {{ fecha_turno|tojson }};
+    const horaTurnoCtx = {{ hora_turno|tojson }};
+    const tieneContextoTurno = Boolean(fechaTurnoCtx && horaTurnoCtx);
+    const form = document.getElementById("formHistoria");
+    const contenedorHistorias = document.getElementById("historiasPrevias");
+    const editorConsulta = document.getElementById("consulta_medica_editor");
+
+
+    const patientData = document.getElementById("patient-data");
+    let pacienteActual = null;
+    let historiasPaciente = [];
+    let debounceAuto = null;
+
+    function parseFechaLocal(iso) {
+      if (!iso) return null;
+      const partes = String(iso).trim().split('-');
+      if (partes.length !== 3) return null;
+      const y = Number(partes[0]);
+      const m = Number(partes[1]);
+      const d = Number(partes[2]);
+      if (!y || !m || !d) return null;
+      return new Date(y, m - 1, d, 12, 0, 0);
+    }
+
+    function formatFechaLocal(iso) {
+      const fecha = parseFechaLocal(iso);
+      return fecha ? fecha.toLocaleDateString('es-AR') : 'No especificada';
+    }
+
+    function formatFechaCorta(iso) {
+      const fecha = parseFechaLocal(iso);
+      return fecha ? fecha.toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' }) : '-';
+    }
+
+    function timestampFechaLocal(iso) {
+      const fecha = parseFechaLocal(iso);
+      return fecha ? fecha.getTime() : 0;
+    }
+
+    function fechaHoyLocal() {
+      const hoy = new Date();
+      const y = hoy.getFullYear();
+      const m = String(hoy.getMonth() + 1).padStart(2, '0');
+      const d = String(hoy.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    document.getElementById("fecha_consulta").value = fechaHoyLocal();
+
+    function escapeHtmlHc(s) {
+      if (s == null || s === '') return '';
+      const el = document.createElement('div');
+      el.textContent = s;
+      return el.innerHTML;
+    }
+
+    function sanitizeConsultaHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      const allowed = ['B', 'STRONG', 'I', 'EM', 'U', 'BR', 'P', 'DIV'];
+      function clean(node) {
+        if (node.nodeType === Node.TEXT_NODE) return;
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          if (!allowed.includes(node.tagName)) {
+            const parent = node.parentNode;
+            while (node.firstChild) parent.insertBefore(node.firstChild, node);
+            parent.removeChild(node);
+            return;
+          }
+          [...node.attributes].forEach((attr) => node.removeAttribute(attr.name));
+        }
+        [...node.childNodes].forEach(clean);
+      }
+      [...tmp.childNodes].forEach(clean);
+      return tmp.innerHTML;
+    }
+
+    function htmlATextoPlano(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      return (tmp.innerText || tmp.textContent || '').trim();
+    }
+
+    function renderConsultaParaVista(texto) {
+      if (!texto) return 'Sin detalles de consulta';
+      if (/<[a-z][\s\S]*>/i.test(texto)) {
+        return sanitizeConsultaHtml(texto);
+      }
+      return escapeHtmlHc(texto).replace(/\n/g, '<br>');
+    }
+
+    function getConsultaContenido() {
+      const html = editorConsulta.innerHTML.trim();
+      if (!html || html === '<br>') return '';
+      return sanitizeConsultaHtml(html);
+    }
+
+    function getConsultaTextoPlano() {
+      return htmlATextoPlano(editorConsulta.innerHTML);
+    }
+
+    function setConsultaContenido(contenido) {
+      if (!contenido) {
+        editorConsulta.innerHTML = '';
+        return;
+      }
+      if (/<[a-z][\s\S]*>/i.test(contenido)) {
+        editorConsulta.innerHTML = sanitizeConsultaHtml(contenido);
+      } else {
+        editorConsulta.innerText = contenido;
+      }
+    }
+
+    let seleccionEditor = null;
+
+    function guardarSeleccionEditor() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return;
+      if (!editorConsulta.contains(sel.anchorNode)) return;
+      seleccionEditor = sel.getRangeAt(0).cloneRange();
+    }
+
+    function restaurarSeleccionEditor() {
+      if (!seleccionEditor) return;
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(seleccionEditor);
+    }
+
+    function aplicarFormato(comando) {
+      editorConsulta.focus();
+      restaurarSeleccionEditor();
+      document.execCommand(comando, false, null);
+      guardarSeleccionEditor();
+      actualizarBotonesFormato();
+      programarAutosave();
+    }
+
+    function actualizarBotonesFormato() {
+      const sel = window.getSelection();
+      const enEditor =
+        document.activeElement === editorConsulta ||
+        (sel && sel.rangeCount > 0 && editorConsulta.contains(sel.anchorNode));
+      if (!enEditor) return;
+
+      ['bold', 'italic', 'underline'].forEach((cmd) => {
+        const btn = document.getElementById(
+          cmd === 'bold' ? 'btn-negrita' : cmd === 'italic' ? 'btn-cursiva' : 'btn-subrayado'
+        );
+        if (btn) {
+          try {
+            btn.classList.toggle('active', document.queryCommandState(cmd));
+          } catch (e) {
+            btn.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    function configurarBotonFormato(id, comando) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        guardarSeleccionEditor();
+      });
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        aplicarFormato(comando);
+      });
+    }
+
+    async function cargarContextoTurnoYObs() {
+      if (!tieneContextoTurno) return;
+      try {
+        const r = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(fechaTurnoCtx)}`);
+        if (!r.ok) return;
+        const lista = await r.json();
+        const turno = lista.find(t => t.dni_paciente === dni && t.hora === horaTurnoCtx);
+        if (!turno) return;
+        const obs = [];
+        if (turno.observacion) {
+          obs.push(`<div class="obs-sombreado-hc obs-sombreado-hc-turno"><strong>Obs. turno:</strong> ${escapeHtmlHc(turno.observacion)}</div>`);
+        }
+        if (turno.observacion_pago) {
+          obs.push(`<div class="obs-sombreado-hc obs-sombreado-hc-pago"><strong>Obs. pago:</strong> ${escapeHtmlHc(turno.observacion_pago)}</div>`);
+        }
+        if (obs.length) {
+          document.getElementById('contenido-obs-turno').innerHTML = obs.join('');
+          document.getElementById('fila-obs-turno').style.display = '';
+        }
+        if (turno.borrador_consulta != null && String(turno.borrador_consulta).length) {
+          setConsultaContenido(turno.borrador_consulta);
+        }
+        if (turno.borrador_fecha_consulta) {
+          document.getElementById('fecha_consulta').value = turno.borrador_fecha_consulta;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function guardarBorradorSilencioso() {
+      if (!tieneContextoTurno) return true;
+      const status = document.getElementById('autosave-status');
+      try {
+        const res = await fetch(
+          `/api/turnos/${encodeURIComponent(dni)}/${encodeURIComponent(fechaTurnoCtx)}/${encodeURIComponent(horaTurnoCtx)}/borrador-consulta`,
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              consulta_medica: getConsultaContenido(),
+              fecha_consulta: document.getElementById('fecha_consulta').value
+            })
+          }
+        );
+        const j = await res.json();
+        if (res.ok) {
+          status.textContent = 'Autoguardado ' + new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          return true;
+        }
+        status.textContent = j.error || 'No se pudo autoguardar';
+        return false;
+      } catch (err) {
+        status.textContent = 'Error de red al autoguardar';
+        return false;
+      }
+    }
+
+    function programarAutosave() {
+      if (!tieneContextoTurno) return;
+      const status = document.getElementById('autosave-status');
+      status.textContent = 'Guardando borrador…';
+      clearTimeout(debounceAuto);
+      debounceAuto = setTimeout(guardarBorradorSilencioso, 1200);
+    }
+
+    async function guardarBorradorInmediato() {
+      clearTimeout(debounceAuto);
+      return guardarBorradorSilencioso();
+    }
+
+    // Cargar datos del paciente
+    async function cargarDatosPaciente() {
+      try {
+        const response = await fetch("/api/pacientes");
+        const pacientes = await response.json();
+        const paciente = pacientes.find(p => p.dni === dni);
+        pacienteActual = paciente;
+        
+        if (paciente) {
+          patientData.innerHTML = `
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Nombre:</strong> ${paciente.nombre} ${paciente.apellido}</p>
+                <p><strong>DNI:</strong> ${paciente.dni}</p>
+                <p><strong>Edad:</strong> ${paciente.edad || 'No especificada'} años</p>
+                <p><strong>Teléfono:</strong> ${paciente.celular || 'No especificado'}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Obra Social:</strong> ${paciente.obra_social || 'No especificada'}</p>
+                <p><strong>N° Obra Social:</strong> ${paciente.numero_obra_social || 'No especificado'}</p>
+                <p><strong>Fecha de Nacimiento:</strong> ${paciente.fecha_nacimiento || 'No especificada'}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          patientData.innerHTML = `
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle"></i>
+              Paciente no encontrado con DNI: ${dni}
+            </div>
+          `;
+        }
+      } catch (error) {
+        patientData.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            Error al cargar datos del paciente: ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    // Cargar historial de consultas
+    async function cargarHistorial() {
+      try {
+        const response = await fetch("/api/historias");
+        const historias = await response.json();
+        historiasPaciente = historias.filter(h => h.dni === dni);
+        
+        // Actualizar estadísticas
+        document.getElementById("totalConsultas").textContent = historiasPaciente.length;
+        
+        if (historiasPaciente.length > 0) {
+          const ultima = historiasPaciente.reduce((a, b) =>
+            timestampFechaLocal(a.fecha_consulta) >= timestampFechaLocal(b.fecha_consulta) ? a : b
+          );
+          document.getElementById("ultimaConsulta").textContent = formatFechaCorta(ultima.fecha_consulta);
+        }
+        
+        if (historiasPaciente.length === 0) {
+          contenedorHistorias.innerHTML = `
+            <div class="text-center text-muted">
+              <i class="bi bi-file-earmark-text fs-1"></i>
+              <p>No hay consultas anteriores registradas</p>
+            </div>
+          `;
+          return;
+        }
+
+
+        // Ordenar por fecha de consulta (más reciente primero)
+        historiasPaciente.sort((a, b) => timestampFechaLocal(b.fecha_consulta) - timestampFechaLocal(a.fecha_consulta));
+
+        let html = '';
+        historiasPaciente.forEach(h => {
+          const fecha = h.fecha_consulta ? formatFechaLocal(h.fecha_consulta) : 'Fecha no especificada';
+          html += `
+            <div class="history-entry p-3 mb-3 rounded">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="mb-0">
+                  <i class="bi bi-calendar-check"></i> 
+                  Consulta del ${fecha}
+                </h6>
+                <small class="text-muted">Dr. ${h.medico || 'No especificado'}</small>
+              </div>
+              <div class="consultation-content">
+                ${renderConsultaParaVista(h.consulta_medica)}
+              </div>
+            </div>
+          `;
+        });
+        
+        contenedorHistorias.innerHTML = html;
+      } catch (error) {
+        contenedorHistorias.innerHTML = `
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            Error al cargar historial: ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    // Descargar consulta individual
+    async function descargarConsulta(id) {
+      const consulta = historiasPaciente.find(h => h.id === id || historiasPaciente.indexOf(h) === id);
+      if (!consulta) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Configurar fuente y tamaños
+      doc.setFont("helvetica");
+      doc.setFontSize(20);
+      doc.text("Historia Clínica", 105, 20, { align: "center" });
+      
+      doc.setFontSize(12);
+      doc.text("Paciente:", 20, 40);
+      doc.setFontSize(10);
+      doc.text(`${pacienteActual?.nombre} ${pacienteActual?.apellido}`, 20, 50);
+      doc.text(`DNI: ${pacienteActual?.dni}`, 20, 60);
+      
+      doc.setFontSize(12);
+      doc.text("Consulta:", 20, 80);
+      doc.setFontSize(10);
+      
+      const fecha = formatFechaLocal(consulta.fecha_consulta);
+      doc.text(`Fecha: ${fecha}`, 20, 90);
+      doc.text(`Médico: ${consulta.medico}`, 20, 100);
+      
+      // Dividir el texto de la consulta en líneas
+      const consultaText = htmlATextoPlano(consulta.consulta_medica) || 'Sin detalles de consulta';
+      const lines = doc.splitTextToSize(consultaText, 170);
+      doc.text("Detalles:", 20, 120);
+      // Guardar PDF
+      const fileName = `consulta_${pacienteActual?.dni}_${fecha.replace(/\//g, '-')}.pdf`;
+      doc.save(fileName);
+    }
+
+    // Descargar historia completa
+    async function descargarHistoriaCompleta() {
+      if (!pacienteActual || historiasPaciente.length === 0) {
+        alert("No hay datos para descargar");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Título
+      doc.setFont("helvetica");
+      doc.setFontSize(20);
+      doc.text("Historia Clínica Completa", 105, 20, { align: "center" });
+      
+      // Datos del paciente
+      doc.setFontSize(14);
+      doc.text("Datos del Paciente:", 20, 40);
+      doc.setFontSize(10);
+      doc.text(`Nombre: ${pacienteActual.nombre} ${pacienteActual.apellido}`, 20, 50);
+      doc.text(`DNI: ${pacienteActual.dni}`, 20, 60);
+      doc.text(`Edad: ${pacienteActual.edad || 'No especificada'} años`, 20, 70);
+      doc.text(`Teléfono: ${pacienteActual.celular || 'No especificado'}`, 20, 80);
+      doc.text(`Obra Social: ${pacienteActual.obra_social || 'No especificada'}`, 20, 90);
+      doc.text(`N° Obra Social: ${pacienteActual.numero_obra_social || 'No especificado'}`, 20, 100);
+      
+      // Historial de consultas
+      let yPosition = 130;
+      doc.setFontSize(14);
+      doc.text("Historial de Consultas:", 20, yPosition);
+      yPosition += 10;
+      historiasPaciente.forEach((consulta, index) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        const fecha = formatFechaLocal(consulta.fecha_consulta);
+        doc.setFontSize(12);
+        doc.text(`Consulta ${index + 1} - ${fecha}`, 20, yPosition);
+        yPosition += 5;
+        doc.setFontSize(10);
+        doc.text(`Médico: ${consulta.medico}`, 20, yPosition);
+        yPosition += 5;
+        
+        const consultaText = htmlATextoPlano(consulta.consulta_medica) || 'Sin detalles de consulta';
+        const lines = doc.splitTextToSize(consultaText, 170);
+        doc.text(lines, 20, yPosition);
+        yPosition += lines.length * 5 + 10;
+      });
+      
+      // Guardar PDF
+      const fileName = `historia_completa_${pacienteActual.dni}.pdf`;
+      doc.save(fileName);
+    }
+
+    form.addEventListener("submit", (e) => e.preventDefault());
+
+    async function guardarHistoriaClinicaPost() {
+      if (tieneContextoTurno) {
+        await guardarBorradorInmediato();
+      }
+      const consulta = getConsultaTextoPlano();
+      const fecha_consulta = document.getElementById("fecha_consulta").value;
+      if (!consulta) {
+        alert("Complete la consulta médica antes de guardar la historia clínica.");
+        return;
+      }
+      if (!fecha_consulta) {
+        alert("Indique la fecha de consulta.");
+        return;
+      }
+      const datos = {
+        dni: form.dni.value,
+        consulta_medica: getConsultaContenido(),
+        fecha_consulta,
+      };
+      if (tieneContextoTurno) {
+        datos.fecha_turno = fechaTurnoCtx;
+        datos.hora_turno = horaTurnoCtx;
+      }
+      try {
+        const sesion = await fetch("/api/session-info").then((r) => r.json());
+        datos.medico = sesion.usuario;
+      } catch (error) {
+        alert("Error al obtener información de sesión");
+        return;
+      }
+      try {
+        const res = await fetch("/historias", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datos),
+        });
+        const resultado = await res.json();
+        if (res.ok) {
+          if (tieneContextoTurno) {
+            const r2 = await fetch("/api/turnos/estado", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                dni_paciente: dni,
+                fecha: fechaTurnoCtx,
+                hora: horaTurnoCtx,
+                estado: "atendido",
+              }),
+            });
+            if (!r2.ok) {
+              const j2 = await r2.json().catch(() => ({}));
+              alert(
+                "La consulta se guardó, pero no se pudo marcar el turno como atendido: " +
+                  (j2.error || r2.status) +
+                  ". Revisá desde el panel de turnos."
+              );
+            }
+          }
+          alert("Historia clínica guardada correctamente.");
+          window.location.href = "/turnos";
+          return;
+        } else {
+          alert("Error: " + resultado.error);
+        }
+      } catch (error) {
+        alert("Error de conexión: " + error.message);
+      }
+    }
+
+    document.getElementById("btn-guardar-hc").addEventListener("click", guardarHistoriaClinicaPost);
+
+    document.getElementById("btn-guardar-cerrar").addEventListener("click", async () => {
+      if (tieneContextoTurno) {
+        const ok = await guardarBorradorSilencioso();
+        if (!ok) {
+          if (!confirm('No se pudo guardar el borrador en el servidor. ¿Salir igualmente?')) return;
+        }
+      }
+      window.location.href = "/turnos";
+    });
+
+    configurarBotonFormato("btn-negrita", "bold");
+    configurarBotonFormato("btn-cursiva", "italic");
+    configurarBotonFormato("btn-subrayado", "underline");
+
+    editorConsulta.addEventListener("keydown", (e) => {
+      if (!e.ctrlKey) return;
+      if (e.key === "b" || e.key === "B") {
+        e.preventDefault();
+        aplicarFormato("bold");
+      } else if (e.key === "i" || e.key === "I") {
+        e.preventDefault();
+        aplicarFormato("italic");
+      } else if (e.key === "u" || e.key === "U") {
+        e.preventDefault();
+        aplicarFormato("underline");
+      }
+    });
+
+    editorConsulta.addEventListener("input", () => {
+      guardarSeleccionEditor();
+      programarAutosave();
+      actualizarBotonesFormato();
+    });
+    editorConsulta.addEventListener("keyup", () => {
+      guardarSeleccionEditor();
+      actualizarBotonesFormato();
+    });
+    editorConsulta.addEventListener("mouseup", () => {
+      guardarSeleccionEditor();
+      actualizarBotonesFormato();
+    });
+    editorConsulta.addEventListener("focus", () => {
+      restaurarSeleccionEditor();
+      actualizarBotonesFormato();
+    });
+    editorConsulta.addEventListener("blur", guardarBorradorInmediato);
+
+    document.addEventListener("selectionchange", () => {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return;
+      if (!editorConsulta.contains(sel.anchorNode)) {
+        ['btn-negrita', 'btn-cursiva', 'btn-subrayado'].forEach((id) => {
+          document.getElementById(id)?.classList.remove('active');
+        });
+        return;
+      }
+      guardarSeleccionEditor();
+      actualizarBotonesFormato();
+    });
+    document.getElementById("fecha_consulta").addEventListener("change", programarAutosave);
+    document.getElementById("fecha_consulta").addEventListener("blur", guardarBorradorInmediato);
+
+    window.addEventListener("beforeunload", () => {
+      if (!tieneContextoTurno) return;
+      const payload = JSON.stringify({
+        consulta_medica: getConsultaContenido(),
+        fecha_consulta: document.getElementById('fecha_consulta').value
+      });
+      const url = `/api/turnos/${encodeURIComponent(dni)}/${encodeURIComponent(fechaTurnoCtx)}/${encodeURIComponent(horaTurnoCtx)}/borrador-consulta`;
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+      }
+    });
+
+    function limpiarFormulario() {
+      setConsultaContenido("");
+      document.getElementById("fecha_consulta").value = fechaHoyLocal();
+      if (tieneContextoTurno) {
+        fetch(
+          `/api/turnos/${encodeURIComponent(dni)}/${encodeURIComponent(fechaTurnoCtx)}/${encodeURIComponent(horaTurnoCtx)}/borrador-consulta`,
+          { method: 'DELETE' }
+        );
+        document.getElementById('autosave-status').textContent = 'Borrador eliminado';
+      }
+    }
+
+    // Cargar datos al iniciar
+    cargarDatosPaciente();
+    cargarHistorial();
+    cargarContextoTurnoYObs();
+    if (tieneContextoTurno) {
+      setInterval(guardarBorradorSilencioso, 20000);
+      document.getElementById('autosave-status').textContent = 'Autoguardado activo mientras redactás';
+    }
+  </script>
+</body>
+</html>
