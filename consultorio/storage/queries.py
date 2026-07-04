@@ -128,6 +128,60 @@ def load_pacientes_por_dnis(dnis: set[str]) -> list:
     return resultado
 
 
+def count_turnos_total() -> int:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.count_turnos_total()
+
+    return len(cargar_json(TURNOS_FILE))
+
+
+def count_turnos_fecha(fecha: str) -> int:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.count_turnos_fecha(fecha)
+
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    return sum(
+        1
+        for t in cargar_json(TURNOS_FILE)
+        if (normalizar_fecha_dia(t.get("fecha")) or str(t.get("fecha", "")).strip()[:10]) == f
+    )
+
+
+def listar_atendidos_sin_pago(fecha: str) -> list:
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    turnos = load_turnos_fecha(f)
+    pagos = load_pagos_fecha(f)
+    dnis_con_pago = {p.get("dni_paciente") for p in pagos}
+    pacientes_map = {p["dni"]: p for p in load_pacientes_liviano()}
+    resultado = []
+    for turno in turnos:
+        if turno.get("estado") != "atendido":
+            continue
+        dni = turno.get("dni_paciente")
+        if not dni or dni in dnis_con_pago:
+            continue
+        paciente = pacientes_map.get(dni)
+        if not paciente:
+            continue
+        resultado.append(
+            {
+                "dni": dni,
+                "nombre": paciente.get("nombre", ""),
+                "apellido": paciente.get("apellido", ""),
+                "obra_social": paciente.get("obra_social", ""),
+                "hora_turno": turno.get("hora", ""),
+                "medico": turno.get("medico", ""),
+                "fecha": f,
+            }
+        )
+    resultado.sort(key=lambda x: x.get("hora_turno", "00:00"))
+    return resultado
+
+
 def count_pacientes() -> int:
     if use_database():
         from consultorio.storage import db_storage

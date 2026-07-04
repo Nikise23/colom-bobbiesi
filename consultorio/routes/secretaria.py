@@ -6,6 +6,8 @@ from consultorio.auth.decorators import login_requerido, rol_permitido
 from consultorio.storage.queries import (
     count_pacientes,
     count_turnos_pendientes,
+    count_turnos_total,
+    listar_atendidos_sin_pago,
     load_pacientes_liviano,
     load_pagos_fecha,
     load_pagos_mes,
@@ -55,6 +57,8 @@ def secretaria_inicio():
         {
             "pacientes": pacientes,
             "total_pacientes": count_pacientes(),
+            "total_turnos_sistema": count_turnos_total(),
+            "turnos_del_dia": len(turnos_raw),
             "turnos_pendientes_total": count_turnos_pendientes(),
             "turnos": turnos_raw,
             "pagos": pagos_dia,
@@ -62,6 +66,7 @@ def secretaria_inicio():
             "turnos_hoy": turnos_hoy,
             "recepcionados": listar_recepcionados(turnos_raw, pacientes, pagos_dia, fecha_param),
             "sala_espera": listar_sala_espera(turnos_raw, pacientes, pagos_dia, fecha_param),
+            "atendidos_sin_pago": listar_atendidos_sin_pago(fecha_param),
             "fecha": fecha_param,
         }
     )

@@ -361,6 +361,15 @@ def count_turnos_estados(estados: set[str]) -> int:
     return Turno.query.filter(Turno.estado.in_(list(estados))).count()
 
 
+def count_turnos_total() -> int:
+    return Turno.query.count()
+
+
+def count_turnos_fecha(fecha: str) -> int:
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    return Turno.query.filter(func.substr(Turno.fecha, 1, 10) == f).count()
+
+
 def buscar_pacientes_paginado(busqueda: str, pagina: int, por_pagina: int) -> dict:
     query = Paciente.query
     busqueda = busqueda.strip()

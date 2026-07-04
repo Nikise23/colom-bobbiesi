@@ -5,8 +5,14 @@ from flask import Blueprint, jsonify, make_response, render_template, request
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
 from consultorio.paths import DATA_FILE, PACIENTES_FILE, PAGOS_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
-from consultorio.storage.queries import buscar_pacientes_paginado as buscar_pacientes_db
-from consultorio.utils.fechas import normalizar_fecha_nacimiento
+from consultorio.storage.queries import (
+    buscar_pacientes_paginado,
+    listar_atendidos_sin_pago,
+    load_pacientes_liviano,
+    load_pagos_fecha,
+    load_turnos_fecha,
+)
+from consultorio.utils.fechas import hoy_ar_iso, normalizar_fecha_dia, normalizar_fecha_nacimiento
 from consultorio.utils.helpers import (
     listar_pacientes_dedup,
     listar_recepcionados,
@@ -44,7 +50,7 @@ def buscar_pacientes_paginado():
     busqueda = request.args.get("busqueda", "").strip()
     pagina = int(request.args.get("pagina", 1))
     por_pagina = min(int(request.args.get("por_pagina", 10)), 50)
-    return jsonify(buscar_pacientes_db(busqueda, pagina, por_pagina))
+    return jsonify(buscar_pacientes_paginado(busqueda, pagina, por_pagina))
 
 
 
@@ -190,35 +196,9 @@ def eliminar_paciente(dni):
 @login_requerido
 @rol_permitido(["secretaria", "medico"])
 def obtener_pacientes_atendidos():
-    """Obtiene pacientes que fueron atendidos y aún no tienen pago registrado para una fecha específica"""
-    fecha = request.args.get("fecha", date.today().isoformat())
-    
-    turnos = cargar_json(TURNOS_FILE)
-    pacientes = cargar_json(PACIENTES_FILE)
-    pagos = cargar_json(PAGOS_FILE)
-    
-    # Filtrar turnos atendidos en la fecha especificada
-    turnos_atendidos = [t for t in turnos if t["fecha"] == fecha and t["estado"] == "atendido"]
-    
-    # Obtener DNIs que ya tienen pago registrado en esa fecha
-    dnis_con_pago = {p["dni_paciente"] for p in pagos if p["fecha"] == fecha}
-    
-    # Filtrar pacientes atendidos sin pago
-    pacientes_sin_pago = []
-    for turno in turnos_atendidos:
-        if turno["dni_paciente"] not in dnis_con_pago:
-            paciente = next((p for p in pacientes if p["dni"] == turno["dni_paciente"]), None)
-            if paciente:
-                pacientes_sin_pago.append({
-                    "dni": paciente["dni"],
-                    "nombre": paciente["nombre"],
-                    "apellido": paciente["apellido"],
-                    "obra_social": paciente.get("obra_social", ""),
-                    "hora_turno": turno["hora"],
-                    "medico": turno["medico"]
-                })
-    
-    return jsonify(pacientes_sin_pago)
+    """Pacientes atendidos en una fecha sin pago registrado."""
+    fecha = request.args.get("fecha", hoy_ar_iso())
+    return jsonify(listar_atendidos_sin_pago(fecha))
 
 
 @bp.route("/api/pacientes/recepcionados", methods=["GET"], endpoint="obtener_pacientes_recepcionados")
@@ -226,10 +206,10 @@ def obtener_pacientes_atendidos():
 @rol_permitido(["secretaria", "medico", "administrador"])
 def obtener_pacientes_recepcionados():
     """Obtiene pacientes que están recepcionados y pendientes de pago"""
-    fecha = request.args.get("fecha", date.today().isoformat())
-    pacientes = listar_pacientes_dedup()
-    turnos_raw = cargar_json(TURNOS_FILE)
-    pagos = cargar_json(PAGOS_FILE)
+    fecha = request.args.get("fecha", hoy_ar_iso())
+    pacientes = load_pacientes_liviano()
+    turnos_raw = load_turnos_fecha(fecha)
+    pagos = load_pagos_fecha(fecha)
     return jsonify(listar_recepcionados(turnos_raw, pacientes, pagos, fecha))
 
 
@@ -238,10 +218,10 @@ def obtener_pacientes_recepcionados():
 @rol_permitido(["secretaria", "medico", "administrador"])
 def obtener_pacientes_sala_espera():
     """Obtiene pacientes que están en sala de espera (ya cobrados)"""
-    fecha = request.args.get("fecha", date.today().isoformat())
-    pacientes = listar_pacientes_dedup()
-    turnos_raw = cargar_json(TURNOS_FILE)
-    pagos = cargar_json(PAGOS_FILE)
+    fecha = request.args.get("fecha", hoy_ar_iso())
+    pacientes = load_pacientes_liviano()
+    turnos_raw = load_turnos_fecha(fecha)
+    pagos = load_pagos_fecha(fecha)
     return jsonify(listar_sala_espera(turnos_raw, pacientes, pagos, fecha))
 
 # ======================= SISTEMA DE RECEPCIÓN =======================
