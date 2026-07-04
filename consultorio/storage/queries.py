@@ -58,7 +58,46 @@ def load_turnos_fecha(fecha: str) -> list:
 
         return db_storage.load_turnos_fecha(fecha)
 
-    return [t for t in cargar_json(TURNOS_FILE) if t.get("fecha") == fecha]
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    return [
+        t
+        for t in cargar_json(TURNOS_FILE)
+        if (normalizar_fecha_dia(t.get("fecha")) or str(t.get("fecha", "")).strip()[:10]) == f
+    ]
+
+
+def load_turnos_medico_fecha(medico: str, fecha: str) -> list:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.load_turnos_medico_fecha(medico, fecha)
+
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    return [
+        t
+        for t in cargar_json(TURNOS_FILE)
+        if t.get("medico") == medico
+        and (normalizar_fecha_dia(t.get("fecha")) or str(t.get("fecha", "")).strip()[:10]) == f
+    ]
+
+
+def load_turnos_medico_proximos(medico: str, fecha_desde: str, limit: int = 50) -> list:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.load_turnos_medico_proximos(medico, fecha_desde, limit)
+
+    f = normalizar_fecha_dia(fecha_desde) or str(fecha_desde).strip()[:10]
+    estados = {"sin atender", "recepcionado", "sala de espera"}
+    turnos = [
+        t
+        for t in cargar_json(TURNOS_FILE)
+        if t.get("medico") == medico
+        and (normalizar_fecha_dia(t.get("fecha")) or str(t.get("fecha", "")).strip()[:10]) >= f
+        and t.get("estado", "sin atender") in estados
+    ]
+    turnos.sort(key=lambda t: (t.get("fecha", ""), t.get("hora", "")))
+    return turnos[:limit]
 
 
 def load_pagos_fecha(fecha: str) -> list:

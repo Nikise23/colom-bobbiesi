@@ -299,10 +299,18 @@
     /* === Dashboard del Médico === */
     let usuarioMedico = null;
      let historiasResultado = []; // Para almacenar resultados de búsqueda
+
+    function fechaLocalArgentina() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
     
     function cargarDashboardMedico(){
       // Establecer fecha de hoy por defecto
-      const hoy = new Date().toLocaleDateString('en-CA'); // formato YYYY-MM-DD en zona local
+      const hoy = fechaLocalArgentina();
       document.getElementById("fecha-agenda-medico").value = hoy;
       
       // Cargar estadísticas del día
@@ -316,12 +324,10 @@
     }
     
     function cargarEstadisticasMedico(){
-      const hoy = new Date().toLocaleDateString('en-CA'); // formato YYYY-MM-DD en zona local
-      fetch("/api/turnos/medico")
+      const hoy = fechaLocalArgentina();
+      fetch(`/api/turnos/medico?fecha=${encodeURIComponent(hoy)}`)
         .then(r => r.json())
-        .then(turnos => {
-          const turnosHoy = turnos.filter(t => t.fecha === hoy);
-          
+        .then(turnosHoy => {
           const pendientes = turnosHoy.filter(t => ["sin atender", "recepcionado"].includes(t.estado)).length;
           const enSala = turnosHoy.filter(t => ["sala de espera", "llamado"].includes(t.estado)).length;
           const atendidos = turnosHoy.filter(t => t.estado === "atendido").length;
@@ -335,7 +341,7 @@
         .catch(console.error);
     }
     function cargarAgendaHoy(){
-      const hoy = new Date().toLocaleDateString('en-CA'); // formato YYYY-MM-DD en zona local
+      const hoy = fechaLocalArgentina();
       document.getElementById("fecha-agenda-medico").value = hoy;
       cargarAgendaMedico();
     }
@@ -363,10 +369,10 @@
       console.log('DEBUG - Fecha recibida:', fecha); // DEBUG
       Promise.all([
         fetch("/api/agenda"),
-        fetch(`/api/turnos/dia?fecha=${fecha}`)
+        fetch(`/api/turnos/medico?fecha=${encodeURIComponent(fecha)}`)
       ])
       .then(([agendaRes, turnosRes]) => Promise.all([agendaRes.json(), turnosRes.json()]))
-      .then(([agenda, turnos]) => {
+      .then(([agenda, turnosMedico]) => {
         // const fechaObj = new Date(fecha + 'T12:00:00');
         // const diasSemana = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
         // const diaSeleccionado = diasSemana[fechaObj.getDay()];
@@ -377,9 +383,6 @@
         const diaSeleccionado = diasSemana[fechaObj.getDay()];
         const fechaFormateada = `${dia}/${mes}/${anio}`;
         console.log('DEBUG - Fecha procesada:', fechaObj, 'Día calculado:', diaSeleccionado); // DEBUG
-        
-        // Filtrar turnos del médico
-        const turnosMedico = turnos.filter(t => t.medico === usuarioMedico);
         
         // Obtener horarios configurados para este médico en este día
         const horariosConfigurados = agenda[usuarioMedico]?.[diaSeleccionado] || [];
@@ -471,14 +474,14 @@
     }
 
     function cargarProximosTurnos(){
-      fetch("/api/turnos/medico")
+      fetch("/api/turnos/medico?proximos=1")
         .then(r => r.json())
         .then(turnos => {
           const ahora = new Date();
           const proximosTurnos = turnos
             .filter(t => {
               const fechaTurno = new Date(`${t.fecha}T${t.hora}`);
-              return fechaTurno > ahora && ['sin atender', 'recepcionado', 'sala de espera'].includes(t.estado);
+              return fechaTurno > ahora;
             })
             .sort((a, b) => new Date(`${a.fecha}T${a.hora}`) - new Date(`${b.fecha}T${b.hora}`))
             .slice(0, 3);
@@ -599,36 +602,49 @@
       
       const historiasContainer = document.getElementById("historias-container");
       
-      // Cargar datos de pacientes para enriquecer las historias
-      fetch("/api/pacientes")
-        .then(r => r.json())
-        .then(pacientes => {
-          lista.forEach((h, index) => {
-            // Buscar datos del paciente
-            const paciente = pacientes.find(p => p.dni === h.dni);
-            const nombreCompleto = paciente ? `${paciente.nombre} ${paciente.apellido}`.trim() : 'Paciente no encontrado';
-            const fechaNac = paciente?.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-ES') : 'No especificada';
-            const edad = paciente?.edad ? `${paciente.edad} años` : 'No especificada';
-            const telefono = paciente?.celular || 'No especificado';
-            
-            const fecha = h.fecha_consulta ? new Date(h.fecha_consulta).toLocaleDateString('es-ES') : 'No especificada';
-            
-            const card = document.createElement("div");
-            card.className = "col-md-6 col-lg-4 mb-3";
-            card.innerHTML = `
-              <div class="card h-100 border-primary">
-                <div class="card-header bg-primary text-white">
+      (async () => {
+        for (let index = 0; index < lista.length; index++) {
+          const h = lista[index];
+          let paciente = h._paciente || null;
+          if (!paciente) {
+            try {
+              const r = await fetch(`/api/pacientes/${encodeURIComponent(h.dni)}`);
+              if (r.ok) paciente = await r.json();
+            } catch (e) {
+              console.error("Error cargando paciente:", e);
+            }
+          }
+          const nombreCompleto = paciente
+            ? `${paciente.nombre} ${paciente.apellido}`.trim()
+            : (h.nombre_paciente || `DNI: ${h.dni}`);
+          const fechaNac = paciente?.fecha_nacimiento
+            ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-ES')
+            : 'No especificada';
+          const edad = paciente?.edad ? `${paciente.edad} años` : 'No especificada';
+          const telefono = paciente?.celular || 'No especificado';
+          const fecha = h.fecha_consulta
+            ? new Date(h.fecha_consulta).toLocaleDateString('es-ES')
+            : 'No especificada';
+          const borderClass = paciente ? 'border-primary' : 'border-warning';
+          const headerClass = paciente ? 'bg-primary text-white' : 'bg-warning text-dark';
+
+          const card = document.createElement("div");
+          card.className = "col-md-6 col-lg-4 mb-3";
+          card.innerHTML = `
+              <div class="card h-100 ${borderClass}">
+                <div class="card-header ${headerClass}">
                   <div class="d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">
                       <i class="bi bi-person-circle"></i> 
                       ${nombreCompleto}
                     </h6>
-                    <button class="btn btn-sm btn-light" onclick="descargarHistoriaIndividual(${index})" title="Descargar PDF">
+                    <button class="btn btn-sm ${paciente ? 'btn-light' : 'btn-dark'}" onclick="descargarHistoriaIndividual(${index})" title="Descargar PDF">
                       <i class="bi bi-download"></i>
                     </button>
                   </div>
                 </div>
                 <div class="card-body">
+                  ${!paciente ? '<div class="alert alert-warning py-1 mb-2"><small>Datos del paciente limitados</small></div>' : ''}
                   <div class="row mb-2">
                     <div class="col-6">
                       <small class="text-muted">DNI:</small><br>
@@ -649,35 +665,30 @@
                       <strong>${telefono}</strong>
                     </div>
                   </div>
-                  
                   <div class="row mb-2">
                     <div class="col-12">
                       <small class="text-muted">Fecha Consulta:</small><br>
                       <strong>${fecha}</strong>
                     </div>
                   </div>
-                  
                   ${h.diagnostico ? `
                     <div class="mb-2">
                       <small class="text-muted">Diagnóstico:</small><br>
                       <strong>${h.diagnostico}</strong>
                     </div>
                   ` : ''}
-                  
                   ${h.tratamiento ? `
                     <div class="mb-2">
                       <small class="text-muted">Tratamiento:</small><br>
                       <strong>${h.tratamiento}</strong>
                     </div>
                   ` : ''}
-                  
                   ${h.observaciones ? `
                     <div class="mb-2">
                       <small class="text-muted">Observaciones:</small><br>
                       <em>${h.observaciones}</em>
                     </div>
                   ` : ''}
-                  
                   ${h.consulta_medica ? (() => {
                     const txt = htmlATextoPlano(h.consulta_medica);
                     return txt ? `
@@ -699,85 +710,12 @@
                 </div>
               </div>
             `;
-            historiasContainer.appendChild(card);
-          });
-        })
-        .catch(error => {
-          console.error("Error al cargar datos de pacientes:", error);
-          // Mostrar historias sin datos de pacientes si hay error
-          lista.forEach((h, index) => {
-            const fecha = h.fecha_consulta ? new Date(h.fecha_consulta).toLocaleDateString('es-ES') : 'No especificada';
-            
-            const card = document.createElement("div");
-            card.className = "col-md-6 col-lg-4 mb-3";
-            card.innerHTML = `
-              <div class="card h-100 border-warning">
-                <div class="card-header bg-warning text-dark">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">
-                      <i class="bi bi-exclamation-triangle"></i> 
-                      DNI: ${h.dni}
-                    </h6>
-                    <button class="btn btn-sm btn-dark" onclick="descargarHistoriaIndividual(${index})" title="Descargar PDF">
-                      <i class="bi bi-download"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="alert alert-warning">
-                    <small>No se pudieron cargar los datos del paciente</small>
-                  </div>
-                  
-                  <div class="mb-2">
-                    <small class="text-muted">Fecha Consulta:</small><br>
-                    <strong>${fecha}</strong>
-                  </div>
-                  
-                  ${h.diagnostico ? `
-                    <div class="mb-2">
-                      <small class="text-muted">Diagnóstico:</small><br>
-                      <strong>${h.diagnostico}</strong>
-                    </div>
-                  ` : ''}
-                  
-                  ${h.tratamiento ? `
-                    <div class="mb-2">
-                      <small class="text-muted">Tratamiento:</small><br>
-                      <strong>${h.tratamiento}</strong>
-                    </div>
-                  ` : ''}
-                   ${h.observaciones ? `
-                    <div class="mb-2">
-                      <small class="text-muted">Observaciones:</small><br>
-                      <em>${h.observaciones}</em>
-                    </div>
-                  ` : ''}
-                  
-                  ${h.consulta_medica ? (() => {
-                    const txt = htmlATextoPlano(h.consulta_medica);
-                    return txt ? `
-                    <div class="mb-2">
-                      <small class="text-muted">Consulta Médica:</small><br>
-                      <em>${txt.substring(0, 100)}${txt.length > 100 ? '...' : ''}</em>
-                    </div>
-                  ` : '';
-                  })() : ''}
-                  
-                  <div class="mt-2">
-                    <small class="text-muted">Médico:</small><br>
-                    <strong>${h.medico || 'No especificado'}</strong>
-                  </div>
-                </div>
-                <div class="card-footer">
-                  <button class="btn btn-sm btn-outline-warning" onclick="verHistoriaCompleta('${h.dni}')">
-                    <i class="bi bi-eye"></i> Ver Completa
-                  </button>
-                </div>
-              </div>
-            `;
-            historiasContainer.appendChild(card);
-          });
-        });
+          historiasContainer.appendChild(card);
+          if (paciente && !h._paciente) {
+            historiasResultado[index]._paciente = paciente;
+          }
+        }
+      })();
     }
 
 
@@ -802,51 +740,34 @@
     function buscarPorApellido(){
       const ape=document.getElementById("apellido_buscar").value.trim().toLowerCase();
       if(!ape) return alert("Ingrese un apellido");
-      // Primero obtenemos los pacientes para filtrar por apellido
-      Promise.all([
-        fetch("/api/pacientes").then(r=>r.json()),
-        fetch("/api/historias").then(r=>r.json())
-      ])
-      .then(([pacientes, historias]) => {
-        // Filtrar pacientes por apellido (máximo 5 resultados)
-        const pacientesFiltrados = pacientes.filter(p => 
-          p.apellido && p.apellido.toLowerCase().includes(ape)
-        ).slice(0, 5);
-        
-        if (pacientesFiltrados.length === 0) {
+      fetch(`/api/pacientes/buscar?busqueda=${encodeURIComponent(ape)}&por_pagina=5`)
+      .then(r => r.json())
+      .then(async ({ pacientes, total }) => {
+        if (pacientes.length === 0) {
           return alert("No se encontraron pacientes con ese apellido");
         }
-
-        // Verificar si hay más resultados
-        const totalPacientes = pacientes.filter(p => 
-          p.apellido && p.apellido.toLowerCase().includes(ape)
-        ).length;
-        
-        if (totalPacientes > 5) {
-          alert(`Se encontraron ${totalPacientes} pacientes. Mostrando los primeros 5. Refina tu búsqueda para ver más resultados.`);
+        if (total > 5) {
+          alert(`Se encontraron ${total} pacientes. Mostrando los primeros 5. Refina tu búsqueda para ver más resultados.`);
         }
-        
-        // Obtener DNIs de los pacientes filtrados
-        const dnisEncontrados = pacientesFiltrados.map(p => p.dni);
-        
-        // Filtrar historias clínicas de esos pacientes
-        const historiasFiltradas = historias.filter(h => 
-          dnisEncontrados.includes(h.dni)
+        const historiasPromises = pacientes.map(p =>
+          fetch(`/historias/${encodeURIComponent(p.dni)}`)
+            .then(r => r.json())
+            .catch(() => null)
         );
-        
+        const historiasRaw = await Promise.all(historiasPromises);
+        const historiasFiltradas = historiasRaw.filter(h => h && !h.error);
         if (historiasFiltradas.length === 0) {
-          alert("Los pacientes encontrados no tienen historias clínicas registradas");
-        } else {
-          // Enriquecer historias con datos del paciente
-          const historiasEnriquecidas = historiasFiltradas.map(h => {
-            const paciente = pacientes.find(p => p.dni === h.dni);
-            return {
-              ...h,
-              nombre_paciente: paciente ? `${paciente.nombre} ${paciente.apellido}` : `DNI: ${h.dni}`
-            };
-          });
-          mostrarHistorias(historiasEnriquecidas);
+          return alert("Los pacientes encontrados no tienen historias clínicas registradas");
         }
+        const historiasEnriquecidas = historiasFiltradas.map(h => {
+          const paciente = pacientes.find(p => p.dni === h.dni);
+          return {
+            ...h,
+            nombre_paciente: paciente ? `${paciente.nombre} ${paciente.apellido}` : `DNI: ${h.dni}`,
+            _paciente: paciente
+          };
+        });
+        mostrarHistorias(historiasEnriquecidas);
       })
       .catch(error => {
         console.error('Error en búsqueda por apellido:', error);
@@ -869,11 +790,7 @@
       const historia = historiasResultado[index];
       if (!historia) return;
 
-      // Obtener datos del paciente
-      fetch("/api/pacientes")
-        .then(r => r.json())
-        .then(pacientes => {
-          const paciente = pacientes.find(p => p.dni === historia.dni);
+      const usarPaciente = (paciente) => {
           const nombreCompleto = paciente ? `${paciente.nombre} ${paciente.apellido}`.trim() : 'Paciente no encontrado';
           const fechaNac = paciente?.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-ES') : 'No especificada';
           const edad = paciente?.edad ? `${paciente.edad} años` : 'No especificada';
@@ -946,77 +863,18 @@
             doc.text(consultaLines, 20, yPosition);
           }
           
-          // Guardar PDF
           const fileName = `historia_${historia.dni}_${fecha.replace(/\//g, '-')}.pdf`;
           doc.save(fileName);
-        })
-        .catch(error => {
-          console.error("Error al obtener datos del paciente:", error);
-          // Generar PDF sin datos del paciente si hay error
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          
-          doc.setFont("helvetica");
-          doc.setFontSize(20);
-          doc.text("Historia Clínica", 105, 20, { align: "center" });
-          doc.setFontSize(12);
-          doc.text("Datos del Paciente:", 20, 40);
-          doc.setFontSize(10);
-          doc.text(`DNI: ${historia.dni}`, 20, 50);
-          doc.text(`Nombre: No disponible`, 20, 60);
-          
-          doc.setFontSize(12);
-          doc.text("Datos de la Consulta:", 20, 80);
-          doc.setFontSize(10);
-          
-          const fecha = historia.fecha_consulta ? new Date(historia.fecha_consulta).toLocaleDateString('es-ES') : 'No especificada';
-          doc.text(`Fecha de Consulta: ${fecha}`, 20, 90);
-          doc.text(`Médico: ${historia.medico || 'No especificado'}`, 20, 100);
-          
-          let yPosition = 120;
-          
-          if (historia.diagnostico) {
-            doc.setFontSize(12);
-            doc.text("Diagnóstico:", 20, yPosition);
-            yPosition += 5;
-            doc.setFontSize(10);
-            const dxLines = doc.splitTextToSize(historia.diagnostico, 170);
-            doc.text(dxLines, 20, yPosition);
-            yPosition += dxLines.length * 5 + 5;
-          }
-          
-          if (historia.tratamiento) {
-            doc.setFontSize(12);
-            doc.text("Tratamiento:", 20, yPosition);
-            yPosition += 5;
-            doc.setFontSize(10);
-            const txLines = doc.splitTextToSize(historia.tratamiento, 170);
-            doc.text(txLines, 20, yPosition);
-            yPosition += txLines.length * 5 + 5;
-          }
-          
-          if (historia.observaciones) {
-            doc.setFontSize(12);
-            doc.text("Observaciones:", 20, yPosition);
-            yPosition += 5;
-            doc.setFontSize(10);
-            const obsLines = doc.splitTextToSize(historia.observaciones, 170);
-            doc.text(obsLines, 20, yPosition);
-            yPosition += obsLines.length * 5 + 5;
-          }
-          if (historia.consulta_medica) {
-            doc.setFontSize(12);
-            doc.text("Consulta Médica:", 20, yPosition);
-            yPosition += 5;
-            doc.setFontSize(10);
-            const consultaLines = doc.splitTextToSize(htmlATextoPlano(historia.consulta_medica), 170);
-            doc.text(consultaLines, 20, yPosition);
-          }
-          
-          const fileName = `historia_${historia.dni}_${fecha.replace(/\//g, '-')}.pdf`;
-          doc.save(fileName);
-        });
-    
+      };
+
+      if (historia._paciente) {
+        usarPaciente(historia._paciente);
+        return;
+      }
+      fetch(`/api/pacientes/${encodeURIComponent(historia.dni)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(paciente => usarPaciente(paciente))
+        .catch(() => usarPaciente(null));
     }
 
     function descargarResultadosPDF(){
@@ -1554,6 +1412,14 @@
   </style>
 
   <script>
+      function fechaLocalArgentina() {
+          const d = new Date();
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+      }
+
       // Actualizar hora actual
       function updateCurrentTime() {
           const now = new Date();
@@ -1571,19 +1437,17 @@
       // Actualizar estadísticas del footer
       async function updateFooterStats() {
           try {
-              // Obtener estadísticas de pacientes
-              const pacientesResponse = await fetch('/api/pacientes');
-              if (pacientesResponse.ok) {
-                  const pacientes = await pacientesResponse.json();
+              const statsResponse = await fetch('/api/pacientes/estadisticas');
+              if (statsResponse.ok) {
+                  const stats = await statsResponse.json();
                   const pacientesCount = document.getElementById('footer-pacientes-count');
                   if (pacientesCount) {
-                      pacientesCount.textContent = pacientes.length;
+                      pacientesCount.textContent = stats.total;
                   }
               }
 
-              // Obtener turnos de hoy
-              const hoy = new Date().toISOString().split('T')[0];
-              const turnosResponse = await fetch(`/api/turnos?fecha=${hoy}`);
+              const hoy = fechaLocalArgentina();
+              const turnosResponse = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(hoy)}`);
               if (turnosResponse.ok) {
                   const turnos = await turnosResponse.json();
                   const turnosCount = document.getElementById('footer-turnos-count');

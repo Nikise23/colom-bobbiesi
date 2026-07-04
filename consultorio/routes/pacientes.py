@@ -6,11 +6,12 @@ from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requ
 from consultorio.paths import DATA_FILE, PACIENTES_FILE, PAGOS_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.storage.queries import (
-    buscar_pacientes_paginado,
+    buscar_pacientes_paginado as buscar_pacientes_paginado_query,
     listar_atendidos_sin_pago,
     load_pacientes_liviano,
     load_pagos_fecha,
     load_turnos_fecha,
+    obtener_paciente,
 )
 from consultorio.utils.fechas import hoy_ar_iso, normalizar_fecha_dia, normalizar_fecha_nacimiento
 from consultorio.utils.helpers import (
@@ -50,7 +51,17 @@ def buscar_pacientes_paginado():
     busqueda = request.args.get("busqueda", "").strip()
     pagina = int(request.args.get("pagina", 1))
     por_pagina = min(int(request.args.get("por_pagina", 10)), 50)
-    return jsonify(buscar_pacientes_paginado(busqueda, pagina, por_pagina))
+    return jsonify(buscar_pacientes_paginado_query(busqueda, pagina, por_pagina))
+
+
+@bp.route("/api/pacientes/<dni>", methods=["GET"], endpoint="obtener_paciente_por_dni")
+@login_requerido
+@rol_permitido(["secretaria", "medico"])
+def obtener_paciente_por_dni(dni):
+    paciente = obtener_paciente(dni)
+    if not paciente:
+        return jsonify({"error": "Paciente no encontrado"}), 404
+    return jsonify(paciente)
 
 
 

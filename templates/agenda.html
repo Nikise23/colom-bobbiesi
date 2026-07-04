@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
   <script>
     let agenda = {};
     let turnos = [];
-    let pacientes = [];
+    let pacientesCache = {};
     let turnoActual = { medico: "", hora: "" };
     let fechaSeleccionada = null;
     let turnosDelDia = [];
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     function contarObrasPorTurnos(listaTurnos) {
       const counts = {};
       for (const t of listaTurnos) {
-        const p = t.paciente || pacientes.find(pp => pp.dni === t.dni_paciente) || {};
+        const p = t.paciente || pacientesCache[t.dni_paciente] || {};
         const label = normalizarObraSocial(p);
         counts[label] = (counts[label] || 0) + 1;
       }
@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
         
         if (turnoExistente) {
           // Horario ocupado - rojo
-          const paciente = turnoExistente.paciente || pacientes.find(p => p.dni === turnoExistente.dni_paciente);
+          const paciente = turnoExistente.paciente || pacientesCache[turnoExistente.dni_paciente];
           const nombrePaciente = paciente ? `${paciente.nombre} ${paciente.apellido}` : turnoExistente.dni_paciente;
           const obraLabel = normalizarObraSocial(paciente || {});
           const estadoEmoji = {
@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     
     function verDetallesTurno(medico, hora, dni_paciente) {
       const turno = turnosDelDia.find(t => t.medico === medico && t.hora === hora && t.dni_paciente === dni_paciente);
-      const paciente = (turno && turno.paciente) || pacientes.find(p => p.dni === dni_paciente);
+      const paciente = (turno && turno.paciente) || pacientesCache[dni_paciente];
       
       if (turno && paciente) {
         const mensaje = `
@@ -789,35 +789,32 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
       document.getElementById("fecha-turno").value = fechaSeleccionada;
       document.getElementById("observacion-turno").value = "";
 
-      // Inicializar select de pacientes
+      // Inicializar select de pacientes (búsqueda bajo demanda)
       const select = document.getElementById("paciente-select");
-      select.innerHTML = pacientes.map(p =>
-        `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
-      ).join("");
+      select.innerHTML = '<option value="">Busque paciente por DNI o apellido arriba...</option>';
       
       // Preseleccionar paciente si viene en URL
       const urlParams = new URLSearchParams(window.location.search);
       const dniPreseleccionado = urlParams.get('dni');
       if (dniPreseleccionado) {
-        select.value = dniPreseleccionado;
-        const pacienteSeleccionado = pacientes.find(p => p.dni === dniPreseleccionado);
-        if (pacienteSeleccionado) {
-          // Resaltar que el paciente está preseleccionado
-          select.style.border = "3px solid #28a745";
-          select.style.backgroundColor = "#d4edda";
-          
-          // Agregar un mensaje temporal
-          const infoTurno = document.getElementById("info-turno");
-          infoTurno.innerHTML = `
-            <strong>Turno para ${turnoActual.medico} a las ${turnoActual.hora}</strong><br>
-            <small class="text-info">📅 Fecha: ${fechaFormateada}</small><br>
-            <small class="text-success">✅ Paciente preseleccionado: ${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}</small>
-          `;
-        }
-        // Limpiar el parámetro de la URL después de usarlo
+        fetch(`/api/pacientes/${encodeURIComponent(dniPreseleccionado)}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(pacienteSeleccionado => {
+            if (!pacienteSeleccionado) return;
+            pacientesCache[pacienteSeleccionado.dni] = pacienteSeleccionado;
+            select.innerHTML = `<option value="${pacienteSeleccionado.dni}" selected>${pacienteSeleccionado.apellido}, ${pacienteSeleccionado.nombre} (${pacienteSeleccionado.dni})</option>`;
+            select.value = dniPreseleccionado;
+            select.style.border = "3px solid #28a745";
+            select.style.backgroundColor = "#d4edda";
+            const infoTurno = document.getElementById("info-turno");
+            infoTurno.innerHTML = `
+              <strong>Turno para ${turnoActual.medico} a las ${turnoActual.hora}</strong><br>
+              <small class="text-info">📅 Fecha: ${fechaFormateada}</small><br>
+              <small class="text-success">✅ Paciente preseleccionado: ${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}</small>
+            `;
+          });
         window.history.replaceState({}, document.title, window.location.pathname);
       } else {
-        // Restablecer estilos normales
         select.style.border = "";
         select.style.backgroundColor = "";
       }
@@ -826,28 +823,35 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
       modal.show();
     }
 
-    // Función para filtrar pacientes en tiempo real
+    let buscarPacientesTimer = null;
+
+    // Función para filtrar pacientes en tiempo real (consulta al servidor)
     function filtrarPacientes() {
-      const filtro = document.getElementById("buscar-paciente-input").value.toLowerCase();
+      const filtro = document.getElementById("buscar-paciente-input").value.trim();
       const select = document.getElementById("paciente-select");
-      
-      if (!filtro) {
-        // Mostrar todos los pacientes
-        select.innerHTML = pacientes.map(p =>
-          `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
-        ).join("");
-      } else {
-        // Filtrar pacientes por DNI o apellido
-        const pacientesFiltrados = pacientes.filter(p => 
-          p.dni.includes(filtro) || 
-          p.apellido.toLowerCase().includes(filtro) ||
-          p.nombre.toLowerCase().includes(filtro)
-        );
-        
-        select.innerHTML = pacientesFiltrados.map(p =>
-          `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
-        ).join("");
+
+      if (filtro.length < 2) {
+        select.innerHTML = '<option value="">Escriba al menos 2 caracteres para buscar...</option>';
+        return;
       }
+
+      clearTimeout(buscarPacientesTimer);
+      buscarPacientesTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/pacientes/buscar?busqueda=${encodeURIComponent(filtro)}&por_pagina=20`);
+          const data = await res.json();
+          for (const p of data.pacientes || []) {
+            pacientesCache[p.dni] = p;
+          }
+          select.innerHTML = (data.pacientes || []).length
+            ? data.pacientes.map(p =>
+                `<option value="${p.dni}">${p.apellido}, ${p.nombre} (${p.dni})</option>`
+              ).join("")
+            : '<option value="">Sin resultados</option>';
+        } catch (e) {
+          console.error('Error buscando pacientes:', e);
+        }
+      }, 300);
     }
 
     // Event listener para asignar turno a paciente existente
@@ -857,7 +861,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
       const fecha = document.getElementById("fecha-turno").value;
       if (!fecha) return alert("Debe seleccionar una fecha");
 
-      const pacienteSeleccionado = pacientes.find(p => p.dni === dni_paciente);
+      const pacienteSeleccionado = pacientesCache[dni_paciente];
       const fechaFormateada = formatearFechaLocal(fecha);
 
       const observacion = document.getElementById("observacion-turno").value.trim().slice(0, 500);
@@ -980,7 +984,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
         mostrarMensajeTemporal(mensaje, 'success');
         
         // Recargar datos y actualizar la vista automáticamente
-        pacientes.push(datosPaciente); // Agregar a la lista local
+        pacientesCache[datosPaciente.dni] = datosPaciente;
         fetchTurnos().then(() => {
           cargarAgendaParaFecha(); // Esto actualiza los turnos del día y re-renderiza
         });
@@ -991,17 +995,15 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
 
     async function fetchTurnos() {
       const fecha = fechaSeleccionada || obtenerFechaArgentina();
-      const res = await fetch(`/api/agenda/inicio?fecha=${encodeURIComponent(fecha)}`);
-      const data = await res.json();
-      turnos = data.turnos;
+      const res = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(fecha)}`);
+      turnos = await res.json();
       turnosDelDia = turnos;
     }
 
     async function recargarTurnosDelDia(fecha) {
-      const res = await fetch(`/api/agenda/inicio?fecha=${encodeURIComponent(fecha)}`);
+      const res = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(fecha)}`);
       if (!res.ok) return;
-      const data = await res.json();
-      turnos = data.turnos;
+      turnos = await res.json();
       turnosDelDia = turnos;
     }
 
@@ -1034,37 +1036,36 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     async function init() {
       try {
         const fechaHoy = obtenerFechaArgentina();
-        const res = await fetch(`/api/agenda/inicio?fecha=${encodeURIComponent(fechaHoy)}`);
-        if (!res.ok) {
-          throw new Error(`Error al cargar agenda: ${res.status}`);
+        const [agendaRes, turnosRes] = await Promise.all([
+          fetch('/api/agenda'),
+          fetch(`/api/turnos/dia?fecha=${encodeURIComponent(fechaHoy)}`)
+        ]);
+        if (!agendaRes.ok || !turnosRes.ok) {
+          throw new Error(`Error al cargar agenda: ${agendaRes.status}/${turnosRes.status}`);
         }
-        const data = await res.json();
-        agenda = data.agenda;
-        pacientes = data.pacientes;
-        turnos = data.turnos;
+        agenda = await agendaRes.json();
+        turnos = await turnosRes.json();
         
-        // Establecer fecha de hoy por defecto - usando timezone de Argentina
-        const fechaHoy = obtenerFechaArgentina();
         document.getElementById('fecha-agenda').value = fechaHoy;
         fechaSeleccionada = fechaHoy;
-      
         turnosDelDia = turnos;
         
-        // Actualizar estadísticas y renderizar
         actualizarEstadisticasDia();
         renderAgenda();
         bindFechaNacimientoInput('nuevo-fecha-nacimiento');
         
-        // Mostrar mensaje si viene desde registro de paciente
         const urlParams = new URLSearchParams(window.location.search);
         const dniDesdeRegistro = urlParams.get('dni');
         if (dniDesdeRegistro) {
-          const paciente = pacientes.find(p => p.dni === dniDesdeRegistro);
-          if (paciente) {
-            document.getElementById('mensaje-paciente').textContent = 
-              `El paciente ${paciente.nombre} ${paciente.apellido} (DNI: ${paciente.dni}) ha sido registrado exitosamente.`;
-            document.getElementById('mensaje-desde-registro').classList.remove('d-none');
-          }
+          fetch(`/api/pacientes/${encodeURIComponent(dniDesdeRegistro)}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(paciente => {
+              if (!paciente) return;
+              pacientesCache[paciente.dni] = paciente;
+              document.getElementById('mensaje-paciente').textContent = 
+                `El paciente ${paciente.nombre} ${paciente.apellido} (DNI: ${paciente.dni}) ha sido registrado exitosamente.`;
+              document.getElementById('mensaje-desde-registro').classList.remove('d-none');
+            });
         }
       } catch (error) {
         console.error('Error al inicializar la agenda:', error);
@@ -1359,24 +1360,20 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
       // Actualizar estadísticas del footer
       async function actualizarFooterInfo() {
           try {
-              // Obtener total de pacientes
-              const responsePacientes = await fetch('/api/pacientes');
-              const pacientes = await responsePacientes.json();
-              const totalPacientes = pacientes.length;
-              
-              // Obtener turnos de hoy
-              const hoy = new Date().toISOString().split('T')[0];
-              const responseTurnos = await fetch(`/api/turnos?fecha=${hoy}`);
-              const turnos = await responseTurnos.json();
-              const turnosHoy = turnos.length;
-              
-              // Actualizar elementos
-              const pacientesElement = document.getElementById('footer-pacientes-count');
-              const turnosElement = document.getElementById('footer-turnos-count');
-              
-              if (pacientesElement) pacientesElement.textContent = totalPacientes;
-              if (turnosElement) turnosElement.textContent = turnosHoy;
-              
+              const statsResponse = await fetch('/api/pacientes/estadisticas');
+              if (statsResponse.ok) {
+                  const stats = await statsResponse.json();
+                  const pacientesElement = document.getElementById('footer-pacientes-count');
+                  if (pacientesElement) pacientesElement.textContent = stats.total;
+              }
+
+              const hoy = obtenerFechaArgentina();
+              const responseTurnos = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(hoy)}`);
+              if (responseTurnos.ok) {
+                  const turnos = await responseTurnos.json();
+                  const turnosElement = document.getElementById('footer-turnos-count');
+                  if (turnosElement) turnosElement.textContent = turnos.length;
+              }
           } catch (error) {
               console.error('Error actualizando footer info:', error);
           }

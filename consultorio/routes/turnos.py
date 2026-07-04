@@ -14,12 +14,16 @@ from consultorio.paths import (
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.storage.queries import (
     insert_pago,
+    load_pacientes_por_dnis,
     load_pagos_fecha,
     load_turnos_fecha,
+    load_turnos_medico_fecha,
+    load_turnos_medico_proximos,
     obtener_paciente,
     pago_existe,
     update_turno,
 )
+from consultorio.utils.fechas import hoy_ar_iso, normalizar_fecha_dia
 from consultorio.utils.helpers import (
     adjuntar_observacion_pago_desde_pagos,
     enriquecer_turnos,
@@ -167,22 +171,29 @@ def gestion_turnos():
 @login_requerido
 @rol_requerido("medico")
 def obtener_turnos_medico():
+    """Turnos del médico logueado. Por defecto solo hoy; ?proximos=1 para futuros."""
     usuario_medico = session.get("usuario")
-    turnos = cargar_json(TURNOS_FILE)
-    pacientes = cargar_json(PACIENTES_FILE)
-    pagos = cargar_json(PAGOS_FILE)
+    fecha = request.args.get("fecha")
+    proximos = request.args.get("proximos", "").lower() in ("1", "true", "yes")
 
-    turnos_medico = [t for t in turnos if t.get("medico") == usuario_medico]
+    if proximos:
+        turnos_raw = load_turnos_medico_proximos(usuario_medico, hoy_ar_iso())
+        fechas = {
+            normalizar_fecha_dia(t.get("fecha")) or str(t.get("fecha", "")).strip()[:10]
+            for t in turnos_raw
+        }
+        pagos = []
+        for f in fechas:
+            if f:
+                pagos.extend(load_pagos_fecha(f))
+    else:
+        fecha = fecha or hoy_ar_iso()
+        turnos_raw = load_turnos_medico_fecha(usuario_medico, fecha)
+        pagos = load_pagos_fecha(fecha)
 
-
-    # Enriquecer con datos del paciente
-    for t in turnos_medico:
-        paciente = next((p for p in pacientes if p["dni"] == t["dni_paciente"]), {})
-        t["paciente"] = paciente
-        t["estado"] = t.get("estado", "sin atender")
-        adjuntar_observacion_pago_desde_pagos(t, pagos)
-
-    return jsonify(turnos_medico)
+    dnis = {t["dni_paciente"] for t in turnos_raw if t.get("dni_paciente")}
+    pacientes = load_pacientes_por_dnis(dnis)
+    return jsonify(enriquecer_turnos(turnos_raw, pacientes, pagos))
 
 
 @bp.route("/api/turnos/<dni>/<fecha>/<hora>", methods=["PUT"], endpoint="editar_turno")

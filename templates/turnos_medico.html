@@ -321,6 +321,14 @@
     let pacientesData = [];
     let usuarioMedico = null;
 
+    function fechaLocalArgentina() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       obtenerUsuario();
       actualizarDatos();
@@ -354,12 +362,9 @@
 
     async function actualizarDatos() {
       try {
-        const hoy = new Date().toISOString().split('T')[0];
-        const response = await fetch(`/api/turnos/dia?fecha=${hoy}`);
-        const turnos = await response.json();
-        
-        // Filtrar solo turnos del médico logueado
-        const turnosMedico = turnos.filter(t => t.medico === usuarioMedico);
+        const hoy = fechaLocalArgentina();
+        const response = await fetch(`/api/turnos/medico?fecha=${encodeURIComponent(hoy)}`);
+        const turnosMedico = await response.json();
         
         // Separar por estados
         const enSalaEspera = turnosMedico.filter(t => t.estado === 'sala de espera');
@@ -571,19 +576,16 @@
     }
     async function mostrarDetallesPaciente(dni, fechaTurno, horaTurno) {
       try {
-        // Cargar información del paciente
         const [pacienteRes, historiaRes] = await Promise.all([
-          fetch('/api/pacientes'),
+          fetch(`/api/pacientes/${encodeURIComponent(dni)}`),
           fetch(`/historias/${dni}`).catch(() => null)
         ]);
         
-        const pacientes = await pacienteRes.json();
-        const paciente = pacientes.find(p => p.dni === dni);
-        
-        if (!paciente) {
+        if (!pacienteRes.ok) {
           mostrarError('Paciente no encontrado');
           return;
         }
+        const paciente = await pacienteRes.json();
         
         let historia = null;
         if (historiaRes && historiaRes.ok) {
@@ -920,6 +922,14 @@
   </style>
 
   <script>
+      function fechaLocalArgentina() {
+          const d = new Date();
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+      }
+
       // Actualizar hora actual
       function updateCurrentTime() {
           const now = new Date();
@@ -937,19 +947,17 @@
       // Actualizar estadísticas del footer
       async function updateFooterStats() {
           try {
-              // Obtener estadísticas de pacientes
-              const pacientesResponse = await fetch('/api/pacientes');
-              if (pacientesResponse.ok) {
-                  const pacientes = await pacientesResponse.json();
+              const statsResponse = await fetch('/api/pacientes/estadisticas');
+              if (statsResponse.ok) {
+                  const stats = await statsResponse.json();
                   const pacientesCount = document.getElementById('footer-pacientes-count');
                   if (pacientesCount) {
-                      pacientesCount.textContent = pacientes.length;
+                      pacientesCount.textContent = stats.total;
                   }
               }
 
-              // Obtener turnos de hoy
-              const hoy = new Date().toISOString().split('T')[0];
-              const turnosResponse = await fetch(`/api/turnos?fecha=${hoy}`);
+              const hoy = fechaLocalArgentina();
+              const turnosResponse = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(hoy)}`);
               if (turnosResponse.ok) {
                   const turnos = await turnosResponse.json();
                   const turnosCount = document.getElementById('footer-turnos-count');

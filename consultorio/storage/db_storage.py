@@ -297,6 +297,35 @@ def load_turnos_fecha(fecha: str) -> list:
     return [t.to_dict() for t in rows]
 
 
+def load_turnos_medico_fecha(medico: str, fecha: str) -> list:
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    rows = (
+        Turno.query.filter(
+            Turno.medico == medico,
+            func.substr(Turno.fecha, 1, 10) == f,
+        )
+        .order_by(Turno.hora)
+        .all()
+    )
+    return [t.to_dict() for t in rows]
+
+
+def load_turnos_medico_proximos(medico: str, fecha_desde: str, limit: int = 50) -> list:
+    f = normalizar_fecha_dia(fecha_desde) or str(fecha_desde).strip()[:10]
+    estados = ["sin atender", "recepcionado", "sala de espera"]
+    rows = (
+        Turno.query.filter(
+            Turno.medico == medico,
+            func.substr(Turno.fecha, 1, 10) >= f,
+            Turno.estado.in_(estados),
+        )
+        .order_by(Turno.fecha, Turno.hora)
+        .limit(limit)
+        .all()
+    )
+    return [t.to_dict() for t in rows]
+
+
 def load_pagos_fecha(fecha: str) -> list:
     f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
     rows = (

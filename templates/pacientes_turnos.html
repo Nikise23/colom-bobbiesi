@@ -83,37 +83,28 @@
   <a href="/" class="mt-10 block text-center text-primary font-semibold hover:underline">&larr; Volver al inicio</a>
 
   <script>
-    let pacientes = [];
     let turnos = [];
     let medicos = [];
     let rolUsuario = null;
 
-    function escapeHtml(text) {
-      if (text == null || text === "") return "";
-      const el = document.createElement("div");
-      el.textContent = text;
-      return el.innerHTML;
+    function fechaLocalArgentina() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
     }
 
     async function cargarDatosIniciales() {
       try {
         await obtenerRol();
-        await cargarPacientes();
         await cargarMedicos();
         
-        // Configurar fecha de hoy por defecto
-        document.getElementById("filtro-fecha").value = new Date().toISOString().split('T')[0];
-        
-        // Cargar turnos del día por defecto
+        document.getElementById("filtro-fecha").value = fechaLocalArgentina();
         await cargarTurnosDelDia();
       } catch (error) {
         console.error('Error cargando datos:', error);
       }
-    }
-
-    async function cargarPacientes() {
-      const res = await fetch("/api/pacientes");
-      pacientes = await res.json();
     }
 
     async function obtenerRol() {
@@ -124,9 +115,9 @@
 
      async function cargarMedicos() {
       try {
-        const res = await fetch("/api/turnos");
-        const todosTurnos = await res.json();
-        medicos = [...new Set(todosTurnos.map(t => t.medico))];
+        const res = await fetch("/api/agenda");
+        const agendaData = await res.json();
+        medicos = Object.keys(agendaData).sort();
         
         const selectMedico = document.getElementById("filtro-medico");
         medicos.forEach(medico => {
@@ -140,6 +131,13 @@
       }
     }
 
+    function escapeHtml(text) {
+      if (text == null || text === "") return "";
+      const el = document.createElement("div");
+      el.textContent = text;
+      return el.innerHTML;
+    }
+
     function formatearFecha(fecha) {
       if (!fecha) return "-";
       const [y, m, d] = fecha.split("-");
@@ -147,7 +145,7 @@
     }
 
     async function cargarTurnosDelDia() {
-      const fecha = new Date().toISOString().split('T')[0];
+      const fecha = fechaLocalArgentina();
       document.getElementById("filtro-fecha").value = fecha;
       await cargarTurnos();
     }
@@ -156,10 +154,9 @@
       try {
         await obtenerRol();
         
-        const fecha = document.getElementById("filtro-fecha").value || new Date().toISOString().split('T')[0];
+        const fecha = document.getElementById("filtro-fecha").value || fechaLocalArgentina();
         
-        // Cargar turnos del día específico
-        const response = await fetch(`/api/turnos/dia?fecha=${fecha}`);
+        const response = await fetch(`/api/turnos/dia?fecha=${encodeURIComponent(fecha)}`);
         turnos = await response.json();
 
       // // Secretaria puede ver todos los turnos, médico solo los suyos

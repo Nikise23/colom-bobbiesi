@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, render_template, request
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
 from consultorio.paths import AGENDA_FILE
 from consultorio.storage import cargar_json, guardar_json
-from consultorio.storage.queries import load_pacientes_liviano, load_pagos_fecha, load_turnos_fecha
+from consultorio.storage.queries import load_pacientes_por_dnis, load_pagos_fecha, load_turnos_fecha
 from consultorio.utils.helpers import enriquecer_turnos
 
 bp = Blueprint("agenda", __name__)
@@ -34,15 +34,17 @@ def obtener_agenda():
 @login_requerido
 @rol_permitido(["secretaria", "medico"])
 def agenda_inicio():
-    """Carga inicial de agenda: solo turnos y pagos del día seleccionado."""
+    """Carga inicial de agenda: turnos del día con pacientes embebidos (sin listar todos)."""
     fecha = request.args.get("fecha", date.today().isoformat())
     turnos_raw = load_turnos_fecha(fecha)
     pagos = load_pagos_fecha(fecha)
-    pacientes = load_pacientes_liviano()
+    dnis = {t["dni_paciente"] for t in turnos_raw if t.get("dni_paciente")}
+    pacientes = load_pacientes_por_dnis(dnis)
+    agenda_data = cargar_json(AGENDA_FILE)
     return jsonify(
         {
-            "agenda": cargar_json(AGENDA_FILE),
-            "pacientes": pacientes,
+            "agenda": agenda_data,
+            "medicos": sorted(agenda_data.keys()),
             "turnos": enriquecer_turnos(turnos_raw, pacientes, pagos),
             "fecha": fecha,
         }
