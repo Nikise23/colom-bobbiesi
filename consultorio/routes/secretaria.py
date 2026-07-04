@@ -3,12 +3,17 @@ from datetime import date, datetime
 from flask import Blueprint, jsonify, render_template, request
 
 from consultorio.auth.decorators import login_requerido, rol_permitido
-from consultorio.paths import PAGOS_FILE, TURNOS_FILE
-from consultorio.storage import cargar_json
+from consultorio.storage.queries import (
+    count_pacientes,
+    count_turnos_pendientes,
+    load_pacientes_liviano,
+    load_pagos_fecha,
+    load_pagos_mes,
+    load_turnos_fecha,
+)
 from consultorio.utils.helpers import (
     calcular_estadisticas_pagos,
     enriquecer_turnos,
-    listar_pacientes_dedup,
     listar_recepcionados,
     listar_sala_espera,
 )
@@ -23,12 +28,11 @@ def vista_secretaria():
     return render_template("secretaria.html")
 
 
-
 @bp.route("/api/secretaria/inicio", methods=["GET"], endpoint="secretaria_inicio")
 @login_requerido
 @rol_permitido(["secretaria", "administrador"])
 def secretaria_inicio():
-    """Carga inicial unificada: una lectura de cada JSON en lugar de 6+ requests."""
+    """Carga inicial optimizada: solo datos del día y del mes en curso."""
     fecha_param = request.args.get("fecha", date.today().isoformat())
     try:
         fecha_dia = datetime.strptime(fecha_param, "%Y-%m-%d").date()
@@ -36,20 +40,25 @@ def secretaria_inicio():
         fecha_dia = date.today()
         fecha_param = fecha_dia.isoformat()
 
-    pacientes = listar_pacientes_dedup()
-    turnos_raw = cargar_json(TURNOS_FILE)
-    pagos = cargar_json(PAGOS_FILE)
-    turnos = enriquecer_turnos(turnos_raw, pacientes, pagos)
-    turnos_hoy = [t for t in turnos if t.get("fecha") == fecha_param]
+    mes_param = fecha_dia.strftime("%Y-%m")
+    turnos_raw = load_turnos_fecha(fecha_param)
+    pagos_dia = load_pagos_fecha(fecha_param)
+    pagos_mes = load_pagos_mes(mes_param)
+    pacientes = load_pacientes_liviano()
+    turnos_hoy = enriquecer_turnos(turnos_raw, pacientes, pagos_dia)
     turnos_hoy.sort(key=lambda t: t.get("hora", "00:00"))
 
-    return jsonify({
-        "pacientes": pacientes,
-        "turnos": turnos,
-        "pagos": pagos,
-        "estadisticas_pagos": calcular_estadisticas_pagos(pagos, fecha_dia),
-        "turnos_hoy": turnos_hoy,
-        "recepcionados": listar_recepcionados(turnos_raw, pacientes, pagos, fecha_param),
-        "sala_espera": listar_sala_espera(turnos_raw, pacientes, pagos, fecha_param),
-        "fecha": fecha_param,
-    })
+    return jsonify(
+        {
+            "pacientes": pacientes,
+            "total_pacientes": count_pacientes(),
+            "turnos_pendientes_total": count_turnos_pendientes(),
+            "turnos": turnos_raw,
+            "pagos": pagos_dia,
+            "estadisticas_pagos": calcular_estadisticas_pagos(pagos_mes, fecha_dia, mes_param),
+            "turnos_hoy": turnos_hoy,
+            "recepcionados": listar_recepcionados(turnos_raw, pacientes, pagos_dia, fecha_param),
+            "sala_espera": listar_sala_espera(turnos_raw, pacientes, pagos_dia, fecha_param),
+            "fecha": fecha_param,
+        }
+    )

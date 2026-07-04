@@ -5,14 +5,13 @@ from flask import Blueprint, jsonify, make_response, render_template, request
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
 from consultorio.paths import DATA_FILE, PACIENTES_FILE, PAGOS_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
+from consultorio.storage.queries import buscar_pacientes_paginado as buscar_pacientes_db
+from consultorio.utils.fechas import normalizar_fecha_nacimiento
 from consultorio.utils.helpers import (
-    calcular_edad,
-    enriquecer_paciente,
     listar_pacientes_dedup,
     listar_recepcionados,
     listar_sala_espera,
 )
-from consultorio.utils.fechas import normalizar_fecha_nacimiento
 
 bp = Blueprint("pacientes", __name__)
 
@@ -41,46 +40,11 @@ def obtener_pacientes():
 @login_requerido
 @rol_permitido(["secretaria", "medico"])
 def buscar_pacientes_paginado():
-    """Buscar pacientes con paginación (evita cargar todos los datos)"""
-    busqueda = request.args.get("busqueda", "").strip().lower()
+    """Buscar pacientes con paginación (consulta optimizada en PostgreSQL)."""
+    busqueda = request.args.get("busqueda", "").strip()
     pagina = int(request.args.get("pagina", 1))
     por_pagina = min(int(request.args.get("por_pagina", 10)), 50)
-
-    pacientes_raw = cargar_json(PACIENTES_FILE)
-    vistos = set()
-    pacientes = []
-    for p in pacientes_raw:
-        if p.get("dni") and p["dni"] not in vistos:
-            vistos.add(p["dni"])
-            pacientes.append(p)
-
-    for paciente in pacientes:
-        enriquecer_paciente(paciente)
-
-    pacientes.sort(key=lambda p: p.get("apellido", "").lower())
-
-    if busqueda:
-        pacientes = [
-            p for p in pacientes
-            if (p.get("dni", "") and busqueda in p["dni"]) or
-               (p.get("apellido", "").lower() and busqueda in p["apellido"].lower()) or
-               (p.get("nombre", "").lower() and busqueda in p["nombre"].lower())
-        ]
-
-    total = len(pacientes)
-    total_paginas = max(1, (total + por_pagina - 1) // por_pagina)
-    pagina = max(1, min(pagina, total_paginas))
-    inicio = (pagina - 1) * por_pagina
-    fin = min(inicio + por_pagina, total)
-    pacientes_pagina = pacientes[inicio:fin]
-
-    return jsonify({
-        "pacientes": pacientes_pagina,
-        "total": total,
-        "pagina": pagina,
-        "total_paginas": total_paginas,
-        "por_pagina": por_pagina,
-    })
+    return jsonify(buscar_pacientes_db(busqueda, pagina, por_pagina))
 
 
 

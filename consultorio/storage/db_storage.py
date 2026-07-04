@@ -10,6 +10,7 @@ from consultorio.models import (
     Turno,
     Usuario,
 )
+from consultorio.utils.fechas import enriquecer_paciente
 
 
 def _agenda_vacia_medico() -> dict:
@@ -282,6 +283,149 @@ def save_pagos(data: list) -> None:
             db.session.delete(row)
 
     db.session.commit()
+
+
+def load_turnos_fecha(fecha: str) -> list:
+    rows = Turno.query.filter_by(fecha=fecha).order_by(Turno.hora).all()
+    return [t.to_dict() for t in rows]
+
+
+def load_pagos_fecha(fecha: str) -> list:
+    rows = Pago.query.filter_by(fecha=fecha).order_by(Pago.id).all()
+    return [p.to_dict() for p in rows]
+
+
+def load_pagos_mes(mes: str) -> list:
+    rows = (
+        Pago.query.filter(Pago.fecha.startswith(mes))
+        .order_by(Pago.fecha, Pago.id)
+        .all()
+    )
+    return [p.to_dict() for p in rows]
+
+
+def load_pacientes_liviano() -> list:
+    rows = Paciente.query.order_by(Paciente.apellido).all()
+    return [
+        {
+            "dni": p.dni,
+            "nombre": p.nombre,
+            "apellido": p.apellido,
+            "obra_social": p.obra_social or "",
+            "celular": p.celular or "",
+            "numero_obra_social": p.numero_obra_social or "",
+        }
+        for p in rows
+    ]
+
+
+def load_pacientes_por_dnis(dnis: set[str]) -> list:
+    if not dnis:
+        return []
+    rows = Paciente.query.filter(Paciente.dni.in_(dnis)).all()
+    resultado = []
+    for row in rows:
+        data = row.to_dict()
+        enriquecer_paciente(data)
+        resultado.append(data)
+    resultado.sort(key=lambda p: p.get("apellido", "").lower())
+    return resultado
+
+
+def obtener_paciente(dni: str) -> dict | None:
+    row = Paciente.query.filter_by(dni=dni).first()
+    if not row:
+        return None
+    data = row.to_dict()
+    enriquecer_paciente(data)
+    return data
+
+
+def count_pacientes() -> int:
+    return Paciente.query.count()
+
+
+def count_turnos_estados(estados: set[str]) -> int:
+    return Turno.query.filter(Turno.estado.in_(list(estados))).count()
+
+
+def buscar_pacientes_paginado(busqueda: str, pagina: int, por_pagina: int) -> dict:
+    query = Paciente.query
+    busqueda = busqueda.strip()
+    if busqueda:
+        like = f"%{busqueda.lower()}%"
+        query = query.filter(
+            db.or_(
+                db.func.lower(Paciente.apellido).like(like),
+                db.func.lower(Paciente.nombre).like(like),
+                Paciente.dni.like(f"%{busqueda}%"),
+            )
+        )
+    query = query.order_by(Paciente.apellido)
+    total = query.count()
+    total_paginas = max(1, (total + por_pagina - 1) // por_pagina)
+    pagina = max(1, min(pagina, total_paginas))
+    rows = query.offset((pagina - 1) * por_pagina).limit(por_pagina).all()
+    pacientes = []
+    for row in rows:
+        data = row.to_dict()
+        enriquecer_paciente(data)
+        pacientes.append(data)
+    return {
+        "pacientes": pacientes,
+        "total": total,
+        "pagina": pagina,
+        "total_paginas": total_paginas,
+        "por_pagina": por_pagina,
+    }
+
+
+def next_pago_id() -> int:
+    max_id = db.session.query(db.func.max(Pago.id)).scalar() or 0
+    return int(max_id) + 1
+
+
+def insert_pago(item: dict) -> dict:
+    pago_id = item.get("id") or next_pago_id()
+    row = Pago(
+        id=pago_id,
+        dni_paciente=item["dni_paciente"],
+        nombre_paciente=item.get("nombre_paciente"),
+        monto=item.get("monto", 0),
+        fecha=item["fecha"],
+        hora=_normalizar_hora(item.get("hora")) or None,
+        tipo_pago=item.get("tipo_pago"),
+        obra_social=item.get("obra_social"),
+        observaciones=item.get("observaciones"),
+        fecha_registro=item.get("fecha_registro"),
+    )
+    db.session.add(row)
+    db.session.commit()
+    return row.to_dict()
+
+
+def pago_existe(dni: str, fecha: str, hora: str | None = None) -> bool:
+    query = Pago.query.filter_by(dni_paciente=dni, fecha=fecha)
+    if hora:
+        query = query.filter_by(hora=_normalizar_hora(hora))
+    return query.first() is not None
+
+
+def update_turno(dni_paciente: str, fecha: str, hora: str, campos: dict) -> bool:
+    hora_norm = _normalizar_hora(hora)
+    row = Turno.query.filter_by(
+        dni_paciente=dni_paciente, fecha=fecha, hora=hora_norm
+    ).first()
+    if not row:
+        return False
+    for key, value in campos.items():
+        if not hasattr(row, key):
+            continue
+        if key in ("hora_recepcion", "hora_sala_espera", "hora") and value:
+            value = _normalizar_hora(value) or value
+        setattr(row, key, value)
+    db.session.commit()
+    return True
 
 
 LOADERS = {

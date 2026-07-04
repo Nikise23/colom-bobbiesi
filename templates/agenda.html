@@ -679,6 +679,8 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     function cargarAgendaParaFecha() {
       fechaSeleccionada = document.getElementById('fecha-agenda').value;
       if (!fechaSeleccionada) return;
+
+      await recargarTurnosDelDia(fechaSeleccionada);
       
       // Verificar si es fin de semana usando función centralizada
       const infoFecha = obtenerDiaSemana(fechaSeleccionada);
@@ -701,10 +703,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
         container.parentNode.insertBefore(advertencia, container);
       }
       
-      // Filtrar turnos para la fecha seleccionada
-      turnosDelDia = turnos.filter(t => t.fecha === fechaSeleccionada);
-      
-      // Actualizar estadísticas generales
+      // turnosDelDia ya viene filtrado desde el servidor
       actualizarEstadisticasDia();
       
       // Re-renderizar la agenda
@@ -991,8 +990,19 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
     });
 
     async function fetchTurnos() {
-      const res = await fetch("/api/turnos");
-      turnos = await res.json();
+      const fecha = fechaSeleccionada || obtenerFechaArgentina();
+      const res = await fetch(`/api/agenda/inicio?fecha=${encodeURIComponent(fecha)}`);
+      const data = await res.json();
+      turnos = data.turnos;
+      turnosDelDia = turnos;
+    }
+
+    async function recargarTurnosDelDia(fecha) {
+      const res = await fetch(`/api/agenda/inicio?fecha=${encodeURIComponent(fecha)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      turnos = data.turnos;
+      turnosDelDia = turnos;
     }
 
     function mostrarMensajeTemporal(mensaje, tipo = 'success') {
@@ -1023,7 +1033,8 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
 
     async function init() {
       try {
-        const res = await fetch("/api/agenda/inicio");
+        const fechaHoy = obtenerFechaArgentina();
+        const res = await fetch(`/api/agenda/inicio?fecha=${encodeURIComponent(fechaHoy)}`);
         if (!res.ok) {
           throw new Error(`Error al cargar agenda: ${res.status}`);
         }
@@ -1037,8 +1048,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
         document.getElementById('fecha-agenda').value = fechaHoy;
         fechaSeleccionada = fechaHoy;
       
-       // Filtrar turnos para hoy
-        turnosDelDia = turnos.filter(t => t.fecha === fechaSeleccionada);
+        turnosDelDia = turnos;
         
         // Actualizar estadísticas y renderizar
         actualizarEstadisticasDia();

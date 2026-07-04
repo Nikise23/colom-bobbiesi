@@ -569,9 +569,9 @@
     // Función para actualizar información del footer
     async function actualizarFooterInfo() {
       try {
-        const response = await fetch('/api/pacientes');
-        const pacientes = await response.json();
-        document.getElementById('footer-total-pacientes').textContent = pacientes.length;
+        const response = await fetch('/api/pacientes/estadisticas');
+        const stats = await response.json();
+        document.getElementById('footer-total-pacientes').textContent = stats.total;
         
         // Obtener turnos de hoy
         const hoy = new Date().toISOString().split('T')[0];

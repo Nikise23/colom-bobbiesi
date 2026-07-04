@@ -12,6 +12,14 @@ from consultorio.paths import (
     timezone_ar,
 )
 from consultorio.storage import cargar_json, guardar_json
+from consultorio.storage.queries import (
+    insert_pago,
+    load_pagos_fecha,
+    load_turnos_fecha,
+    obtener_paciente,
+    pago_existe,
+    update_turno,
+)
 from consultorio.utils.helpers import (
     adjuntar_observacion_pago_desde_pagos,
     enriquecer_turnos,
@@ -431,68 +439,57 @@ def mover_a_sala_espera():
     elif tipo_pago not in ["efectivo", "transferencia"]:
         return jsonify({"error": "Tipo de pago inválido. Debe ser 'efectivo' o 'transferencia'"}), 400
 
-    turnos = cargar_json(TURNOS_FILE)
-    pacientes = cargar_json(PACIENTES_FILE)
-     
-    # Buscar el turno
-    turno_encontrado = None
-
-    for turno in turnos:
-        if (turno["dni_paciente"] == dni_paciente and 
-            turno["fecha"] == fecha and 
-            turno["hora"] == hora):
-            turno_encontrado = turno
-            break
-     
+    turno_encontrado = next(
+        (
+            t
+            for t in load_turnos_fecha(fecha)
+            if t.get("dni_paciente") == dni_paciente and t.get("hora") == hora
+        ),
+        None,
+    )
     if not turno_encontrado:
         return jsonify({"error": "Turno no encontrado"}), 404
-        
     if turno_encontrado.get("estado") != "recepcionado":
         return jsonify({"error": "El paciente debe estar recepcionado primero"}), 400
-        
-    # Verificar que el paciente existe
 
-    paciente = next((p for p in pacientes if p["dni"] == dni_paciente), None)
+    paciente = obtener_paciente(dni_paciente)
     if not paciente:
         return jsonify({"error": "Paciente no encontrado"}), 404
-     
-    # Verificar si ya existe un pago para este paciente en esta fecha y hora
-    pagos = cargar_json(PAGOS_FILE)
-    pago_existente = next((p for p in pagos if p["dni_paciente"] == dni_paciente and p["fecha"] == fecha and p.get("hora") == hora), None)
-    
-    if pago_existente:
+    if pago_existe(dni_paciente, fecha, hora):
         return jsonify({"error": "Ya existe un pago registrado para este paciente en este turno"}), 400
-    
-    
-    # Registrar el pago
-    nuevo_pago = {
-        "id": len(pagos) + 1,
-        "dni_paciente": dni_paciente,
-        "nombre_paciente": f"{paciente.get('nombre', '')} {paciente.get('apellido', '')}".strip(),
-        "monto": monto,
-        "fecha": fecha,
-        "hora": hora,  # Guardar la hora del turno en el pago
-        "fecha_registro": datetime.now(timezone_ar).isoformat(),
-        "observaciones": observaciones,
-        "obra_social": paciente.get("obra_social", ""),
-        "tipo_pago": tipo_pago  # Agregar tipo de pago
-    }
-     
-    pagos.append(nuevo_pago)
-    guardar_json(PAGOS_FILE, pagos)
-    # Mover a sala de espera
-    turno_encontrado["estado"] = "sala de espera"
-    turno_encontrado["hora_sala_espera"] = datetime.now(timezone_ar).strftime("%H:%M")
-    turno_encontrado["pago_registrado"] = True
-    turno_encontrado["monto_pagado"] = monto
-    turno_encontrado["observacion_pago"] = observaciones
 
-    guardar_json(TURNOS_FILE, turnos)
+    nuevo_pago = insert_pago(
+        {
+            "dni_paciente": dni_paciente,
+            "nombre_paciente": f"{paciente.get('nombre', '')} {paciente.get('apellido', '')}".strip(),
+            "monto": monto,
+            "fecha": fecha,
+            "hora": hora,
+            "fecha_registro": datetime.now(timezone_ar).isoformat(),
+            "observaciones": observaciones,
+            "obra_social": paciente.get("obra_social", ""),
+            "tipo_pago": tipo_pago,
+        }
+    )
+    update_turno(
+        dni_paciente,
+        fecha,
+        hora,
+        {
+            "estado": "sala de espera",
+            "hora_sala_espera": datetime.now(timezone_ar).strftime("%H:%M"),
+            "pago_registrado": True,
+            "monto_pagado": monto,
+            "observacion_pago": observaciones,
+        },
+    )
 
-    return jsonify({
-        "mensaje": "Paciente movido a sala de espera y pago registrado",
-        "pago": nuevo_pago
-    })
+    return jsonify(
+        {
+            "mensaje": "Paciente movido a sala de espera y pago registrado",
+            "pago": nuevo_pago,
+        }
+    )
     
 
 @bp.route("/api/turnos/dia", methods=["GET"], endpoint="obtener_turnos_dia")
@@ -501,10 +498,13 @@ def mover_a_sala_espera():
 def obtener_turnos_dia():
     """Obtener todos los turnos de una fecha específica (por defecto hoy)"""
     fecha = request.args.get("fecha", date.today().isoformat())
-    pacientes = listar_pacientes_dedup()
-    turnos_raw = cargar_json(TURNOS_FILE)
-    pagos = cargar_json(PAGOS_FILE)
-    turnos_dia = enriquecer_turnos([t for t in turnos_raw if t.get("fecha") == fecha], pacientes, pagos)
+    turnos_raw = load_turnos_fecha(fecha)
+    pagos = load_pagos_fecha(fecha)
+    dnis = {t["dni_paciente"] for t in turnos_raw if t.get("dni_paciente")}
+    from consultorio.storage.queries import load_pacientes_por_dnis
+
+    pacientes = load_pacientes_por_dnis(dnis)
+    turnos_dia = enriquecer_turnos(turnos_raw, pacientes, pagos)
     turnos_dia.sort(key=lambda t: t.get("hora", "00:00"))
     return jsonify(turnos_dia)
 
