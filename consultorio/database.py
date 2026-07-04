@@ -18,5 +18,5 @@ def init_db(app) -> None:
     db.init_app(app)
 
     with app.app_context():
-        import consultorio.models  # noqa: F401
-        db.create_all()
+        import consultorio.models  # noqa: F401 — registra modelos en SQLAlchemy
+        # El esquema lo gestiona Alembic (pre-deploy: scripts/render_predeploy.py)
