@@ -19,6 +19,7 @@ from consultorio.paths import (
     timezone_ar,
 )
 from consultorio.storage import cargar_json, guardar_json
+from consultorio.utils.backup import backup_zip_filename, build_backup_zip
 
 bp = Blueprint("administrador", __name__)
 
@@ -104,30 +105,15 @@ def crear_usuario_api():
 @login_requerido
 @rol_requerido("administrador")
 def descargar_backup_datos():
-    """ZIP con pagos, historias clínicas, turnos y pacientes para respaldo manual."""
-    parejas = [
-        (PAGOS_FILE, "pagos.json"),
-        (DATA_FILE, "historias_clinicas.json"),
-        (TURNOS_FILE, "turnos.json"),
-        (PACIENTES_FILE, "pacientes.json"),
-    ]
-    buf = io.BytesIO()
-    agregados = 0
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        for ruta, nombre_en_zip in parejas:
-            if os.path.isfile(ruta):
-                zf.write(ruta, arcname=nombre_en_zip)
-                agregados += 1
+    """ZIP con todos los datos (PostgreSQL o JSON): pacientes, turnos, pagos, historias, agenda y usuarios."""
+    buf, agregados = build_backup_zip()
     if agregados == 0:
-        return jsonify({"error": "No se encontró ningún archivo de datos para respaldar."}), 404
-    buf.seek(0)
-    stamp = datetime.now(timezone_ar).strftime("%Y%m%d_%H%M")
-    nombre_zip = f"backup_consultorio_{stamp}.zip"
+        return jsonify({"error": "No se encontraron datos para respaldar."}), 404
     return send_file(
         buf,
         mimetype="application/zip",
         as_attachment=True,
-        download_name=nombre_zip,
+        download_name=backup_zip_filename(),
     )
 
 
