@@ -4,61 +4,103 @@ from flask import Blueprint, jsonify, redirect, render_template, request, send_f
 from werkzeug.security import check_password_hash
 
 from consultorio.auth.decorators import login_requerido, rol_requerido
+from consultorio.auth.login_limiter import (
+    clear_login_attempts,
+    client_ip,
+    is_login_blocked,
+    record_failed_login,
+)
+from consultorio.auth.security import cerrar_sesion, iniciar_sesion
 from consultorio.paths import USUARIOS_FILE
 from consultorio.storage import cargar_json
 
 bp = Blueprint("auth", __name__)
 
 
-@bp.route('/descargar/<archivo>', endpoint="descargar_archivo")
+def _redirigir_por_rol(rol: str):
+    if rol == "secretaria":
+        return redirect(url_for("secretaria.vista_secretaria"))
+    if rol == "administrador":
+        return redirect(url_for("administrador.vista_administrador"))
+    return redirect(url_for("auth.inicio"))
+
+
+@bp.route("/descargar/<archivo>", endpoint="descargar_archivo")
 @login_requerido
 @rol_requerido("administrador")
 def descargar_archivo(archivo):
-    # En producción usa /data/, en desarrollo local usa la raíz
-    if os.path.exists("/data"):
-        ruta = f"/data/{archivo}"
-    else:
-        ruta = archivo
-    
-    if os.path.exists(ruta):
-        return send_file(ruta, as_attachment=True)
-    else:
-        return f"Archivo '{archivo}' no encontrado", 404
+    # Evitar path traversal: solo el nombre de archivo, sin rutas
+    nombre_seguro = os.path.basename(archivo)
+    if not nombre_seguro or nombre_seguro != archivo:
+        return "Nombre de archivo inválido", 400
 
+    if os.path.exists("/data"):
+        ruta = os.path.join("/data", nombre_seguro)
+    else:
+        ruta = nombre_seguro
+
+    if os.path.exists(ruta) and os.path.isfile(ruta):
+        return send_file(ruta, as_attachment=True)
+    return f"Archivo '{nombre_seguro}' no encontrado", 404
 
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")
 def login():
-    if request.method == "POST":
-        usuario = request.form.get("usuario")
-        contrasena = request.form.get("contrasena")
-        usuarios = cargar_json(USUARIOS_FILE)
+    ip = client_ip(request)
 
+    if request.method == "POST":
+        bloqueado, segundos = is_login_blocked(ip)
+        if bloqueado:
+            minutos = max(1, segundos // 60)
+            return render_template(
+                "login.html",
+                error=(
+                    f"Demasiados intentos fallidos. "
+                    f"Esperá {minutos} minuto(s) antes de volver a intentar."
+                ),
+            ), 429
+
+        usuario = (request.form.get("usuario") or "").strip()
+        contrasena = request.form.get("contrasena") or ""
+        usuarios = cargar_json(USUARIOS_FILE)
 
         for u in usuarios:
             if u["usuario"] == usuario and check_password_hash(u["contrasena"], contrasena):
-                session["usuario"] = usuario
-                session["rol"] = u.get("rol", "")
-                # Redirigir según el rol
-                if u.get("rol") == "secretaria":
-                    return redirect(url_for("secretaria.vista_secretaria"))
-                elif u.get("rol") == "administrador":
-                    return redirect(url_for("administrador.vista_administrador"))
-                else:
-                    return redirect(url_for("auth.inicio"))
+                clear_login_attempts(ip)
+                iniciar_sesion(usuario, u.get("rol", ""))
+                return _redirigir_por_rol(u.get("rol", ""))
+
+        bloqueado_ahora, segundos = record_failed_login(ip)
+        if bloqueado_ahora:
+            minutos = max(1, segundos // 60)
+            return render_template(
+                "login.html",
+                error=(
+                    f"Demasiados intentos fallidos. "
+                    f"Esperá {minutos} minuto(s) antes de volver a intentar."
+                ),
+            ), 429
+
         return render_template("login.html", error="Usuario o contraseña incorrectos")
 
+    bloqueado, segundos = is_login_blocked(ip)
+    if bloqueado:
+        minutos = max(1, segundos // 60)
+        return render_template(
+            "login.html",
+            error=(
+                f"Demasiados intentos fallidos. "
+                f"Esperá {minutos} minuto(s) antes de volver a intentar."
+            ),
+        )
 
     return render_template("login.html")
 
 
-
 @bp.route("/logout", endpoint="logout")
 def logout():
-    session.pop("usuario", None)
-    session.pop("rol", None)
+    cerrar_sesion()
     return redirect(url_for("auth.login"))
-
 
 
 @bp.route("/", endpoint="inicio")
@@ -67,14 +109,12 @@ def inicio():
     return render_template("index.html")
 
 
-
 @bp.route("/api/session-info", endpoint="session_info")
 @login_requerido
 def session_info():
-    return jsonify({
-        "usuario": session.get("usuario"),
-        "rol": session.get("rol")
-    })
-
-
-# ========================== MÉDICO ============================
+    return jsonify(
+        {
+            "usuario": session.get("usuario"),
+            "rol": session.get("rol"),
+        }
+    )
