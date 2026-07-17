@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-from datetime import date
 
 from consultorio.config import get_data_paths, use_database
 from consultorio.paths import PACIENTES_FILE, PAGOS_FILE, TURNOS_FILE

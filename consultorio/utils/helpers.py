@@ -1,6 +1,6 @@
 import copy
 import re
-from datetime import date, datetime
+from datetime import datetime
 
 from consultorio.paths import PACIENTES_FILE, timezone_ar
 from consultorio.storage import cargar_json

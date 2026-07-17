@@ -3,17 +3,16 @@ from datetime import date, datetime
 from flask import Blueprint, jsonify, make_response, render_template, request
 
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
-from consultorio.paths import DATA_FILE, PACIENTES_FILE, PAGOS_FILE, TURNOS_FILE, timezone_ar
+from consultorio.paths import DATA_FILE, PACIENTES_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.storage.queries import (
     buscar_pacientes_paginado as buscar_pacientes_paginado_query,
-    listar_atendidos_sin_pago,
     load_pacientes_liviano,
     load_pagos_fecha,
     load_turnos_fecha,
     obtener_paciente,
 )
-from consultorio.utils.fechas import hoy_ar_iso, normalizar_fecha_dia, normalizar_fecha_nacimiento
+from consultorio.utils.fechas import hoy_ar_iso, normalizar_fecha_nacimiento
 from consultorio.utils.helpers import (
     listar_pacientes_dedup,
     listar_recepcionados,
@@ -198,19 +197,6 @@ def eliminar_paciente(dni):
             return jsonify({"mensaje": "Paciente eliminado correctamente"})
     
     return jsonify({"error": "Paciente no encontrado"}), 404
-
-# --- Rutas para turnos y agenda ---
-
-
-
-@bp.route("/api/pacientes/atendidos", methods=["GET"], endpoint="obtener_pacientes_atendidos")
-@login_requerido
-@rol_permitido(["secretaria", "medico"])
-def obtener_pacientes_atendidos():
-    """Pacientes atendidos en una fecha sin pago registrado."""
-    fecha = request.args.get("fecha", hoy_ar_iso())
-    return jsonify(listar_atendidos_sin_pago(fecha))
-
 
 @bp.route("/api/pacientes/recepcionados", methods=["GET"], endpoint="obtener_pacientes_recepcionados")
 @login_requerido

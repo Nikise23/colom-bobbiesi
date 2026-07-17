@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from consultorio import create_app
 from consultorio.storage.queries import (
     count_pacientes,
-    count_turnos_fecha,
     count_turnos_total,
     listar_atendidos_sin_pago,
     load_pagos_fecha,

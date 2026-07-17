@@ -1,5 +1,6 @@
 # Entorno virtual
 venv/
+.venv/
 
 # Archivos de Python
 __pycache__/
@@ -23,3 +24,21 @@ Thumbs.db
 
 # Historial de Jupyter, si usás
 .ipynb_checkpoints/
+
+# Cachés y cobertura de pruebas
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backups generados localmente
+backup_consultorio_*.zip
+backup_consultorio_*.dump
+turnos_backup.json
+
+# Datos JSON locales (pueden estar vacíos y son peligrosos si se migran a prod)
+pacientes.json
+turnos.json
+pagos.json
+historias_clinicas.json
+usuarios.json
+agenda.json

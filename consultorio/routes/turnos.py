@@ -25,7 +25,6 @@ from consultorio.storage.queries import (
 )
 from consultorio.utils.fechas import hoy_ar_iso, normalizar_fecha_dia
 from consultorio.utils.helpers import (
-    adjuntar_observacion_pago_desde_pagos,
     enriquecer_turnos,
     listar_pacientes_dedup,
     normalizar_texto_obs,

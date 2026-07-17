@@ -1,12 +1,8 @@
-from datetime import date
-
 from flask import Blueprint, jsonify, render_template, request
 
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
 from consultorio.paths import AGENDA_FILE
 from consultorio.storage import cargar_json, guardar_json
-from consultorio.storage.queries import load_pacientes_por_dnis, load_pagos_fecha, load_turnos_fecha
-from consultorio.utils.helpers import enriquecer_turnos
 
 bp = Blueprint("agenda", __name__)
 
@@ -28,27 +24,6 @@ def obtener_agenda():
     except Exception as e:
         print(f"Error al cargar agenda: {e}")
         return jsonify({"error": "Error al cargar la agenda"}), 500
-
-
-@bp.route("/api/agenda/inicio", methods=["GET"], endpoint="agenda_inicio")
-@login_requerido
-@rol_permitido(["secretaria", "medico"])
-def agenda_inicio():
-    """Carga inicial de agenda: turnos del día con pacientes embebidos (sin listar todos)."""
-    fecha = request.args.get("fecha", date.today().isoformat())
-    turnos_raw = load_turnos_fecha(fecha)
-    pagos = load_pagos_fecha(fecha)
-    dnis = {t["dni_paciente"] for t in turnos_raw if t.get("dni_paciente")}
-    pacientes = load_pacientes_por_dnis(dnis)
-    agenda_data = cargar_json(AGENDA_FILE)
-    return jsonify(
-        {
-            "agenda": agenda_data,
-            "medicos": sorted(agenda_data.keys()),
-            "turnos": enriquecer_turnos(turnos_raw, pacientes, pagos),
-            "fecha": fecha,
-        }
-    )
 
 
 @bp.route("/api/agenda/<medico>/<dia>", methods=["PUT"], endpoint="actualizar_agenda_dia")

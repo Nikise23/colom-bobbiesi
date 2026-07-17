@@ -3,6 +3,7 @@ import re
 from sqlalchemy import func
 
 from consultorio.config import DIAS_AGENDA
+from consultorio.db_safety import refuse_empty_replace, refuse_mass_delete
 from consultorio.extensions import db
 from consultorio.models import (
     AgendaHorario,
@@ -28,6 +29,8 @@ def save_usuarios(data: list) -> None:
         return
     incoming = {item["usuario"]: item for item in data if item.get("usuario")}
     existing = {u.usuario: u for u in Usuario.query.all()}
+    refuse_empty_replace("usuarios", len(incoming), len(existing))
+    refuse_mass_delete("usuarios", len(incoming), len(existing), min_existing=3)
 
     for usuario, item in incoming.items():
         row = existing.get(usuario)
@@ -85,6 +88,8 @@ def save_pacientes(data: list) -> None:
         return
     incoming = {item["dni"]: item for item in data if item.get("dni")}
     existing = {p.dni: p for p in Paciente.query.all()}
+    refuse_empty_replace("pacientes", len(incoming), len(existing))
+    refuse_mass_delete("pacientes", len(incoming), len(existing))
 
     for dni, item in incoming.items():
         row = existing.get(dni)
@@ -133,6 +138,8 @@ def save_turnos(data: list) -> None:
     pending: dict[tuple, Turno] = {}
 
     for item in data:
+        if not isinstance(item, dict):
+            continue
         hora = _normalizar_hora(item.get("hora"))
         key = (item.get("dni_paciente"), item.get("fecha"), hora)
         if not all(key):
@@ -159,6 +166,9 @@ def save_turnos(data: list) -> None:
         row.borrador_consulta = item.get("borrador_consulta")
         row.borrador_fecha_consulta = item.get("borrador_fecha_consulta")
         row.borrador_actualizado = item.get("borrador_actualizado")
+
+    refuse_empty_replace("turnos", len(incoming_keys), len(existing))
+    refuse_mass_delete("turnos", len(incoming_keys), len(existing))
 
     for key, row in existing.items():
         if key not in incoming_keys:
@@ -204,6 +214,9 @@ def save_agenda(data: dict) -> None:
                 if key not in existing:
                     db.session.add(AgendaHorario(medico=medico, dia=dia, hora=hora_norm))
 
+    refuse_empty_replace("agenda", len(incoming_keys), len(existing))
+    refuse_mass_delete("agenda", len(incoming_keys), len(existing))
+
     for key, row in existing.items():
         if key not in incoming_keys:
             db.session.delete(row)
@@ -239,6 +252,9 @@ def save_historias(data: list) -> None:
         row.medico = item.get("medico")
         row.consulta_medica = item.get("consulta_medica")
         row.fecha_creacion = item.get("fecha_creacion")
+
+    refuse_empty_replace("historias", len(incoming_ids), len(existing))
+    refuse_mass_delete("historias", len(incoming_ids), len(existing))
 
     for historia_id, row in existing.items():
         if historia_id not in incoming_ids:
@@ -279,6 +295,9 @@ def save_pagos(data: list) -> None:
         row.obra_social = item.get("obra_social")
         row.observaciones = item.get("observaciones")
         row.fecha_registro = item.get("fecha_registro")
+
+    refuse_empty_replace("pagos", len(incoming_ids), len(existing))
+    refuse_mass_delete("pagos", len(incoming_ids), len(existing))
 
     for pago_id, row in existing.items():
         if pago_id not in incoming_ids:

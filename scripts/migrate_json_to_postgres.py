@@ -1,17 +1,35 @@
 #!/usr/bin/env python3
-"""Importa los archivos JSON existentes a PostgreSQL."""
+"""Importa archivos JSON a PostgreSQL.
+
+SOLO para bases LOCALES por defecto.
+Nunca uses este script contra producción salvo emergencia controlada.
+
+Uso seguro:
+  python scripts/migrate_json_to_postgres.py              # dry-run (no escribe)
+  python scripts/migrate_json_to_postgres.py --write       # escribe en localhost
+"""
+
+from __future__ import annotations
 
 import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flask import Flask
 
-from consultorio.config import get_data_paths
+from consultorio.config import get_data_paths, load_env_file
 from consultorio.database import init_db
+from consultorio.db_safety import (
+    allow_remote_data_migrate,
+    database_hostname,
+    is_local_database_url,
+    normalize_database_url,
+    require_local_database,
+)
 from consultorio.storage import db_storage
 from consultorio.storage.db_storage import _normalizar_hora
 from consultorio.utils.fechas import normalizar_fecha_nacimiento
@@ -77,22 +95,55 @@ def _sanitizar_pagos(data: list) -> list:
 
 
 def load_json_file(path: str, entity: str):
+    """Carga JSON. Missing/vacío → None (no migrar esa entidad)."""
     if not os.path.exists(path):
-        return db_storage.DEFAULTS[entity]
+        print(f"  {entity}: archivo ausente ({path}) — se omite")
+        return None
     with open(path, "r", encoding="utf-8") as file:
         data = json.load(file)
-    if entity == "agenda" and not isinstance(data, dict):
-        return {}
-    if entity != "agenda" and not isinstance(data, list):
-        return []
+    if entity == "agenda":
+        if not isinstance(data, dict) or not data:
+            print(f"  {entity}: vacío o inválido — se omite")
+            return None
+        return data
+    if not isinstance(data, list) or len(data) == 0:
+        print(f"  {entity}: lista vacía — se omite (no se toca la BD)")
+        return None
     return data
 
 
-def migrate(data_dir: str | None = None, dry_run: bool = False, only: list[str] | None = None) -> None:
-    if not os.environ.get("DATABASE_URL"):
+def migrate(
+    data_dir: str | None = None,
+    write: bool = False,
+    only: list[str] | None = None,
+    allow_remote: bool = False,
+) -> None:
+    load_env_file()
+    database_url = normalize_database_url(os.environ.get("DATABASE_URL", ""))
+    if not database_url:
         print("Error: DATABASE_URL no está configurada.")
-        print("Ejemplo: postgresql://usuario:clave@localhost:5432/colom_bobbiesi")
+        print("Ejemplo local: postgresql://usuario:clave@localhost:5432/colom_bobbiesi")
         sys.exit(1)
+    os.environ["DATABASE_URL"] = database_url
+
+    host = database_hostname(database_url) or "(sin host)"
+    print(f"Destino DATABASE_URL host: {host}")
+
+    if not is_local_database_url(database_url):
+        if not allow_remote or not allow_remote_data_migrate():
+            print("Error: DATABASE_URL apunta a un servidor remoto.")
+            print("Este script solo escribe en localhost.")
+            print("Para una emergencia remota (NO recomendado):")
+            print('  set ALLOW_REMOTE_DATA_MIGRATE=I_UNDERSTAND')
+            print("  python scripts/migrate_json_to_postgres.py --allow-remote --write")
+            sys.exit(1)
+        print("ADVERTENCIA: migración REMOTA habilitada explícitamente.")
+    else:
+        # Revalida por claridad en logs
+        require_local_database("migrate_json_to_postgres")
+
+    if not write:
+        print("Modo dry-run (no se escribe). Para aplicar: agregá --write")
 
     paths = get_data_paths()
     if data_dir:
@@ -111,42 +162,42 @@ def migrate(data_dir: str | None = None, dry_run: bool = False, only: list[str] 
             print(f"Entidades inválidas: {', '.join(invalid)}")
             sys.exit(1)
         entities = only
-    summary = {}
 
     with app.app_context():
         for entity in entities:
             data = load_json_file(paths[entity], entity)
+            if data is None:
+                continue
             if entity == "pacientes" and isinstance(data, list):
                 data = _sanitizar_pacientes(data)
             if entity == "turnos" and isinstance(data, list):
                 data = _sanitizar_turnos(data)
             if entity == "pagos" and isinstance(data, list):
                 data = _sanitizar_pagos(data)
-            summary[entity] = len(data) if isinstance(data, (list, dict)) else 0
-            if dry_run:
+
+            count = len(data) if isinstance(data, (list, dict)) else 0
+            existing = db_storage.cargar(entity)
+            existing_count = (
+                len(existing) if isinstance(existing, (list, dict)) else 0
+            )
+            print(f"  {entity}: JSON={count} BD={existing_count}")
+
+            if not write:
                 continue
+
             db_storage.guardar(entity, data)
-            print(f"  {entity}: {summary[entity]} registros importados")
+            print(f"    → importado")
 
-    print("\nResumen de migración:")
-    for entity in entities:
-        data = load_json_file(paths[entity], entity)
-        if entity == "agenda":
-            count = len(data) if isinstance(data, dict) else 0
-            label = "médicos en agenda"
-        else:
-            count = len(data) if isinstance(data, list) else 0
-            label = "registros"
-        print(f"  - {entity}: {count} {label}")
-
-    if dry_run:
-        print("\n(dry-run: no se escribió en la base de datos)")
-    else:
+    if write:
         print("\nMigración completada.")
+    else:
+        print("\n(dry-run: no se escribió en la base de datos)")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Migrar JSON a PostgreSQL")
+    parser = argparse.ArgumentParser(
+        description="Migrar JSON a PostgreSQL (solo localhost; dry-run por defecto)"
+    )
     parser.add_argument(
         "--data-dir",
         help="Directorio con los archivos JSON (por defecto: raíz del proyecto o /data)",
@@ -154,15 +205,30 @@ def main():
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Solo mostrar conteos sin escribir en la base",
+        help="Alias de compatibilidad: no escribe (es el comportamiento por defecto)",
+    )
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="Confirma escritura en la base (sin esto solo muestra conteos)",
     )
     parser.add_argument(
         "--only",
-        help="Solo importar estas entidades (coma-separadas): usuarios,pacientes,agenda,turnos,historias,pagos",
+        help="Solo importar estas entidades (coma-separadas)",
+    )
+    parser.add_argument(
+        "--allow-remote",
+        action="store_true",
+        help="Permitir remoto SOLO si ALLOW_REMOTE_DATA_MIGRATE=I_UNDERSTAND",
     )
     args = parser.parse_args()
     only = [e.strip() for e in args.only.split(",")] if args.only else None
-    migrate(data_dir=args.data_dir, dry_run=args.dry_run, only=only)
+    migrate(
+        data_dir=args.data_dir,
+        write=bool(args.write) and not args.dry_run,
+        only=only,
+        allow_remote=args.allow_remote,
+    )
 
 
 if __name__ == "__main__":

@@ -1,9 +1,7 @@
-import os
-
-from flask import Blueprint, jsonify, redirect, render_template, request, send_file, session, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash
 
-from consultorio.auth.decorators import login_requerido, rol_requerido
+from consultorio.auth.decorators import login_requerido
 from consultorio.auth.login_limiter import (
     clear_login_attempts,
     client_ip,
@@ -23,25 +21,6 @@ def _redirigir_por_rol(rol: str):
     if rol == "administrador":
         return redirect(url_for("administrador.vista_administrador"))
     return redirect(url_for("auth.inicio"))
-
-
-@bp.route("/descargar/<archivo>", endpoint="descargar_archivo")
-@login_requerido
-@rol_requerido("administrador")
-def descargar_archivo(archivo):
-    # Evitar path traversal: solo el nombre de archivo, sin rutas
-    nombre_seguro = os.path.basename(archivo)
-    if not nombre_seguro or nombre_seguro != archivo:
-        return "Nombre de archivo inválido", 400
-
-    if os.path.exists("/data"):
-        ruta = os.path.join("/data", nombre_seguro)
-    else:
-        ruta = nombre_seguro
-
-    if os.path.exists(ruta) and os.path.isfile(ruta):
-        return send_file(ruta, as_attachment=True)
-    return f"Archivo '{nombre_seguro}' no encontrado", 404
 
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")

@@ -3,17 +3,22 @@
 Configura PostgreSQL local: crea la BD, aplica migraciones e importa JSON.
 
 Uso:
-  1. Iniciá el servicio PostgreSQL (ver instrucciones abajo)
-  2. Editá .env con tu usuario/clave de pgAdmin
+  1. Iniciá el servicio PostgreSQL
+  2. Editá .env con DATABASE_URL=...@localhost...
   3. python scripts/setup_postgres_local.py
+
+Por seguridad, este script rechaza servidores remotos.
 """
 
+import argparse
 import os
 import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
+
+from consultorio.db_safety import require_local_database
 
 
 def load_env_file():
@@ -27,13 +32,6 @@ def load_env_file():
                 continue
             key, _, value = line.partition("=")
             os.environ.setdefault(key.strip(), value.strip())
-
-
-def get_database_url() -> str:
-    url = os.environ.get("DATABASE_URL", "")
-    if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql://", 1)
-    return url
 
 
 def parse_db_name(url: str) -> str:
@@ -73,9 +71,13 @@ def run_alembic():
 
 
 def run_json_migration():
-    print("\nImportando datos JSON...")
+    print("\nImportando datos JSON (solo si los archivos tienen contenido)...")
     result = subprocess.run(
-        [sys.executable, os.path.join(ROOT, "scripts", "migrate_json_to_postgres.py")],
+        [
+            sys.executable,
+            os.path.join(ROOT, "scripts", "migrate_json_to_postgres.py"),
+            "--write",
+        ],
         cwd=ROOT,
         env=os.environ.copy(),
     )
@@ -96,19 +98,19 @@ def verify_data():
         usuarios = cargar_json(USUARIOS_FILE)
         agenda = cargar_json(AGENDA_FILE)
         medicos = len(agenda) if isinstance(agenda, dict) else 0
-        print(f"\nVerificación OK:")
+        print("\nVerificación OK:")
         print(f"  - Usuarios en PostgreSQL: {len(usuarios)}")
         print(f"  - Médicos en agenda: {medicos}")
 
 
 def main():
-    load_env_file()
-    url = get_database_url()
-    if not url:
-        print("Error: DATABASE_URL no está definida en .env")
-        print("Copiá .env.example a .env y configurá tu clave de PostgreSQL.")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Crear y poblar una base PostgreSQL local desde los JSON."
+    )
+    parser.parse_args()
 
+    load_env_file()
+    url = require_local_database("setup_postgres_local")
     os.environ["DATABASE_URL"] = url
 
     try:

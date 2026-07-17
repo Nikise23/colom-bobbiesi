@@ -1,7 +1,5 @@
 import csv
 import io
-import os
-import zipfile
 from datetime import date, datetime
 
 from flask import Blueprint, jsonify, make_response, render_template, request, send_file
@@ -10,13 +8,10 @@ from werkzeug.security import generate_password_hash
 from consultorio.auth.decorators import login_requerido, rol_requerido
 from consultorio.paths import (
     AGENDA_FILE,
-    DATA_FILE,
     DIAS_AGENDA,
     PACIENTES_FILE,
     PAGOS_FILE,
-    TURNOS_FILE,
     USUARIOS_FILE,
-    timezone_ar,
 )
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.utils.backup import backup_zip_filename, build_backup_zip
