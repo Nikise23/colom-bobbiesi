@@ -325,7 +325,8 @@
                 <label class="form-label fw-semibold">
                   <i class="bi bi-card-text me-2 text-primary"></i>DNI
                 </label>
-                <input type="text" id="dni" class="form-control form-input" placeholder="Ingrese el DNI" required>
+                <input type="text" id="dni" class="form-control form-input" placeholder="Solo números, 7 u 8 dígitos" maxlength="8" inputmode="numeric" pattern="[0-9]{7,8}" required>
+                <div id="dni-hint" class="form-text text-muted">7 u 8 dígitos (sin puntos ni espacios)</div>
               </div>
               
               <div class="row">
@@ -333,13 +334,14 @@
                   <label class="form-label fw-semibold">
                     <i class="bi bi-calendar me-2 text-primary"></i>Fecha de Nacimiento
                   </label>
-                  <input type="text" id="fecha_nacimiento" class="form-control form-input" placeholder="dd/mm/aaaa" maxlength="10" required>
+                  <input type="text" id="fecha_nacimiento" class="form-control form-input" placeholder="Escribí 15051990 → 15/05/1990" maxlength="10" inputmode="numeric" required>
+                  <div class="form-text text-muted">Se formatea solo como dd/mm/aaaa</div>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">
                     <i class="bi bi-calendar-heart me-2 text-primary"></i>Edad
                   </label>
-                  <input type="text" id="edad" class="form-control form-input" placeholder="Se calcula automáticamente" readonly>
+                  <input type="text" id="edad" class="form-control form-input" placeholder="Se calcula al completar la fecha" readonly>
                 </div>
               </div>
               
@@ -409,8 +411,8 @@
                 <span class="input-group-text bg-primary text-white">
                   <i class="bi bi-search"></i>
                 </span>
-                <input type="text" id="buscar" class="form-control form-input" placeholder="Buscar por DNI, nombre o apellido...">
-                <button onclick="paginaPacientesActual=1; cargarPacientes()" class="btn btn-primary-custom text-white">
+                <input type="text" id="buscar" class="form-control form-input" placeholder="Escribí DNI, nombre o apellido... (busca solo)" autocomplete="off">
+                <button type="button" onclick="paginaPacientesActual=1; cargarPacientes()" class="btn btn-primary-custom text-white">
                   <i class="bi bi-search me-2"></i>Buscar
                 </button>
               </div>
@@ -549,7 +551,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/js/fecha_nacimiento.js"></script>
+  <script src="/static/js/fecha_nacimiento.js?v=3"></script>
   <script>
     // Variable para almacenar el DNI del último paciente registrado
     let ultimoPacienteRegistrado = null;
@@ -604,19 +606,26 @@
       actualizarFooterInfo();
       actualizarHora();
       
-      // Máscara dd/mm/aaaa (barras automáticas)
+      // Máscara dd/mm/aaaa + edad en vivo; DNI solo dígitos (máx. 8)
       bindFechaNacimientoInput('fecha_nacimiento', 'edad');
+      bindDniInput('dni', 'dni-hint');
       
-      // Event listener para búsqueda en tiempo real (con debounce)
+      // Búsqueda automática mientras se escribe (desde el 1.er carácter)
       document.getElementById('buscar').addEventListener('input', function() {
         const input = this;
         paginaPacientesActual = 1;
         clearTimeout(cargarPacientesTimeout);
         cargarPacientesTimeout = setTimeout(() => {
-          if (input.value.length >= 2 || input.value.length === 0) {
-            cargarPacientes();
-          }
-        }, 250);
+          cargarPacientes();
+        }, 200);
+      });
+
+      let buscarTurnosTimeout = null;
+      document.getElementById('buscar-turnos').addEventListener('input', function() {
+        clearTimeout(buscarTurnosTimeout);
+        buscarTurnosTimeout = setTimeout(() => {
+          buscarTurnos();
+        }, 200);
       });
     });
     
@@ -991,17 +1000,19 @@
 
     function editarPaciente(p) {
       document.getElementById("form-title").innerText = "Modificar Paciente";
-      document.getElementById("dni").value = p.dni;
+      document.getElementById("dni").value = String(p.dni || "").replace(/\D/g, "").slice(0, 8);
       document.getElementById("dni").readOnly = false; // Permitir editar DNI
       document.getElementById("nombre").value = p.nombre;
       document.getElementById("apellido").value = p.apellido;
-      document.getElementById("fecha_nacimiento").value = p.fecha_nacimiento || '';
-      document.getElementById("edad").value = p.edad || '';
+      const fechaInput = document.getElementById("fecha_nacimiento");
+      fechaInput.value = formatearFechaInput(p.fecha_nacimiento || "");
+      actualizarEdadCampo(fechaInput.value, "edad");
       document.getElementById("obra_social").value = p.obra_social;
       document.getElementById("numero_obra_social").value = p.numero_obra_social;
       document.getElementById("celular").value = p.celular;
       // Guardar el DNI original para la actualización
       document.getElementById("form-paciente").dataset.dniOriginal = p.dni;
+      document.getElementById("dni").dispatchEvent(new Event("input"));
     }
 
     function limpiarFormulario() {
@@ -1050,8 +1061,9 @@
       const fechaNacimiento = fechaInput.value;
       const edad = calcularEdad(fechaNacimiento);
 
+      const dniValido = validarDni(document.getElementById("dni").value);
       const datos = {
-        dni: document.getElementById("dni").value.trim(),
+        dni: dniValido || document.getElementById("dni").value.trim(),
         nombre: document.getElementById("nombre").value.trim(),
         apellido: document.getElementById("apellido").value.trim(),
         fecha_nacimiento: fechaNacimiento,
@@ -1065,6 +1077,12 @@
       if (!datos.dni || !datos.nombre || !datos.apellido || !datos.fecha_nacimiento || 
           !datos.obra_social || !datos.numero_obra_social || !datos.celular) {
         alert('Por favor complete todos los campos obligatorios');
+        return;
+      }
+
+      if (!dniValido) {
+        alert('DNI inválido. Debe tener 7 u 8 dígitos (sin puntos).');
+        document.getElementById("dni").focus();
         return;
       }
 

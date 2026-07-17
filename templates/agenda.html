@@ -298,13 +298,15 @@
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="nuevo-dni" class="form-label">DNI:</label>
-                      <input type="text" id="nuevo-dni" class="form-control" required>
+                      <input type="text" id="nuevo-dni" class="form-control" maxlength="8" inputmode="numeric" pattern="[0-9]{7,8}" required>
+                      <div id="nuevo-dni-hint" class="form-text text-muted">7 u 8 dígitos</div>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="nuevo-fecha-nacimiento" class="form-label">Fecha de Nacimiento:</label>
-                      <input type="text" id="nuevo-fecha-nacimiento" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" required>
+                      <input type="text" id="nuevo-fecha-nacimiento" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" required>
+                      <div id="nuevo-edad-hint" class="form-text text-muted">La edad se calcula al completar la fecha</div>
                     </div>
                   </div>
                 </div>
@@ -427,7 +429,7 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
 <!-- Fin tabla editable -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/js/fecha_nacimiento.js"></script>
+  <script src="/static/js/fecha_nacimiento.js?v=3"></script>
   <script>
     let agenda = {};
     let turnos = [];
@@ -913,29 +915,26 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
       // Recopilar datos del nuevo paciente
       const fechaNacInput = document.getElementById("nuevo-fecha-nacimiento");
       fechaNacInput.value = formatearFechaInput(fechaNacInput.value);
+      const dniValido = validarDni(document.getElementById("nuevo-dni").value);
+      if (!dniValido) {
+        alert("DNI inválido. Debe tener 7 u 8 dígitos (sin puntos).");
+        document.getElementById("nuevo-dni").focus();
+        return;
+      }
+      if (!parseFechaNacimiento(fechaNacInput.value)) {
+        alert("La fecha de nacimiento debe tener el formato dd/mm/aaaa");
+        fechaNacInput.focus();
+        return;
+      }
       const datosPaciente = {
         nombre: document.getElementById("nuevo-nombre").value.trim(),
         apellido: document.getElementById("nuevo-apellido").value.trim(),
-        dni: document.getElementById("nuevo-dni").value.trim(),
+        dni: dniValido,
         fecha_nacimiento: fechaNacInput.value,
         obra_social: document.getElementById("nuevo-obra-social").value.trim(),
         numero_obra_social: document.getElementById("nuevo-numero-obra-social").value.trim(),
         celular: document.getElementById("nuevo-celular").value.trim()
       };
-
-      // Calcular edad (formato dd/mm/aaaa)
-      const partesFecha = datosPaciente.fecha_nacimiento.split('/');
-      if (partesFecha.length === 3) {
-        const [dia, mes, anio] = partesFecha.map(Number);
-        const fechaNac = new Date(anio, mes - 1, dia);
-        if (!isNaN(fechaNac.getTime())) {
-          const hoy = new Date();
-          let edad = hoy.getFullYear() - fechaNac.getFullYear();
-          if (hoy.getMonth() < fechaNac.getMonth() || (hoy.getMonth() === fechaNac.getMonth() && hoy.getDate() < fechaNac.getDate())) {
-            edad--;
-          }
-        }
-      }
 
       try {
         // 1. Registrar el nuevo paciente
@@ -1052,7 +1051,8 @@ document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
         
         actualizarEstadisticasDia();
         renderAgenda();
-        bindFechaNacimientoInput('nuevo-fecha-nacimiento');
+        bindFechaNacimientoInput('nuevo-fecha-nacimiento', 'nuevo-edad-hint');
+        bindDniInput('nuevo-dni', 'nuevo-dni-hint');
         
         const urlParams = new URLSearchParams(window.location.search);
         const dniDesdeRegistro = urlParams.get('dni');

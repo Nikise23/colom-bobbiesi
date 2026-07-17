@@ -108,7 +108,12 @@ def registrar_paciente():
     for campo in campos:
         if not data.get(campo) or not str(data[campo]).strip():
             return jsonify({"error": f"El campo '{campo}' es obligatorio"}), 400
-    
+
+    dni = str(data["dni"]).strip()
+    if not dni.isdigit() or len(dni) not in (7, 8):
+        return jsonify({"error": "DNI inválido. Debe tener 7 u 8 dígitos."}), 400
+    data["dni"] = dni
+
     # La edad se calculará dinámicamente cuando se consulte
 
     pacientes = cargar_json(PACIENTES_FILE)
