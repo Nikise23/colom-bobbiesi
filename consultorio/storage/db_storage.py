@@ -507,7 +507,10 @@ def insert_historia(
     fecha_turno: str | None = None,
     hora_turno: str | None = None,
 ) -> dict:
+    # La tabla no tiene autoincremento (id manual desde el esquema inicial)
+    max_id = db.session.query(db.func.max(HistoriaClinica.id)).scalar() or 0
     row = HistoriaClinica(
+        id=int(max_id) + 1,
         dni=item["dni"],
         fecha_consulta=item.get("fecha_consulta"),
         medico=item.get("medico"),
