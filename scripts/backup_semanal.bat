@@ -1,6 +1,7 @@
 @echo off
-REM Ejecutar backup semanal del consultorio.
+REM Ejecutar backup semanal del consultorio (producción vía BACKUP_DATABASE_URL).
 REM Ajustá las rutas según tu PC.
+REM En .env: DATABASE_URL=localhost y BACKUP_DATABASE_URL=URL de Render.
 
 set PROJECT_DIR=C:\Users\nicfe\Downloads\colom-bobbiesi-main\colom-bobbiesi-web
 set BACKUP_DIR=C:\Backups\colom-bobbiesi

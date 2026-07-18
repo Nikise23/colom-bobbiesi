@@ -10,7 +10,11 @@ Uso:
   python scripts/backup_postgres.py --output-dir "C:\\Backups\\colom-bobbiesi"
 
 Requiere en .env (o variable de entorno):
-  DATABASE_URL=postgresql://...
+  BACKUP_DATABASE_URL=postgresql://...   (recomendado: URL de producción)
+  o, si no está, DATABASE_URL
+
+Así podés dejar DATABASE_URL en localhost para desarrollo y respaldar
+producción con BACKUP_DATABASE_URL sin riesgo de mezclar ambos.
 
 Para pg_dump en Windows: instalá PostgreSQL client tools o agregá pg_dump al PATH.
 """
@@ -24,6 +28,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -35,6 +40,28 @@ from consultorio.utils.backup import build_backup_zip
 
 def _stamp() -> str:
     return datetime.now(timezone_ar).strftime("%Y%m%d_%H%M")
+
+
+def _normalize_url(url: str) -> str:
+    url = (url or "").strip()
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql://", 1)
+    return url
+
+
+def _resolve_backup_url() -> tuple[str, str]:
+    """Devuelve (url, origen) priorizando BACKUP_DATABASE_URL."""
+    backup = _normalize_url(os.environ.get("BACKUP_DATABASE_URL", ""))
+    if backup:
+        return backup, "BACKUP_DATABASE_URL"
+    primary = _normalize_url(os.environ.get("DATABASE_URL", ""))
+    if primary:
+        return primary, "DATABASE_URL"
+    return "", ""
+
+
+def _hostname(url: str) -> str:
+    return (urlparse(url).hostname or "(sin host)").lower()
 
 
 def _pg_dump(database_url: str, dest: Path) -> bool:
@@ -114,17 +141,23 @@ def main() -> int:
     args = parser.parse_args()
 
     load_env_file()
-    database_url = os.environ.get("DATABASE_URL", "").strip()
+    database_url, url_source = _resolve_backup_url()
     if not database_url:
-        print("ERROR: Definí DATABASE_URL en .env o en variables de entorno.")
-        print("       En Render: Database → Connections → External Database URL")
+        print("ERROR: Definí BACKUP_DATABASE_URL (recomendado) o DATABASE_URL en .env.")
+        print("       BACKUP_DATABASE_URL debe ser la URL de producción (Render).")
+        print("       DATABASE_URL puede quedar en localhost para desarrollo.")
         return 1
+
+    # create_app / pg_dump leen DATABASE_URL; usamos la URL de backup
+    # sin cambiar el .env (desarrollo sigue en localhost).
+    os.environ["DATABASE_URL"] = database_url
 
     output_dir = Path(args.output_dir).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     stamp = _stamp()
     print(f"Backup consultorio — {stamp}")
+    print(f"Origen: {url_source} -> {_hostname(database_url)}")
     print(f"Carpeta: {output_dir}")
 
     zip_path = output_dir / f"backup_consultorio_{stamp}.zip"
