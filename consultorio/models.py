@@ -99,6 +99,62 @@ class AgendaHorario(db.Model):
     )
 
 
+class MedicoWeb(db.Model):
+    __tablename__ = "medicos_web"
+
+    medico = db.Column(db.String(255), primary_key=True)
+    visible = db.Column(db.Boolean, nullable=False, default=False)
+
+    def to_dict(self) -> dict:
+        return {"medico": self.medico, "visible": bool(self.visible)}
+
+
+class AgendaWebHorario(db.Model):
+    __tablename__ = "agenda_web_horarios"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    medico = db.Column(db.String(255), nullable=False, index=True)
+    dia = db.Column(db.String(20), nullable=False)
+    hora = db.Column(db.String(10), nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("medico", "dia", "hora", name="uq_agenda_web_medico_dia_hora"),
+    )
+
+
+class BloqueoWeb(db.Model):
+    __tablename__ = "bloqueos_web"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    medico = db.Column(db.String(255), nullable=False, index=True)
+    tipo = db.Column(db.String(20), nullable=False)  # dia | rango_horas | semanal
+    fecha = db.Column(db.String(30))
+    dia_semana = db.Column(db.String(20))
+    hora_desde = db.Column(db.String(10))
+    hora_hasta = db.Column(db.String(10))
+    motivo = db.Column(db.Text)
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    def to_dict(self) -> dict:
+        data = {
+            "id": self.id,
+            "medico": self.medico,
+            "tipo": self.tipo,
+            "activo": bool(self.activo),
+        }
+        if self.fecha:
+            data["fecha"] = self.fecha
+        if self.dia_semana:
+            data["dia_semana"] = self.dia_semana
+        if self.hora_desde:
+            data["hora_desde"] = self.hora_desde
+        if self.hora_hasta:
+            data["hora_hasta"] = self.hora_hasta
+        if self.motivo:
+            data["motivo"] = self.motivo
+        return data
+
+
 class HistoriaClinica(db.Model):
     __tablename__ = "historias_clinicas"
 

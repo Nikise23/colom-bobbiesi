@@ -1,5 +1,6 @@
 from consultorio.routes.administrador import bp as administrador_bp
 from consultorio.routes.agenda import bp as agenda_bp
+from consultorio.routes.agenda_web import bp as agenda_web_bp
 from consultorio.routes.auth import bp as auth_bp
 from consultorio.routes.historias import bp as historias_bp
 from consultorio.routes.pacientes import bp as pacientes_bp
@@ -15,6 +16,7 @@ _ALL_BLUEPRINTS = [
     pacientes_bp,
     turnos_bp,
     agenda_bp,
+    agenda_web_bp,
     pagos_bp,
     secretaria_bp,
     administrador_bp,

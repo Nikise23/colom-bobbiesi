@@ -14,6 +14,11 @@ PACIENTES_FILE = _paths["pacientes"]
 TURNOS_FILE = _paths["turnos"]
 AGENDA_FILE = _paths["agenda"]
 PAGOS_FILE = _paths["pagos"]
+AGENDA_WEB_FILE = _paths["agenda_web"]
+BLOQUEOS_WEB_FILE = _paths["bloqueos_web"]
+
+# Médicos publicados inicialmente en el sitio (seed / compat)
+MEDICOS_WEB_SEED = ("Marianela Bobbiesi", "Francisco Colom")
 
 
 def mover_a_persistencia(nombre_archivo: str) -> None:
@@ -39,5 +44,7 @@ def copiar_json_a_persistencia() -> None:
             "turnos.json",
             "agenda.json",
             "pagos.json",
+            "agenda_web.json",
+            "bloqueos_web.json",
         ]:
             mover_a_persistencia(archivo)

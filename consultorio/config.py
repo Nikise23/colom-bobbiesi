@@ -36,6 +36,8 @@ def get_data_paths() -> dict[str, str]:
         "turnos": "turnos.json",
         "agenda": "agenda.json",
         "pagos": "pagos.json",
+        "agenda_web": "agenda_web.json",
+        "bloqueos_web": "bloqueos_web.json",
     }
     return {key: os.path.join(base, filename) for key, filename in names.items()}
 

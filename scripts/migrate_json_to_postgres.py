@@ -101,7 +101,7 @@ def load_json_file(path: str, entity: str):
         return None
     with open(path, "r", encoding="utf-8") as file:
         data = json.load(file)
-    if entity == "agenda":
+    if entity in ("agenda", "agenda_web"):
         if not isinstance(data, dict) or not data:
             print(f"  {entity}: vacío o inválido — se omite")
             return None
@@ -155,7 +155,16 @@ def migrate(
     app = Flask(__name__)
     init_db(app)
 
-    entities = ["usuarios", "pacientes", "agenda", "turnos", "historias", "pagos"]
+    entities = [
+        "usuarios",
+        "pacientes",
+        "agenda",
+        "turnos",
+        "historias",
+        "pagos",
+        "agenda_web",
+        "bloqueos_web",
+    ]
     if only:
         invalid = [e for e in only if e not in entities]
         if invalid:

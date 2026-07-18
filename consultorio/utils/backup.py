@@ -19,12 +19,14 @@ BACKUP_ENTITIES: list[tuple[str, str]] = [
     ("pacientes", "pacientes.json"),
     ("agenda", "agenda.json"),
     ("usuarios", "usuarios.json"),
+    ("agenda_web", "agenda_web.json"),
+    ("bloqueos_web", "bloqueos_web.json"),
 ]
 
 
 def _cargar_entidad(entity: str, path: str):
     data = cargar_json(path)
-    if entity == "agenda":
+    if entity in ("agenda", "agenda_web"):
         return data if isinstance(data, dict) else {}
     return data if isinstance(data, list) else []
 

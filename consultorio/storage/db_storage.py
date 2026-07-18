@@ -7,7 +7,10 @@ from consultorio.db_safety import refuse_empty_replace, refuse_mass_delete
 from consultorio.extensions import db
 from consultorio.models import (
     AgendaHorario,
+    AgendaWebHorario,
+    BloqueoWeb,
     HistoriaClinica,
+    MedicoWeb,
     Paciente,
     Pago,
     Turno,
@@ -222,6 +225,160 @@ def save_agenda(data: dict) -> None:
             db.session.delete(row)
 
     db.session.commit()
+
+
+def load_agenda_web() -> dict:
+    """{medico: {visible: bool, dias: {LUNES: [...], ...}}}"""
+    result: dict = {}
+    for row in MedicoWeb.query.order_by(MedicoWeb.medico).all():
+        result[row.medico] = {
+            "visible": bool(row.visible),
+            "dias": _agenda_vacia_medico(),
+        }
+    for row in AgendaWebHorario.query.order_by(
+        AgendaWebHorario.medico, AgendaWebHorario.dia, AgendaWebHorario.hora
+    ).all():
+        entry = result.setdefault(
+            row.medico,
+            {"visible": False, "dias": _agenda_vacia_medico()},
+        )
+        if row.dia not in entry["dias"]:
+            entry["dias"][row.dia] = []
+        entry["dias"][row.dia].append(row.hora)
+    return result
+
+
+def save_agenda_web(data: dict) -> None:
+    """Reemplazo completo del mapa agenda web (usar con cuidado)."""
+    if not isinstance(data, dict):
+        return
+
+    MedicoWeb.query.delete()
+    AgendaWebHorario.query.delete()
+
+    for medico, cfg in data.items():
+        if not isinstance(cfg, dict):
+            continue
+        visible = bool(cfg.get("visible", False))
+        db.session.add(MedicoWeb(medico=medico, visible=visible))
+        dias = cfg.get("dias") or {}
+        if not isinstance(dias, dict):
+            continue
+        for dia, horas in dias.items():
+            if dia not in DIAS_AGENDA or not isinstance(horas, list):
+                continue
+            for hora in horas:
+                hora_norm = _normalizar_hora(hora)
+                if not hora_norm:
+                    continue
+                db.session.add(
+                    AgendaWebHorario(medico=medico, dia=dia, hora=hora_norm)
+                )
+    db.session.commit()
+
+
+def upsert_medico_web(medico: str, visible: bool, dias: dict) -> None:
+    row = MedicoWeb.query.get(medico)
+    if row is None:
+        db.session.add(MedicoWeb(medico=medico, visible=visible))
+    else:
+        row.visible = visible
+
+    AgendaWebHorario.query.filter_by(medico=medico).delete()
+    for dia, horas in (dias or {}).items():
+        if dia not in DIAS_AGENDA or not isinstance(horas, list):
+            continue
+        seen = set()
+        for hora in horas:
+            hora_norm = _normalizar_hora(hora)
+            if not hora_norm or hora_norm in seen:
+                continue
+            seen.add(hora_norm)
+            db.session.add(AgendaWebHorario(medico=medico, dia=dia, hora=hora_norm))
+    db.session.commit()
+
+
+def load_bloqueos_web() -> list:
+    return [
+        b.to_dict()
+        for b in BloqueoWeb.query.order_by(BloqueoWeb.id).all()
+    ]
+
+
+def save_bloqueos_web(data: list) -> None:
+    if not isinstance(data, list):
+        return
+    existing = {b.id: b for b in BloqueoWeb.query.all()}
+    incoming_ids = set()
+
+    for item in data:
+        if not isinstance(item, dict) or not item.get("medico") or not item.get("tipo"):
+            continue
+        bid = item.get("id")
+        if bid is not None and bid in existing:
+            row = existing[bid]
+            incoming_ids.add(bid)
+            row.medico = item["medico"]
+            row.tipo = item["tipo"]
+            row.fecha = item.get("fecha")
+            row.dia_semana = item.get("dia_semana")
+            row.hora_desde = _normalizar_hora(item.get("hora_desde")) or None
+            row.hora_hasta = _normalizar_hora(item.get("hora_hasta")) or None
+            row.motivo = item.get("motivo")
+            row.activo = bool(item.get("activo", True))
+        else:
+            db.session.add(
+                BloqueoWeb(
+                    medico=item["medico"],
+                    tipo=item["tipo"],
+                    fecha=item.get("fecha"),
+                    dia_semana=item.get("dia_semana"),
+                    hora_desde=_normalizar_hora(item.get("hora_desde")) or None,
+                    hora_hasta=_normalizar_hora(item.get("hora_hasta")) or None,
+                    motivo=item.get("motivo"),
+                    activo=bool(item.get("activo", True)),
+                )
+            )
+
+    for bid, row in existing.items():
+        if bid not in incoming_ids and bid is not None:
+            # Solo borrar los que estaban y no vinieron si el replace es total
+            # Cuando hay items nuevos sin id, no borramos todo; solo sync por ids presentes
+            pass
+
+    # Replace-all semantics when caller sends full list (backup/migrate)
+    if data is not None:
+        kept = {item.get("id") for item in data if isinstance(item, dict) and item.get("id")}
+        for bid, row in existing.items():
+            if bid not in kept:
+                db.session.delete(row)
+
+    db.session.commit()
+
+
+def insert_bloqueo_web(item: dict) -> dict:
+    row = BloqueoWeb(
+        medico=item["medico"],
+        tipo=item["tipo"],
+        fecha=item.get("fecha"),
+        dia_semana=item.get("dia_semana"),
+        hora_desde=_normalizar_hora(item.get("hora_desde")) or None,
+        hora_hasta=_normalizar_hora(item.get("hora_hasta")) or None,
+        motivo=item.get("motivo"),
+        activo=bool(item.get("activo", True)),
+    )
+    db.session.add(row)
+    db.session.commit()
+    return row.to_dict()
+
+
+def delete_bloqueo_web(bloqueo_id: int) -> bool:
+    row = BloqueoWeb.query.get(bloqueo_id)
+    if row is None:
+        return False
+    db.session.delete(row)
+    db.session.commit()
+    return True
 
 
 def load_historias() -> list:
@@ -643,6 +800,8 @@ LOADERS = {
     "agenda": load_agenda,
     "historias": load_historias,
     "pagos": load_pagos,
+    "agenda_web": load_agenda_web,
+    "bloqueos_web": load_bloqueos_web,
 }
 
 SAVERS = {
@@ -652,6 +811,8 @@ SAVERS = {
     "agenda": save_agenda,
     "historias": save_historias,
     "pagos": save_pagos,
+    "agenda_web": save_agenda_web,
+    "bloqueos_web": save_bloqueos_web,
 }
 
 DEFAULTS = {
@@ -661,6 +822,8 @@ DEFAULTS = {
     "agenda": {},
     "historias": [],
     "pagos": [],
+    "agenda_web": {},
+    "bloqueos_web": [],
 }
 
 

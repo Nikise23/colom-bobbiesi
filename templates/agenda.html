@@ -340,34 +340,140 @@
     </div>
   </div>
 
-  <!-- Tabla editable de agenda para secretaria -->
+  <!-- Configuración de agenda / sitio web (secretaria) -->
 {% if session['rol'] == 'secretaria' %}
 <div class="card mb-4">
   <div class="card-header bg-primary text-white">
-    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Editar Agenda de Médicos</h5>
-    <small>Modifica los horarios de cada médico y día. Usa coma para separar los horarios (ej: 14:05, 14:10, ...)</small>
+    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Configurar agendas</h5>
+    <small>Agenda interna = trabajo diario. Horarios web / bloqueos = lo que ve el sitio.</small>
   </div>
   <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-bordered align-middle text-center" id="tabla-agenda-editable">
-        <thead class="table-light">
-          <tr>
-            <th>Médico</th>
-            <th>LUNES</th>
-            <th>MARTES</th>
-            <th>MIERCOLES</th>
-            <th>JUEVES</th>
-            <th>VIERNES</th>
-            <th>SÁBADO</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-agenda-editable"></tbody>
-      </table>
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-interna" data-bs-toggle="tab" data-bs-target="#pane-interna" type="button" role="tab">Agenda interna</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-web" data-bs-toggle="tab" data-bs-target="#pane-web" type="button" role="tab">Horarios web</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-bloqueos" data-bs-toggle="tab" data-bs-target="#pane-bloqueos" type="button" role="tab">Bloqueos web</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="pane-interna" role="tabpanel">
+        <p class="text-muted small">Modificá los horarios de cada médico y día. Usá coma para separar (ej: 14:05, 14:10).</p>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle text-center" id="tabla-agenda-editable">
+            <thead class="table-light">
+              <tr>
+                <th>Médico</th>
+                <th>LUNES</th>
+                <th>MARTES</th>
+                <th>MIERCOLES</th>
+                <th>JUEVES</th>
+                <th>VIERNES</th>
+                <th>SÁBADO</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-agenda-editable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="pane-web" role="tabpanel">
+        <p class="text-muted small">
+          Solo los médicos con <strong>Visible en sitio</strong> y horarios cargados aparecen en la API pública.
+          Los horarios web deben existir en la agenda interna.
+        </p>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle text-center">
+            <thead class="table-light">
+              <tr>
+                <th>Médico</th>
+                <th>Visible</th>
+                <th>LUNES</th>
+                <th>MARTES</th>
+                <th>MIERCOLES</th>
+                <th>JUEVES</th>
+                <th>VIERNES</th>
+                <th>SÁBADO</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-agenda-web"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="pane-bloqueos" role="tabpanel">
+        <p class="text-muted small">Los bloqueos solo afectan al sitio web; la agenda interna sigue igual.</p>
+        <form id="form-bloqueo-web" class="row g-2 align-items-end mb-3">
+          <div class="col-md-3">
+            <label class="form-label small mb-0">Médico</label>
+            <select id="bloqueo-medico" class="form-select form-select-sm" required></select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small mb-0">Tipo</label>
+            <select id="bloqueo-tipo" class="form-select form-select-sm" onchange="toggleCamposBloqueo()">
+              <option value="dia">Día completo</option>
+              <option value="rango_horas">Rango horario</option>
+              <option value="semanal">Semanal (día de semana)</option>
+            </select>
+          </div>
+          <div class="col-md-2" id="wrap-bloqueo-fecha">
+            <label class="form-label small mb-0">Fecha</label>
+            <input type="date" id="bloqueo-fecha" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-2 d-none" id="wrap-bloqueo-dia">
+            <label class="form-label small mb-0">Día semana</label>
+            <select id="bloqueo-dia-semana" class="form-select form-select-sm">
+              <option>LUNES</option><option>MARTES</option><option>MIERCOLES</option>
+              <option>JUEVES</option><option>VIERNES</option><option>SABADO</option>
+            </select>
+          </div>
+          <div class="col-md-1" id="wrap-bloqueo-desde">
+            <label class="form-label small mb-0">Desde</label>
+            <input type="time" id="bloqueo-hora-desde" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-1" id="wrap-bloqueo-hasta">
+            <label class="form-label small mb-0">Hasta</label>
+            <input type="time" id="bloqueo-hora-hasta" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small mb-0">Motivo</label>
+            <input type="text" id="bloqueo-motivo" class="form-control form-control-sm" maxlength="200" placeholder="Opcional">
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-warning btn-sm w-100">Agregar</button>
+          </div>
+        </form>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Médico</th>
+                <th>Tipo</th>
+                <th>Detalle</th>
+                <th>Motivo</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-bloqueos-web"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <script>
+const DIAS_AGENDA_UI = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'];
+
+function escAttr(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 function renderTablaEditableAgenda() {
   fetch('/api/agenda')
     .then(r => r.json())
@@ -376,26 +482,32 @@ function renderTablaEditableAgenda() {
       tbody.innerHTML = '';
       for (const medico in agenda) {
         const row = document.createElement('tr');
+        const m = escAttr(medico);
         row.innerHTML = `
           <td><strong>${medico}</strong></td>
-          ${['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'].map(dia => `
+          ${DIAS_AGENDA_UI.map(dia => `
             <td><input type="text" class="form-control form-control-sm" id="input-${medico}-${dia}" value="${(agenda[medico][dia]||[]).join(', ')}"></td>
           `).join('')}
           <td>
-            <button class="btn btn-success btn-sm me-1" onclick="guardarHorarios('${medico}')"><i class="bi bi-save"></i> Guardar</button>
-            <button class="btn btn-secondary btn-sm" onclick="restaurarHorarios('${medico}')"><i class="bi bi-arrow-clockwise"></i> Restaurar</button>
+            <button class="btn btn-success btn-sm me-1" onclick="guardarHorarios('${m}')"><i class="bi bi-save"></i> Guardar</button>
+            <button class="btn btn-secondary btn-sm" onclick="restaurarHorarios('${m}')"><i class="bi bi-arrow-clockwise"></i> Restaurar</button>
           </td>
         `;
         tbody.appendChild(row);
       }
-      // Guardar copia original para restaurar
       window._agendaOriginal = JSON.parse(JSON.stringify(agenda));
+      const sel = document.getElementById('bloqueo-medico');
+      if (sel) {
+        sel.innerHTML = Object.keys(agenda).sort().map(med =>
+          `<option value="${med}">${med}</option>`
+        ).join('');
+      }
     });
 }
+
 async function guardarHorarios(medico) {
-  const dias = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'];
   const diasPayload = {};
-  for (const dia of dias) {
+  for (const dia of DIAS_AGENDA_UI) {
     const val = document.getElementById(`input-${medico}-${dia}`).value.trim();
     diasPayload[dia] = val ? val.split(',').map(h => h.trim()).filter(Boolean) : [];
   }
@@ -416,17 +528,198 @@ async function guardarHorarios(medico) {
     alert('Error al guardar horarios: ' + e.message);
   }
 }
+
 function restaurarHorarios(medico) {
   const agenda = window._agendaOriginal;
-  const dias = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'];
-  for (const dia of dias) {
+  for (const dia of DIAS_AGENDA_UI) {
     document.getElementById(`input-${medico}-${dia}`).value = (agenda[medico][dia]||[]).join(', ');
   }
 }
-document.addEventListener('DOMContentLoaded', renderTablaEditableAgenda);
+
+function renderTablaAgendaWeb() {
+  fetch('/api/agenda-web')
+    .then(r => r.json())
+    .then(web => {
+      const tbody = document.getElementById('tbody-agenda-web');
+      tbody.innerHTML = '';
+      window._agendaWebOriginal = JSON.parse(JSON.stringify(web));
+      for (const medico of Object.keys(web).sort()) {
+        const cfg = web[medico];
+        const m = escAttr(medico);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${medico}</strong></td>
+          <td>
+            <input type="checkbox" class="form-check-input" id="web-visible-${medico}" ${cfg.visible ? 'checked' : ''}>
+          </td>
+          ${DIAS_AGENDA_UI.map(dia => `
+            <td><input type="text" class="form-control form-control-sm" id="web-${medico}-${dia}" value="${(cfg.dias[dia]||[]).join(', ')}"></td>
+          `).join('')}
+          <td class="text-nowrap">
+            <button class="btn btn-success btn-sm me-1" onclick="guardarAgendaWeb('${m}')"><i class="bi bi-save"></i></button>
+            <button class="btn btn-outline-primary btn-sm" title="Copiar desde agenda interna" onclick="copiarAgendaWeb('${m}')"><i class="bi bi-files"></i></button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      }
+    });
+}
+
+async function guardarAgendaWeb(medico) {
+  const diasPayload = {};
+  for (const dia of DIAS_AGENDA_UI) {
+    const val = document.getElementById(`web-${medico}-${dia}`).value.trim();
+    diasPayload[dia] = val ? val.split(',').map(h => h.trim()).filter(Boolean) : [];
+  }
+  const visible = document.getElementById(`web-visible-${medico}`).checked;
+  try {
+    const res = await fetch(`/api/agenda-web/${encodeURIComponent(medico)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visible, dias: diasPayload })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(`Agenda web de ${medico} guardada.`);
+      renderTablaAgendaWeb();
+    } else {
+      alert('Error: ' + (data.error || res.status));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function copiarAgendaWeb(medico) {
+  if (!confirm(`¿Copiar horarios internos de ${medico} a la agenda web?`)) return;
+  const visible = document.getElementById(`web-visible-${medico}`)?.checked;
+  try {
+    const res = await fetch(`/api/agenda-web/${encodeURIComponent(medico)}/copiar-interna`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visible })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('Horarios copiados.');
+      renderTablaAgendaWeb();
+    } else {
+      alert('Error: ' + (data.error || res.status));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function toggleCamposBloqueo() {
+  const tipo = document.getElementById('bloqueo-tipo').value;
+  document.getElementById('wrap-bloqueo-fecha').classList.toggle('d-none', tipo === 'semanal');
+  document.getElementById('wrap-bloqueo-dia').classList.toggle('d-none', tipo !== 'semanal');
+  const necesitaHoras = tipo === 'rango_horas';
+  document.getElementById('wrap-bloqueo-desde').classList.toggle('opacity-50', tipo === 'dia');
+  document.getElementById('wrap-bloqueo-hasta').classList.toggle('opacity-50', tipo === 'dia');
+  if (necesitaHoras) {
+    document.getElementById('bloqueo-hora-desde').required = true;
+    document.getElementById('bloqueo-hora-hasta').required = true;
+  } else {
+    document.getElementById('bloqueo-hora-desde').required = false;
+    document.getElementById('bloqueo-hora-hasta').required = false;
+  }
+}
+
+function detalleBloqueo(b) {
+  if (b.tipo === 'semanal') {
+    const rango = (b.hora_desde && b.hora_hasta) ? ` ${b.hora_desde}-${b.hora_hasta}` : ' (todo el día)';
+    return `Cada ${b.dia_semana}${rango}`;
+  }
+  if (b.tipo === 'rango_horas') {
+    return `${b.fecha} ${b.hora_desde || ''}-${b.hora_hasta || ''}`;
+  }
+  const rango = (b.hora_desde && b.hora_hasta) ? ` ${b.hora_desde}-${b.hora_hasta}` : ' (todo el día)';
+  return `${b.fecha || ''}${rango}`;
+}
+
+function renderBloqueosWeb() {
+  fetch('/api/bloqueos-web')
+    .then(r => r.json())
+    .then(data => {
+      const tbody = document.getElementById('tbody-bloqueos-web');
+      tbody.innerHTML = '';
+      const bloqueos = data.bloqueos || [];
+      if (!bloqueos.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-muted">Sin bloqueos web</td></tr>';
+        return;
+      }
+      for (const b of bloqueos) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${b.medico}</td>
+          <td><span class="badge bg-secondary">${b.tipo}</span></td>
+          <td>${detalleBloqueo(b)}</td>
+          <td>${b.motivo || ''}</td>
+          <td><button class="btn btn-outline-danger btn-sm" onclick="eliminarBloqueoWeb(${b.id})">Eliminar</button></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    });
+}
+
+async function eliminarBloqueoWeb(id) {
+  if (!confirm('¿Eliminar este bloqueo?')) return;
+  const res = await fetch(`/api/bloqueos-web/${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) {
+    alert(data.error || 'No se pudo eliminar');
+    return;
+  }
+  renderBloqueosWeb();
+}
+
+document.getElementById('form-bloqueo-web')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const tipo = document.getElementById('bloqueo-tipo').value;
+  const payload = {
+    medico: document.getElementById('bloqueo-medico').value,
+    tipo,
+    motivo: document.getElementById('bloqueo-motivo').value.trim() || null,
+  };
+  const hd = document.getElementById('bloqueo-hora-desde').value;
+  const hh = document.getElementById('bloqueo-hora-hasta').value;
+  if (tipo === 'semanal') {
+    payload.dia_semana = document.getElementById('bloqueo-dia-semana').value;
+  } else {
+    payload.fecha = document.getElementById('bloqueo-fecha').value;
+  }
+  if (hd) payload.hora_desde = hd;
+  if (hh) payload.hora_hasta = hh;
+  try {
+    const res = await fetch('/api/bloqueos-web', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Error al crear bloqueo');
+      return;
+    }
+    e.target.reset();
+    toggleCamposBloqueo();
+    renderBloqueosWeb();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderTablaEditableAgenda();
+  renderTablaAgendaWeb();
+  renderBloqueosWeb();
+  toggleCamposBloqueo();
+});
 </script>
 {% endif %}
-<!-- Fin tabla editable -->
+<!-- Fin configuración agenda -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/static/js/fecha_nacimiento.js?v=3"></script>

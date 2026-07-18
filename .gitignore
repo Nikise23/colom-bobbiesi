@@ -42,3 +42,5 @@ pagos.json
 historias_clinicas.json
 usuarios.json
 agenda.json
+agenda_web.json
+bloqueos_web.json

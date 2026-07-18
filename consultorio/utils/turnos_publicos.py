@@ -2,8 +2,9 @@ import os
 import time
 from datetime import date, datetime, timedelta
 
-from consultorio.paths import AGENDA_FILE, PACIENTES_FILE, TURNOS_FILE, timezone_ar
+from consultorio.paths import PACIENTES_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
+from consultorio.utils import agenda_web as aw
 from consultorio.utils.fechas import normalizar_fecha_nacimiento
 
 DIA_EN_ES = {
@@ -126,26 +127,8 @@ def filtrar_horarios_futuros(fecha_dt: date, horarios: list[str]) -> list[str]:
     return [h for h in horarios if h >= ahora]
 
 
-def _agenda_medico(medico: str) -> tuple[dict | None, str | None]:
-    agenda = cargar_json(AGENDA_FILE)
-    if medico not in agenda:
-        return None, "Médico no encontrado"
-    return agenda[medico], None
-
-
-def _horarios_libres_dia(
-    medico_agenda: dict,
-    fecha_dt: date,
-    dia_es: str,
-    horas_ocupadas: set[str],
-) -> list[str]:
-    todos = medico_agenda.get(dia_es, [])
-    libres = [h for h in todos if h not in horas_ocupadas]
-    return filtrar_horarios_futuros(fecha_dt, libres)
-
-
 def slots_disponibles(medico: str, fecha_str: str) -> tuple[list[str], str | None]:
-    fecha_dt, dia_es, err = fecha_a_dia_agenda(fecha_str)
+    fecha_dt, _, err = fecha_a_dia_agenda(fecha_str)
     if err:
         return [], err
 
@@ -153,13 +136,9 @@ def slots_disponibles(medico: str, fecha_str: str) -> tuple[list[str], str | Non
     if err:
         return [], err
 
-    medico_agenda, err = _agenda_medico(medico)
-    if err:
-        return [], err
-
     turnos = cargar_json(TURNOS_FILE)
     ocupados = horarios_ocupados(turnos, medico, fecha_str)
-    return _horarios_libres_dia(medico_agenda, fecha_dt, dia_es, ocupados), None
+    return aw.horarios_web_libres(medico, fecha_str, ocupados)
 
 
 def slots_disponibles_rango(
@@ -176,9 +155,11 @@ def slots_disponibles_rango(
     if err:
         return None, err
 
-    medico_agenda, err = _agenda_medico(medico)
-    if err:
-        return None, err
+    aw.ensure_seed_from_internal()
+    web = aw.load_agenda_web()
+    cfg = web.get(medico)
+    if not cfg or not cfg.get("visible"):
+        return None, "Médico no encontrado"
 
     turnos = cargar_json(TURNOS_FILE)
     ocupados_map = ocupados_por_fecha_en_rango(
@@ -188,14 +169,14 @@ def slots_disponibles_rango(
     dias = []
     total_dias_con_turno = 0
     for fecha_dt in iter_dias_habiles(desde_dt, hasta_dt):
-        _, dia_es, _ = fecha_a_dia_agenda(fecha_dt.isoformat())
         fecha_iso = fecha_dt.isoformat()
-        libres = _horarios_libres_dia(
-            medico_agenda,
-            fecha_dt,
-            dia_es,
+        libres, err_dia = aw.horarios_web_libres(
+            medico,
+            fecha_iso,
             ocupados_map.get(fecha_iso, set()),
         )
+        if err_dia:
+            libres = []
         if libres:
             total_dias_con_turno += 1
         dias.append(
@@ -235,8 +216,7 @@ def slots_disponibles_rango_cached(
 
 
 def listar_medicos() -> list[str]:
-    agenda = cargar_json(AGENDA_FILE)
-    return sorted(agenda.keys())
+    return aw.listar_medicos_visibles()
 
 
 def turno_publico(turno: dict) -> dict:
@@ -348,6 +328,7 @@ def reservar_turno(data: dict) -> tuple[dict, int]:
     }
     turnos.append(turno_nuevo)
     guardar_json(TURNOS_FILE, turnos)
+    _RANGO_CACHE.clear()
 
     return {
         "mensaje": "Turno reservado correctamente",
@@ -377,6 +358,7 @@ def cancelar_turno(dni: str, fecha: str, hora: str) -> tuple[dict, int]:
                 }, 400
             turnos.pop(i)
             guardar_json(TURNOS_FILE, turnos)
+            _RANGO_CACHE.clear()
             return {"mensaje": "Turno cancelado correctamente"}, 200
 
     return {"error": "Turno no encontrado"}, 404

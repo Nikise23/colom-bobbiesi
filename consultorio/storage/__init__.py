@@ -16,6 +16,10 @@ def cargar_json(path: str):
     data = json_storage.cargar(path)
     if path.endswith("agenda.json") and not isinstance(data, dict):
         return {}
+    if path.endswith("agenda_web.json") and not isinstance(data, dict):
+        return {}
+    if path.endswith("bloqueos_web.json") and not isinstance(data, list):
+        return []
     return data
 
 
