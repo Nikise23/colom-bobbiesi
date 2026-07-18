@@ -401,6 +401,137 @@ def obtener_paciente(dni: str) -> dict | None:
     return data
 
 
+def load_historias_dni(dni: str) -> list:
+    rows = (
+        HistoriaClinica.query.filter_by(dni=dni)
+        .order_by(HistoriaClinica.fecha_consulta.desc(), HistoriaClinica.id.desc())
+        .all()
+    )
+    return [row.to_dict() for row in rows]
+
+
+def buscar_historias_paginado(
+    busqueda: str,
+    pagina: int,
+    por_pagina: int,
+    ordenar_por: str,
+    orden: str,
+) -> dict:
+    resumen = (
+        db.session.query(
+            HistoriaClinica.dni.label("dni"),
+            func.count(HistoriaClinica.id).label("total_consultas"),
+            func.max(HistoriaClinica.id).label("ultima_historia_id"),
+        )
+        .group_by(HistoriaClinica.dni)
+        .subquery()
+    )
+
+    query = (
+        db.session.query(
+            Paciente,
+            HistoriaClinica.id,
+            HistoriaClinica.fecha_consulta,
+            HistoriaClinica.medico,
+            HistoriaClinica.consulta_medica,
+            HistoriaClinica.fecha_creacion,
+            resumen.c.total_consultas,
+            func.count().over().label("total_resultados"),
+        )
+        .join(resumen, resumen.c.dni == Paciente.dni)
+        .join(HistoriaClinica, HistoriaClinica.id == resumen.c.ultima_historia_id)
+    )
+
+    busqueda = busqueda.strip()
+    if busqueda:
+        like = f"%{busqueda.lower()}%"
+        query = query.filter(
+            db.or_(
+                db.func.lower(Paciente.apellido).like(like),
+                db.func.lower(Paciente.nombre).like(like),
+                Paciente.dni.like(f"%{busqueda}%"),
+            )
+        )
+
+    columnas_orden = {
+        "apellido": Paciente.apellido,
+        "nombre": Paciente.nombre,
+        "fecha": HistoriaClinica.fecha_consulta,
+        "dni": Paciente.dni,
+    }
+    columna = columnas_orden.get(ordenar_por, Paciente.apellido)
+    query = query.order_by(columna.desc() if orden == "desc" else columna.asc())
+
+    rows = query.offset((pagina - 1) * por_pagina).limit(por_pagina).all()
+    total = int(rows[0][-1]) if rows else 0
+    total_paginas = max(1, (total + por_pagina - 1) // por_pagina)
+    pacientes = []
+    for (
+        paciente,
+        historia_id,
+        fecha_consulta,
+        medico,
+        consulta_medica,
+        fecha_creacion,
+        total_consultas,
+        _total_resultados,
+    ) in rows:
+        ultima_historia = {
+            "id": historia_id,
+            "dni": paciente.dni,
+            "fecha_consulta": fecha_consulta or "",
+            "medico": medico or "",
+            "consulta_medica": consulta_medica or "",
+            "fecha_creacion": fecha_creacion or "",
+        }
+        pacientes.append(
+            {
+                "paciente": paciente.to_dict(),
+                "ultima_consulta": fecha_consulta or "",
+                "total_consultas": int(total_consultas or 0),
+                "ultima_historia": ultima_historia,
+            }
+        )
+
+    return {
+        "pacientes": pacientes,
+        "total": total,
+        "pagina": pagina,
+        "total_paginas": total_paginas,
+        "por_pagina": por_pagina,
+    }
+
+
+def insert_historia(
+    item: dict,
+    fecha_turno: str | None = None,
+    hora_turno: str | None = None,
+) -> dict:
+    row = HistoriaClinica(
+        dni=item["dni"],
+        fecha_consulta=item.get("fecha_consulta"),
+        medico=item.get("medico"),
+        consulta_medica=item.get("consulta_medica"),
+        fecha_creacion=item.get("fecha_creacion"),
+    )
+    db.session.add(row)
+
+    if fecha_turno and hora_turno:
+        turno = Turno.query.filter_by(
+            dni_paciente=item["dni"],
+            fecha=fecha_turno,
+            hora=_normalizar_hora(hora_turno),
+        ).first()
+        if turno:
+            turno.estado = "atendido"
+            turno.borrador_consulta = None
+            turno.borrador_fecha_consulta = None
+            turno.borrador_actualizado = None
+
+    db.session.commit()
+    return row.to_dict()
+
+
 def count_pacientes() -> int:
     return Paciente.query.count()
 

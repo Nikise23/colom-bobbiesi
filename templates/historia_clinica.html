@@ -266,10 +266,8 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     const dni = "{{ dni }}";
     const fechaTurnoCtx = {{ fecha_turno|tojson }};
@@ -284,6 +282,7 @@
     let pacienteActual = null;
     let historiasPaciente = [];
     let debounceAuto = null;
+    let guardandoHistoria = false;
 
     function parseFechaLocal(iso) {
       if (!iso) return null;
@@ -518,9 +517,8 @@
     // Cargar datos del paciente
     async function cargarDatosPaciente() {
       try {
-        const response = await fetch("/api/pacientes");
-        const pacientes = await response.json();
-        const paciente = pacientes.find(p => p.dni === dni);
+        const response = await fetch(`/api/pacientes/${encodeURIComponent(dni)}`);
+        const paciente = response.ok ? await response.json() : null;
         pacienteActual = paciente;
         
         if (paciente) {
@@ -560,9 +558,8 @@
     // Cargar historial de consultas
     async function cargarHistorial() {
       try {
-        const response = await fetch("/api/historias");
-        const historias = await response.json();
-        historiasPaciente = historias.filter(h => h.dni === dni);
+        const response = await fetch(`/api/historias?dni=${encodeURIComponent(dni)}`);
+        historiasPaciente = await response.json();
         
         // Actualizar estadísticas
         document.getElementById("totalConsultas").textContent = historiasPaciente.length;
@@ -713,9 +710,6 @@
     form.addEventListener("submit", (e) => e.preventDefault());
 
     async function guardarHistoriaClinicaPost() {
-      if (tieneContextoTurno) {
-        await guardarBorradorInmediato();
-      }
       const consulta = getConsultaTextoPlano();
       const fecha_consulta = document.getElementById("fecha_consulta").value;
       if (!consulta) {
@@ -735,13 +729,14 @@
         datos.fecha_turno = fechaTurnoCtx;
         datos.hora_turno = horaTurnoCtx;
       }
-      try {
-        const sesion = await fetch("/api/session-info").then((r) => r.json());
-        datos.medico = sesion.usuario;
-      } catch (error) {
-        alert("Error al obtener información de sesión");
-        return;
-      }
+      const botonGuardar = document.getElementById("btn-guardar-hc");
+      const botonCerrar = document.getElementById("btn-guardar-cerrar");
+      guardandoHistoria = true;
+      clearTimeout(debounceAuto);
+      botonGuardar.disabled = true;
+      botonCerrar.disabled = true;
+      botonGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+      document.getElementById("autosave-status").textContent = "Guardando historia clínica…";
       try {
         const res = await fetch("/historias", {
           method: "POST",
@@ -750,27 +745,6 @@
         });
         const resultado = await res.json();
         if (res.ok) {
-          if (tieneContextoTurno) {
-            const r2 = await fetch("/api/turnos/estado", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                dni_paciente: dni,
-                fecha: fechaTurnoCtx,
-                hora: horaTurnoCtx,
-                estado: "atendido",
-              }),
-            });
-            if (!r2.ok) {
-              const j2 = await r2.json().catch(() => ({}));
-              alert(
-                "La consulta se guardó, pero no se pudo marcar el turno como atendido: " +
-                  (j2.error || r2.status) +
-                  ". Revisá desde el panel de turnos."
-              );
-            }
-          }
-          alert("Historia clínica guardada correctamente.");
           window.location.href = "/turnos";
           return;
         } else {
@@ -778,6 +752,11 @@
         }
       } catch (error) {
         alert("Error de conexión: " + error.message);
+      } finally {
+        guardandoHistoria = false;
+        botonGuardar.disabled = false;
+        botonCerrar.disabled = false;
+        botonGuardar.innerHTML = '<i class="bi bi-save"></i> Guardar historia clínica';
       }
     }
 
@@ -828,7 +807,9 @@
       restaurarSeleccionEditor();
       actualizarBotonesFormato();
     });
-    editorConsulta.addEventListener("blur", guardarBorradorInmediato);
+    editorConsulta.addEventListener("blur", () => {
+      if (!guardandoHistoria) guardarBorradorInmediato();
+    });
 
     document.addEventListener("selectionchange", () => {
       const sel = window.getSelection();
@@ -843,7 +824,9 @@
       actualizarBotonesFormato();
     });
     document.getElementById("fecha_consulta").addEventListener("change", programarAutosave);
-    document.getElementById("fecha_consulta").addEventListener("blur", guardarBorradorInmediato);
+    document.getElementById("fecha_consulta").addEventListener("blur", () => {
+      if (!guardandoHistoria) guardarBorradorInmediato();
+    });
 
     window.addEventListener("beforeunload", () => {
       if (!tieneContextoTurno) return;

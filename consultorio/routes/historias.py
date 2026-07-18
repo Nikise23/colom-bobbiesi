@@ -1,10 +1,12 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, session
 
 from consultorio.auth.decorators import login_requerido, rol_requerido
-from consultorio.paths import DATA_FILE, PACIENTES_FILE, TURNOS_FILE, timezone_ar
+from consultorio.config import use_database
+from consultorio.paths import DATA_FILE, PACIENTES_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
+from consultorio.storage.queries import update_turno
 from consultorio.utils.helpers import validar_historia
 
 bp = Blueprint("historias", __name__)
@@ -32,7 +34,15 @@ def ver_historia_clinica():
 @login_requerido
 @rol_requerido("medico")
 def obtener_todas_las_historias():
+    dni = request.args.get("dni", "").strip()
+    if dni and use_database():
+        from consultorio.storage import db_storage
+
+        return jsonify(db_storage.load_historias_dni(dni))
+
     historias = cargar_json(DATA_FILE)
+    if dni:
+        historias = [h for h in historias if h.get("dni") == dni]
     return jsonify(historias)
 
 
@@ -41,37 +51,41 @@ def obtener_todas_las_historias():
 @login_requerido
 @rol_requerido("medico")
 def crear_historia():
-    historias = cargar_json(DATA_FILE)
     nueva = dict(request.json or {})
     fecha_turno = nueva.pop("fecha_turno", None)
     hora_turno = nueva.pop("hora_turno", None)
+    nueva["medico"] = session.get("usuario", "")
 
     valido, mensaje = validar_historia(nueva)
     if not valido:
         return jsonify({"error": mensaje}), 400
 
 
-    # Agregar ID único para la consulta
-    nueva["id"] = len(historias) + 1
     nueva["fecha_creacion"] = datetime.now(timezone_ar).isoformat()
 
+    if use_database():
+        from consultorio.storage import db_storage
 
+        db_storage.insert_historia(nueva, fecha_turno, hora_turno)
+        return jsonify({"mensaje": "Consulta registrada correctamente"}), 201
+
+    historias = cargar_json(DATA_FILE)
+    nueva["id"] = max((int(h.get("id") or 0) for h in historias), default=0) + 1
     historias.append(nueva)
     guardar_json(DATA_FILE, historias)
 
     if fecha_turno and hora_turno:
-        turnos = cargar_json(TURNOS_FILE)
-        for t in turnos:
-            if (
-                t.get("dni_paciente") == nueva.get("dni")
-                and t.get("fecha") == fecha_turno
-                and t.get("hora") == hora_turno
-            ):
-                t.pop("borrador_consulta", None)
-                t.pop("borrador_fecha_consulta", None)
-                t.pop("borrador_actualizado", None)
-                break
-        guardar_json(TURNOS_FILE, turnos)
+        update_turno(
+            nueva.get("dni"),
+            fecha_turno,
+            hora_turno,
+            {
+                "estado": "atendido",
+                "borrador_consulta": None,
+                "borrador_fecha_consulta": None,
+                "borrador_actualizado": None,
+            },
+        )
 
     return jsonify({"mensaje": "Consulta registrada correctamente"}), 201
 
@@ -129,15 +143,31 @@ def ver_historias_gestion():
 @login_requerido
 @rol_requerido("medico")
 def buscar_historias():
-    historias = cargar_json(DATA_FILE)
-    pacientes = cargar_json(PACIENTES_FILE)
-    
     # Parámetros de búsqueda
     busqueda = request.args.get("busqueda", "").strip().lower()
-    pagina = int(request.args.get("pagina", 1))
-    por_pagina = int(request.args.get("por_pagina", 10))
+    try:
+        pagina = max(1, int(request.args.get("pagina", 1)))
+        por_pagina = min(50, max(1, int(request.args.get("por_pagina", 10))))
+    except (TypeError, ValueError):
+        pagina, por_pagina = 1, 10
     ordenar_por = request.args.get("ordenar_por", "apellido")
     orden = request.args.get("orden", "asc")
+
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return jsonify(
+            db_storage.buscar_historias_paginado(
+                busqueda,
+                pagina,
+                por_pagina,
+                ordenar_por,
+                orden,
+            )
+        )
+
+    historias = cargar_json(DATA_FILE)
+    pacientes = cargar_json(PACIENTES_FILE)
     
     # Enriquecer historias con datos del paciente
     historias_enriquecidas = []

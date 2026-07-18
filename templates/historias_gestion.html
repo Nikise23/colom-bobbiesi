@@ -186,6 +186,7 @@
     let busquedaTimeout;
     let paginaActual = 1;
     let totalPaginas = 1;
+    let cargarController = null;
     
     document.addEventListener('DOMContentLoaded', function() {
       cargarPacientes();
@@ -196,11 +197,13 @@
       busquedaTimeout = setTimeout(() => {
         paginaActual = 1; // Resetear a primera página al buscar
         cargarPacientes();
-      }, 500); // Esperar 500ms después del último keystroke
+      }, 250);
     }
 
     async function cargarPacientes(pagina = 1) {
       try {
+        if (cargarController) cargarController.abort();
+        cargarController = new AbortController();
         paginaActual = pagina;
         const busqueda = document.getElementById('busqueda').value.trim();
         const ordenarPor = document.getElementById('ordenar-por').value;
@@ -214,7 +217,11 @@
           orden: orden
         });
 
-        const response = await fetch(`/api/historias/buscar?${params}`);
+        document.getElementById('resultado-info').textContent = 'Buscando…';
+        const response = await fetch(`/api/historias/buscar?${params}`, {
+          signal: cargarController.signal,
+          cache: 'no-store'
+        });
         const data = await response.json();
         
         if (response.ok) {
@@ -225,6 +232,7 @@
           mostrarError('Error al cargar pacientes');
         }
       } catch (error) {
+        if (error.name === 'AbortError') return;
         console.error('Error:', error);
         mostrarError('Error de conexión');
       }

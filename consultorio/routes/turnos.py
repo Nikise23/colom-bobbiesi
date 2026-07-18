@@ -128,22 +128,14 @@ def actualizar_estado_turno():
         return jsonify({"error": "Estado inválido"}), 400
 
 
-    turnos = cargar_json(TURNOS_FILE)
-    encontrado = False
-
-
-    for turno in turnos:
-        if turno["dni_paciente"] == dni_paciente and turno["fecha"] == fecha and turno["hora"] == hora:
-            turno["estado"] = nuevo_estado
-            encontrado = True
-            break
-
-
-    if not encontrado:
+    if not update_turno(
+        dni_paciente,
+        fecha,
+        hora,
+        {"estado": nuevo_estado},
+    ):
         return jsonify({"error": "Turno no encontrado"}), 404
 
-
-    guardar_json(TURNOS_FILE, turnos)
     return jsonify({"mensaje": "Estado actualizado correctamente"})
 
 
