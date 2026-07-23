@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from consultorio.paths import PACIENTES_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.utils import agenda_web as aw
+from consultorio.utils.email import avisar_turno_online
 from consultorio.utils.fechas import normalizar_fecha_nacimiento
 
 DIA_EN_ES = {
@@ -329,6 +330,18 @@ def reservar_turno(data: dict) -> tuple[dict, int]:
     turnos.append(turno_nuevo)
     guardar_json(TURNOS_FILE, turnos)
     _RANGO_CACHE.clear()
+
+    try:
+        avisar_turno_online(
+            medico=medico,
+            fecha=fecha,
+            hora=hora,
+            paciente=paciente,
+            paciente_nuevo=creado,
+        )
+    except Exception:
+        # Defensa extra: el aviso nunca debe afectar la reserva
+        pass
 
     return {
         "mensaje": "Turno reservado correctamente",
