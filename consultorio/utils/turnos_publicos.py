@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from consultorio.paths import PACIENTES_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.utils import agenda_web as aw
-from consultorio.utils.email import avisar_turno_online
+from consultorio.utils.email import avisar_turno_online, validar_email
 from consultorio.utils.fechas import normalizar_fecha_nacimiento
 
 DIA_EN_ES = {
@@ -304,6 +304,10 @@ def reservar_turno(data: dict) -> tuple[dict, int]:
     if not all([medico, fecha, hora]):
         return {"error": "Los campos 'medico', 'fecha' y 'hora' son obligatorios"}, 400
 
+    email_paciente, err_email = validar_email(data.get("email"))
+    if err_email:
+        return {"error": err_email}, 400
+
     libres, err = slots_disponibles(medico, fecha)
     if err:
         return {"error": err}, 400
@@ -338,6 +342,7 @@ def reservar_turno(data: dict) -> tuple[dict, int]:
             hora=hora,
             paciente=paciente,
             paciente_nuevo=creado,
+            email_paciente=email_paciente,
         )
     except Exception:
         # Defensa extra: el aviso nunca debe afectar la reserva

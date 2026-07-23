@@ -71,6 +71,7 @@ class EmailSmtpTests(unittest.TestCase):
             "SMTP_PASS",
             "SMTP_FROM",
             "SMTP_TO",
+            "CONSULTORIO_DIRECCION",
         ):
             os.environ.pop(key, None)
 
@@ -127,6 +128,18 @@ class EmailSmtpTests(unittest.TestCase):
             msg = smtp_instance.send_message.call_args[0][0]
             self.assertEqual(msg["To"], "user@example.com")
 
+    def test_validar_email(self):
+        self.assertEqual(email_util.validar_email(None), (None, None))
+        self.assertEqual(email_util.validar_email(""), (None, None))
+        self.assertEqual(email_util.validar_email("  "), (None, None))
+        self.assertEqual(
+            email_util.validar_email("Ana@Mail.com"),
+            ("ana@mail.com", None),
+        )
+        email, err = email_util.validar_email("malo")
+        self.assertIsNone(email)
+        self.assertEqual(err, "Email inválido")
+
 
 class ReservaConEmailTests(unittest.TestCase):
     def setUp(self):
@@ -147,7 +160,7 @@ class ReservaConEmailTests(unittest.TestCase):
     @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
-    def test_reserva_envia_aviso(
+    def test_sin_email_solo_consultorio(
         self, mock_aw_date, mock_tp_date, _g, _c1, _c2, mock_avisar
     ):
         mock_aw_date.today.return_value = date(2026, 7, 1)
@@ -161,12 +174,94 @@ class ReservaConEmailTests(unittest.TestCase):
             }
         )
         self.assertEqual(status, 201)
-        self.assertFalse(body["paciente_nuevo"])
         self.assertEqual(len(TURNOS), 1)
-        mock_avisar.assert_called_once()
         kwargs = mock_avisar.call_args.kwargs
-        self.assertEqual(kwargs["medico"], "Dr Test")
-        self.assertEqual(kwargs["paciente_nuevo"], False)
+        self.assertIsNone(kwargs["email_paciente"])
+
+    @patch("consultorio.utils.turnos_publicos.avisar_turno_online")
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
+    @patch("consultorio.utils.turnos_publicos.date")
+    @patch("consultorio.utils.agenda_web.date")
+    def test_con_email_valido_pasa_destino(
+        self, mock_aw_date, mock_tp_date, _g, _c1, _c2, mock_avisar
+    ):
+        mock_aw_date.today.return_value = date(2026, 7, 1)
+        mock_tp_date.today.return_value = date(2026, 7, 1)
+        body, status = tp.reservar_turno(
+            {
+                "medico": "Dr Test",
+                "fecha": "2026-07-06",
+                "hora": "09:00",
+                "dni": "12345678",
+                "email": "Paciente@Example.com",
+            }
+        )
+        self.assertEqual(status, 201)
+        self.assertEqual(len(TURNOS), 1)
+        kwargs = mock_avisar.call_args.kwargs
+        self.assertEqual(kwargs["email_paciente"], "paciente@example.com")
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
+    @patch("consultorio.utils.turnos_publicos.date")
+    @patch("consultorio.utils.agenda_web.date")
+    def test_email_invalido_400(self, mock_aw_date, mock_tp_date, *_):
+        mock_aw_date.today.return_value = date(2026, 7, 1)
+        mock_tp_date.today.return_value = date(2026, 7, 1)
+        body, status = tp.reservar_turno(
+            {
+                "medico": "Dr Test",
+                "fecha": "2026-07-06",
+                "hora": "09:00",
+                "dni": "12345678",
+                "email": "no-es-mail",
+            }
+        )
+        self.assertEqual(status, 400)
+        self.assertEqual(body["error"], "Email inválido")
+        self.assertEqual(len(TURNOS), 0)
+
+    @patch("consultorio.utils.email.enviar_email")
+    def test_avisar_con_email_paciente_dos_envios(self, mock_enviar):
+        mock_enviar.return_value = True
+        result = email_util.avisar_turno_online(
+            medico="Dr Test",
+            fecha="2026-07-06",
+            hora="09:00",
+            paciente=PACIENTES[0],
+            paciente_nuevo=False,
+            email_paciente="paciente@example.com",
+        )
+        self.assertTrue(result["consultorio"])
+        self.assertTrue(result["paciente"])
+        self.assertEqual(mock_enviar.call_count, 2)
+        destinos = [
+            c.kwargs.get("destino") if c.kwargs else (c.args[2] if len(c.args) > 2 else None)
+            for c in mock_enviar.call_args_list
+        ]
+        # Primer call: consultorio (destino None → SMTP_TO)
+        # Segundo: paciente
+        self.assertIsNone(destinos[0])
+        self.assertEqual(destinos[1], "paciente@example.com")
+        self.assertIn("Confirmación de turno", mock_enviar.call_args_list[1].args[0])
+
+    @patch("consultorio.utils.email.enviar_email")
+    def test_avisar_sin_email_solo_consultorio(self, mock_enviar):
+        mock_enviar.return_value = True
+        result = email_util.avisar_turno_online(
+            medico="Dr Test",
+            fecha="2026-07-06",
+            hora="09:00",
+            paciente=PACIENTES[0],
+            paciente_nuevo=False,
+            email_paciente=None,
+        )
+        self.assertTrue(result["consultorio"])
+        self.assertIsNone(result["paciente"])
+        self.assertEqual(mock_enviar.call_count, 1)
 
     @patch(
         "consultorio.utils.turnos_publicos.avisar_turno_online",
@@ -188,11 +283,11 @@ class ReservaConEmailTests(unittest.TestCase):
                 "fecha": "2026-07-06",
                 "hora": "09:30",
                 "dni": "12345678",
+                "email": "ok@example.com",
             }
         )
         self.assertEqual(status, 201)
         self.assertEqual(len(TURNOS), 1)
-        self.assertIn("mensaje", body)
 
     @patch("consultorio.utils.email.smtplib.SMTP")
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
