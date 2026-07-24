@@ -20,6 +20,26 @@ logger = logging.getLogger(__name__)
 # Formato básico: local@dominio.tld (sin espacios)
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+_DIA_ES = {
+    0: "LUNES",
+    1: "MARTES",
+    2: "MIERCOLES",
+    3: "JUEVES",
+    4: "VIERNES",
+    5: "SABADO",
+    6: "DOMINGO",
+}
+
+
+def formatear_fecha_mail(fecha: str) -> str:
+    """YYYY-MM-DD → 'LUNES 27-07-2026'. Si falla, devuelve la fecha original."""
+    try:
+        dt = datetime.strptime(fecha.strip(), "%Y-%m-%d")
+    except ValueError:
+        return fecha
+    dia = _DIA_ES[dt.weekday()]
+    return f"{dia} {dt.strftime('%d-%m-%Y')}"
+
 
 def smtp_configured() -> bool:
     return bool(
@@ -215,6 +235,7 @@ def _cuerpo_texto_paciente(
     apellido = (paciente.get("apellido") or "").strip()
     saludo = f"{nombre} {apellido}".strip() or "Hola"
     direccion = os.environ.get("CONSULTORIO_DIRECCION", "").strip()
+    fecha_legible = formatear_fecha_mail(fecha)
 
     lineas = [
         f"{saludo},",
@@ -222,7 +243,7 @@ def _cuerpo_texto_paciente(
         "Tu turno en Colom · Bobbiesi quedó confirmado.",
         "",
         f"Médico: {medico}",
-        f"Fecha: {fecha}",
+        f"Fecha: {fecha_legible}",
         f"Hora: {hora}",
     ]
     if direccion:
@@ -254,7 +275,7 @@ def _html_confirmacion_paciente(
     apellido = escape((paciente.get("apellido") or "").strip())
     saludo = f"{nombre} {apellido}".strip() or "Hola"
     medico_e = escape(medico)
-    fecha_e = escape(fecha)
+    fecha_e = escape(formatear_fecha_mail(fecha))
     hora_e = escape(hora)
     direccion = os.environ.get("CONSULTORIO_DIRECCION", "").strip()
     logo_url = os.environ.get("CONSULTORIO_LOGO_URL", "").strip()

@@ -141,6 +141,13 @@ class EmailSmtpTests(unittest.TestCase):
         self.assertIn("BEGIN:VEVENT", ics)
         self.assertIn("20260727T090000", ics)
 
+    def test_formatear_fecha_mail(self):
+        self.assertEqual(
+            email_util.formatear_fecha_mail("2026-07-27"),
+            "LUNES 27-07-2026",
+        )
+        self.assertEqual(email_util.formatear_fecha_mail("mala"), "mala")
+
 
 class ReservaConEmailTests(unittest.TestCase):
     def setUp(self):
@@ -241,6 +248,7 @@ class ReservaConEmailTests(unittest.TestCase):
         self.assertIn("Confirmación de turno", call.args[0])
         self.assertIn("html", call.kwargs)
         self.assertIn("Guardar en el calendario", call.kwargs["html"])
+        self.assertIn("LUNES 06-07-2026", call.kwargs["html"])
         self.assertIn("ics_content", call.kwargs)
         self.assertIn("BEGIN:VCALENDAR", call.kwargs["ics_content"])
 
