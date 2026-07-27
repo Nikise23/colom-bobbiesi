@@ -229,6 +229,16 @@ def turno_publico(turno: dict) -> dict:
     }
 
 
+def paciente_existe(dni: str) -> tuple[bool | None, str | None]:
+    """Devuelve (existe, error). Solo indica existencia; no expone datos del paciente."""
+    err = _validar_dni(dni)
+    if err:
+        return None, err
+    pacientes = cargar_json(PACIENTES_FILE)
+    existe = any(p.get("dni") == dni for p in pacientes)
+    return existe, None
+
+
 def listar_turnos_paciente(dni: str, solo_futuros: bool = True) -> list[dict]:
     turnos = cargar_json(TURNOS_FILE)
     hoy = date.today().isoformat()
@@ -270,7 +280,6 @@ def _obtener_o_crear_paciente(data: dict) -> tuple[dict | None, str | None, bool
         "apellido",
         "celular",
         "obra_social",
-        "numero_obra_social",
         "fecha_nacimiento",
     ]
     for campo in campos:
@@ -287,7 +296,7 @@ def _obtener_o_crear_paciente(data: dict) -> tuple[dict | None, str | None, bool
         "apellido": str(data["apellido"]).strip(),
         "celular": str(data["celular"]).strip(),
         "obra_social": str(data["obra_social"]).strip(),
-        "numero_obra_social": str(data["numero_obra_social"]).strip(),
+        "numero_obra_social": str(data.get("numero_obra_social") or "").strip(),
         "fecha_nacimiento": fecha_nac,
         "fecha_registro": datetime.now(timezone_ar).isoformat(),
     }

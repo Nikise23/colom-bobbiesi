@@ -257,6 +257,9 @@ def _cuerpo_texto_paciente(
         [
             "Guardá este mail o agregalo a tu calendario.",
             "",
+            "Recuerde que su obra social puede estar sujeta a un copago. "
+            "Cualquier duda contactarse por WhatsApp.",
+            "",
             "Colom · Bobbiesi",
         ]
     )
@@ -349,6 +352,11 @@ def _html_confirmacion_paciente(
             {calendar_block}
             <p style="margin:16px 0 0;font-size:13px;color:#6c757d;line-height:1.5;">
               Guardá este mail o agregalo a tu calendario.
+            </p>
+            <p style="margin:16px 0 0;padding:12px 14px;background:#f7fafc;border:1px solid #e3eaf1;
+                       border-radius:8px;font-size:13px;color:#5a6a7a;line-height:1.5;">
+              Recuerde que su obra social puede estar sujeta a un copago.
+              Cualquier duda contactarse por WhatsApp.
             </p>
           </td>
         </tr>

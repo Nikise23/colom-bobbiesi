@@ -9,6 +9,7 @@ from consultorio.utils.turnos_publicos import (
     listar_turnos_paciente,
     max_dias_por_request,
     max_dias_reserva,
+    paciente_existe,
     reservar_turno,
     slots_disponibles,
     slots_disponibles_rango_cached,
@@ -88,6 +89,7 @@ def public_api_info():
             "max_dias_por_request": max_dias_por_request(),
             "endpoints": {
                 "medicos": "GET /api/public/v1/medicos",
+                "paciente": "GET /api/public/v1/pacientes?dni=...",
                 "disponibilidad": "GET /api/public/v1/disponibilidad?medico=...&fecha=YYYY-MM-DD",
                 "disponibilidad_rango": (
                     "GET /api/public/v1/disponibilidad-rango?"
@@ -99,6 +101,16 @@ def public_api_info():
             },
         }
     )
+
+
+@bp.route("/api/public/v1/pacientes", methods=["GET"], endpoint="public_paciente_existe")
+@public_api_auth
+def public_paciente_existe():
+    dni = (request.args.get("dni") or "").strip()
+    existe, err = paciente_existe(dni)
+    if err:
+        return jsonify({"error": err}), 400
+    return jsonify({"dni": dni, "existe": existe})
 
 
 @bp.route("/api/public/v1/medicos", methods=["GET"], endpoint="public_medicos")
