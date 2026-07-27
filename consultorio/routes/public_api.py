@@ -6,6 +6,7 @@ from consultorio.config import public_api_configured, public_api_key, public_api
 from consultorio.utils.turnos_publicos import (
     cancelar_turno,
     listar_medicos,
+    listar_medicos_detalle,
     listar_turnos_paciente,
     max_dias_por_request,
     max_dias_reserva,
@@ -88,7 +89,7 @@ def public_api_info():
             "max_dias_reserva": max_dias_reserva(),
             "max_dias_por_request": max_dias_por_request(),
             "endpoints": {
-                "medicos": "GET /api/public/v1/medicos",
+                "medicos": "GET /api/public/v1/medicos (incluye detalle.agenda)",
                 "paciente": "GET /api/public/v1/pacientes?dni=...",
                 "disponibilidad": "GET /api/public/v1/disponibilidad?medico=...&fecha=YYYY-MM-DD",
                 "disponibilidad_rango": (
@@ -116,7 +117,13 @@ def public_paciente_existe():
 @bp.route("/api/public/v1/medicos", methods=["GET"], endpoint="public_medicos")
 @public_api_auth
 def public_medicos():
-    return jsonify({"medicos": listar_medicos()})
+    detalle = listar_medicos_detalle()
+    return jsonify(
+        {
+            "medicos": [m["nombre"] for m in detalle] or listar_medicos(),
+            "detalle": detalle,
+        }
+    )
 
 
 @bp.route("/api/public/v1/disponibilidad", methods=["GET"], endpoint="public_disponibilidad")

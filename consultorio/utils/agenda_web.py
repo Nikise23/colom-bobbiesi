@@ -27,6 +27,18 @@ DIA_EN_ES = {
     "SATURDAY": "SABADO",
 }
 
+DIA_LABEL_ES = {
+    "LUNES": "lunes",
+    "MARTES": "martes",
+    "MIERCOLES": "miércoles",
+    "JUEVES": "jueves",
+    "VIERNES": "viernes",
+    "SABADO": "sábado",
+}
+
+# Corte típico consultorio: antes de 13:00 = mañana, desde 13:00 = tarde.
+_CORTE_TARDE = "13:00"
+
 
 def normalizar_hora(hora) -> str | None:
     if hora is None:
@@ -189,6 +201,81 @@ def listar_medicos_visibles() -> list[str]:
     return sorted(
         m for m, cfg in web.items() if cfg.get("visible") and any(cfg.get("dias", {}).values())
     )
+
+
+def _periodo_del_dia(horas: list[str]) -> str | None:
+    """Devuelve 'mañana', 'tarde' o 'mañana y tarde' según los horarios."""
+    validas = [h for h in horas if isinstance(h, str) and h.strip()]
+    if not validas:
+        return None
+    manana = any(h < _CORTE_TARDE for h in validas)
+    tarde = any(h >= _CORTE_TARDE for h in validas)
+    if manana and tarde:
+        return "mañana y tarde"
+    if manana:
+        return "mañana"
+    return "tarde"
+
+
+def _unir_dias(dias: list[str]) -> str:
+    if not dias:
+        return ""
+    if len(dias) == 1:
+        return dias[0].capitalize()
+    if len(dias) == 2:
+        return f"{dias[0].capitalize()} y {dias[1]}"
+    return f"{', '.join(d.capitalize() if i == 0 else d for i, d in enumerate(dias[:-1]))} y {dias[-1]}"
+
+
+def resumen_atencion(dias: dict | None) -> str:
+    """
+    Texto legible de días/momento a partir de la agenda web.
+    Ej: 'Miércoles y viernes por la tarde'
+    """
+    if not isinstance(dias, dict):
+        return ""
+
+    grupos: dict[str, list[str]] = {}
+    for dia in DIAS_AGENDA:
+        horas = dias.get(dia) or []
+        if not isinstance(horas, list):
+            continue
+        periodo = _periodo_del_dia(horas)
+        if not periodo:
+            continue
+        grupos.setdefault(periodo, []).append(DIA_LABEL_ES.get(dia, dia.lower()))
+
+    partes: list[str] = []
+    # Orden preferido: mañana → tarde → mañana y tarde
+    for periodo in ("mañana", "tarde", "mañana y tarde"):
+        lista = grupos.get(periodo)
+        if not lista:
+            continue
+        dias_txt = _unir_dias(lista)
+        if periodo == "mañana y tarde":
+            partes.append(f"{dias_txt} por la mañana y la tarde")
+        else:
+            partes.append(f"{dias_txt} por la {periodo}")
+    return ". ".join(partes)
+
+
+def listar_medicos_con_agenda() -> list[dict]:
+    """Médicos visibles con resumen de atención según agenda web."""
+    ensure_seed_from_internal()
+    web = load_agenda_web()
+    resultado = []
+    for medico in sorted(web.keys()):
+        cfg = web.get(medico) or {}
+        dias = cfg.get("dias") or {}
+        if not cfg.get("visible") or not any(dias.values() if isinstance(dias, dict) else []):
+            continue
+        resultado.append(
+            {
+                "nombre": medico,
+                "agenda": resumen_atencion(dias),
+            }
+        )
+    return resultado
 
 
 def _agenda_web_medico(medico: str) -> tuple[dict | None, str | None]:

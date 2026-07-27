@@ -220,6 +220,10 @@ def listar_medicos() -> list[str]:
     return aw.listar_medicos_visibles()
 
 
+def listar_medicos_detalle() -> list[dict]:
+    return aw.listar_medicos_con_agenda()
+
+
 def turno_publico(turno: dict) -> dict:
     return {
         "medico": turno.get("medico"),

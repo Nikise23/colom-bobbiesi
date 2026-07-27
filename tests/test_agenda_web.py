@@ -90,7 +90,17 @@ class AgendaWebPublicTests(unittest.TestCase):
         self.assertEqual(tp.listar_medicos(), ["Dr Test"])
         res = self.client.get("/api/public/v1/medicos", headers=self.headers)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.get_json()["medicos"], ["Dr Test"])
+        body = res.get_json()
+        self.assertEqual(body["medicos"], ["Dr Test"])
+        self.assertEqual(
+            body["detalle"],
+            [
+                {
+                    "nombre": "Dr Test",
+                    "agenda": "Lunes y viernes por la mañana. Martes por la tarde",
+                }
+            ],
+        )
 
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
