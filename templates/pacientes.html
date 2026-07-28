@@ -573,13 +573,19 @@
       try {
         const response = await fetch('/api/pacientes/estadisticas');
         const stats = await response.json();
-        document.getElementById('footer-total-pacientes').textContent = stats.total;
+        const totalEl = document.getElementById('footer-total-pacientes');
+        if (totalEl) {
+          totalEl.textContent = stats.total;
+        }
         
         // Obtener turnos de hoy
         const hoy = new Date().toISOString().split('T')[0];
         const turnosResponse = await fetch(`/api/turnos/dia?fecha=${hoy}`);
         const turnos = await turnosResponse.json();
-        document.getElementById('footer-turnos-hoy').textContent = turnos.length;
+        const turnosEl = document.getElementById('footer-turnos-hoy');
+        if (turnosEl) {
+          turnosEl.textContent = turnos.length;
+        }
       } catch (error) {
         console.error('Error actualizando footer:', error);
       }
@@ -593,7 +599,10 @@
         minute: '2-digit',
         second: '2-digit'
       });
-      document.getElementById('footer-hora-actual').textContent = hora;
+      const horaEl = document.getElementById('footer-hora-actual');
+      if (horaEl) {
+        horaEl.textContent = hora;
+      }
       
       // Actualizar cada segundo
       setTimeout(actualizarHora, 1000);
