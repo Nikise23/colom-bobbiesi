@@ -17,6 +17,11 @@ def normalizar_fecha_dia(value: str | None) -> str | None:
     return normalizar_fecha_nacimiento(value)
 
 
+def _anio_nacimiento_valido(anio: int) -> bool:
+    hoy = hoy_ar()
+    return 1900 <= anio <= hoy.year
+
+
 def normalizar_fecha_nacimiento(value: str | None) -> str | None:
     """Convierte dd/mm/yyyy, yyyy-mm-dd u ISO con hora a yyyy-mm-dd."""
     if not value or not str(value).strip():
@@ -29,12 +34,23 @@ def normalizar_fecha_nacimiento(value: str | None) -> str | None:
     digits = "".join(ch for ch in texto if ch.isdigit())
     if len(digits) == 8:
         try:
-            return datetime.strptime(digits, "%d%m%Y").date().isoformat()
+            fecha = datetime.strptime(digits, "%d%m%Y").date()
+            return fecha.isoformat() if _anio_nacimiento_valido(fecha.year) else None
         except ValueError:
             pass
-    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+    formatos = (
+        ("%d/%m/%Y", r"^\d{2}/\d{2}/\d{4}$"),
+        ("%Y-%m-%d", r"^\d{4}-\d{2}-\d{2}$"),
+        ("%d-%m-%Y", r"^\d{2}-\d{2}-\d{4}$"),
+    )
+    for fmt, patron in formatos:
+        import re
+
+        if not re.fullmatch(patron, texto):
+            continue
         try:
-            return datetime.strptime(texto, fmt).date().isoformat()
+            fecha = datetime.strptime(texto, fmt).date()
+            return fecha.isoformat() if _anio_nacimiento_valido(fecha.year) else None
         except ValueError:
             continue
     return None

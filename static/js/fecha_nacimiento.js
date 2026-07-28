@@ -3,6 +3,11 @@
     return String(valor || "").replace(/\D/g, "").slice(0, maxLen);
   }
 
+  function anioNacimientoValido(anio) {
+    const actual = new Date().getFullYear();
+    return anio >= 1900 && anio <= actual;
+  }
+
   function formatearFechaInput(valor) {
     // Si viene ISO (yyyy-mm-dd), convertir a dd/mm/aaaa
     const texto = String(valor || "").trim();
@@ -22,8 +27,12 @@
     const normalizado = formatearFechaInput(valor);
     const partes = String(normalizado).trim().split("/");
     if (partes.length !== 3) return null;
-    const [dia, mes, anio] = partes.map(Number);
-    if (!dia || !mes || !anio || String(partes[2]).length !== 4) return null;
+    const [diaTxt, mesTxt, anioTxt] = partes;
+    if (anioTxt.length !== 4) return null;
+    const dia = Number(diaTxt);
+    const mes = Number(mesTxt);
+    const anio = Number(anioTxt);
+    if (!dia || !mes || !anio || !anioNacimientoValido(anio)) return null;
     const fecha = new Date(anio, mes - 1, dia);
     if (
       fecha.getFullYear() !== anio ||
@@ -101,6 +110,11 @@
     function onChange() {
       aplicarMascaraFecha(input);
       actualizarEdadCampo(input.value, edadId);
+      if (input.value.length === 10 && !parseFechaNacimiento(input.value)) {
+        input.setCustomValidity("La fecha debe ser válida y tener formato dd/mm/aaaa");
+      } else {
+        input.setCustomValidity("");
+      }
     }
 
     input.addEventListener("input", onChange);
