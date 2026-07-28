@@ -103,7 +103,9 @@
     }
     input.dataset.fechaMaskBound = "1";
     input.setAttribute("inputmode", "numeric");
-    input.setAttribute("autocomplete", "bday");
+    // Es un formulario administrativo, no conviene que el navegador
+    // autocomplemente con la fecha de nacimiento del perfil del usuario.
+    input.setAttribute("autocomplete", "off");
     input.setAttribute("maxlength", "10");
     input.setAttribute("placeholder", input.getAttribute("placeholder") || "dd/mm/aaaa");
 
