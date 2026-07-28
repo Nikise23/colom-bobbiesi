@@ -551,7 +551,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/js/fecha_nacimiento.js?v=3"></script>
+  <script src="/static/js/fecha_nacimiento.js?v=4"></script>
   <script>
     // Variable para almacenar el DNI del último paciente registrado
     let ultimoPacienteRegistrado = null;
@@ -1006,6 +1006,7 @@
       document.getElementById("apellido").value = p.apellido;
       const fechaInput = document.getElementById("fecha_nacimiento");
       fechaInput.value = formatearFechaInput(p.fecha_nacimiento || "");
+      fechaInput.dispatchEvent(new Event("input"));
       actualizarEdadCampo(fechaInput.value, "edad");
       document.getElementById("obra_social").value = p.obra_social;
       document.getElementById("numero_obra_social").value = p.numero_obra_social;
