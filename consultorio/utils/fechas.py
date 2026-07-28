@@ -31,16 +31,9 @@ def normalizar_fecha_nacimiento(value: str | None) -> str | None:
         texto = texto.split("T", 1)[0]
     elif " " in texto:
         texto = texto.split(" ", 1)[0]
-    digits = "".join(ch for ch in texto if ch.isdigit())
-    if len(digits) == 8:
-        try:
-            fecha = datetime.strptime(digits, "%d%m%Y").date()
-            return fecha.isoformat() if _anio_nacimiento_valido(fecha.year) else None
-        except ValueError:
-            pass
     formatos = (
-        ("%d/%m/%Y", r"^\d{2}/\d{2}/\d{4}$"),
         ("%Y-%m-%d", r"^\d{4}-\d{2}-\d{2}$"),
+        ("%d/%m/%Y", r"^\d{2}/\d{2}/\d{4}$"),
         ("%d-%m-%Y", r"^\d{2}-\d{2}-\d{4}$"),
     )
     for fmt, patron in formatos:
@@ -53,6 +46,15 @@ def normalizar_fecha_nacimiento(value: str | None) -> str | None:
             return fecha.isoformat() if _anio_nacimiento_valido(fecha.year) else None
         except ValueError:
             continue
+
+    digits = "".join(ch for ch in texto if ch.isdigit())
+    if len(digits) == 8:
+        try:
+            fecha = datetime.strptime(digits, "%d%m%Y").date()
+            if _anio_nacimiento_valido(fecha.year):
+                return fecha.isoformat()
+        except ValueError:
+            pass
     return None
 
 
