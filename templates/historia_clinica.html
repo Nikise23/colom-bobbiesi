@@ -327,6 +327,27 @@
       return el.innerHTML;
     }
 
+    function pareceHtmlConsulta(texto) {
+      if (!texto) return false;
+      return /<[a-z][\s\S]*>/i.test(texto) || /&(?:nbsp|amp|lt|gt|#\d+|#x[\da-f]+);/i.test(texto);
+    }
+
+    function normalizarEspaciosConsulta(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      const walker = document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT);
+      const nodos = [];
+      while (walker.nextNode()) nodos.push(walker.currentNode);
+      nodos.forEach((n) => {
+        n.nodeValue = (n.nodeValue || '').replace(/\u00a0/g, ' ');
+      });
+      return tmp.innerHTML
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
+    }
+
     function sanitizeConsultaHtml(html) {
       const tmp = document.createElement('div');
       tmp.innerHTML = html || '';
@@ -345,18 +366,18 @@
         [...node.childNodes].forEach(clean);
       }
       [...tmp.childNodes].forEach(clean);
-      return tmp.innerHTML;
+      return normalizarEspaciosConsulta(tmp.innerHTML);
     }
 
     function htmlATextoPlano(html) {
       const tmp = document.createElement('div');
       tmp.innerHTML = html || '';
-      return (tmp.innerText || tmp.textContent || '').trim();
+      return (tmp.innerText || tmp.textContent || '').replace(/\u00a0/g, ' ').trim();
     }
 
     function renderConsultaParaVista(texto) {
       if (!texto) return 'Sin detalles de consulta';
-      if (/<[a-z][\s\S]*>/i.test(texto)) {
+      if (pareceHtmlConsulta(texto)) {
         return sanitizeConsultaHtml(texto);
       }
       return escapeHtmlHc(texto).replace(/\n/g, '<br>');
@@ -377,7 +398,7 @@
         editorConsulta.innerHTML = '';
         return;
       }
-      if (/<[a-z][\s\S]*>/i.test(contenido)) {
+      if (pareceHtmlConsulta(contenido)) {
         editorConsulta.innerHTML = sanitizeConsultaHtml(contenido);
       } else {
         editorConsulta.innerText = contenido;

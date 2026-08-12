@@ -60,6 +60,27 @@ def _guardar(path, data):
         TURNOS.extend(data)
 
 
+def _get_turno(dni, fecha, hora):
+    for t in TURNOS:
+        if t.get("dni_paciente") == dni and t.get("fecha") == fecha and t.get("hora") == hora:
+            return dict(t)
+    return None
+
+
+def _insert_turno(item):
+    nuevo = dict(item)
+    TURNOS.append(nuevo)
+    return nuevo
+
+
+def _delete_turno(dni, fecha, hora):
+    for i, t in enumerate(TURNOS):
+        if t.get("dni_paciente") == dni and t.get("fecha") == fecha and t.get("hora") == hora:
+            TURNOS.pop(i)
+            return True
+    return False
+
+
 class EmailSmtpTests(unittest.TestCase):
     def setUp(self):
         self._env = os.environ.copy()
@@ -163,13 +184,14 @@ class ReservaConEmailTests(unittest.TestCase):
         tp._RANGO_CACHE.clear()
 
     @patch("consultorio.utils.turnos_publicos.avisar_turno_online")
+    @patch("consultorio.utils.turnos_publicos.insert_turno", side_effect=_insert_turno)
+    @patch("consultorio.utils.turnos_publicos.get_turno", side_effect=_get_turno)
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
-    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
     def test_sin_email_pasa_none(
-        self, mock_aw_date, mock_tp_date, _g, _c1, _c2, mock_avisar
+        self, mock_aw_date, mock_tp_date, _c1, _c2, _get, _ins, mock_avisar
     ):
         mock_aw_date.today.return_value = date(2026, 7, 1)
         mock_tp_date.today.return_value = date(2026, 7, 1)
@@ -185,13 +207,14 @@ class ReservaConEmailTests(unittest.TestCase):
         self.assertIsNone(mock_avisar.call_args.kwargs["email_paciente"])
 
     @patch("consultorio.utils.turnos_publicos.avisar_turno_online")
+    @patch("consultorio.utils.turnos_publicos.insert_turno", side_effect=_insert_turno)
+    @patch("consultorio.utils.turnos_publicos.get_turno", side_effect=_get_turno)
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
-    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
     def test_con_email_valido_pasa_destino(
-        self, mock_aw_date, mock_tp_date, _g, _c1, _c2, mock_avisar
+        self, mock_aw_date, mock_tp_date, _c1, _c2, _get, _ins, mock_avisar
     ):
         mock_aw_date.today.return_value = date(2026, 7, 1)
         mock_tp_date.today.return_value = date(2026, 7, 1)
@@ -209,9 +232,10 @@ class ReservaConEmailTests(unittest.TestCase):
             mock_avisar.call_args.kwargs["email_paciente"], "paciente@example.com"
         )
 
+    @patch("consultorio.utils.turnos_publicos.insert_turno", side_effect=_insert_turno)
+    @patch("consultorio.utils.turnos_publicos.get_turno", side_effect=_get_turno)
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
-    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
     def test_email_invalido_400(self, mock_aw_date, mock_tp_date, *_):
@@ -270,13 +294,14 @@ class ReservaConEmailTests(unittest.TestCase):
         "consultorio.utils.turnos_publicos.avisar_turno_online",
         side_effect=RuntimeError("smtp down"),
     )
+    @patch("consultorio.utils.turnos_publicos.insert_turno", side_effect=_insert_turno)
+    @patch("consultorio.utils.turnos_publicos.get_turno", side_effect=_get_turno)
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
-    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
     def test_reserva_ok_aunque_mail_falle(
-        self, mock_aw_date, mock_tp_date, _g, _c1, _c2, _avisar
+        self, mock_aw_date, mock_tp_date, _c1, _c2, _get, _ins, _avisar
     ):
         mock_aw_date.today.return_value = date(2026, 7, 1)
         mock_tp_date.today.return_value = date(2026, 7, 1)
@@ -293,13 +318,14 @@ class ReservaConEmailTests(unittest.TestCase):
         self.assertEqual(len(TURNOS), 1)
 
     @patch("consultorio.utils.email.smtplib.SMTP")
+    @patch("consultorio.utils.turnos_publicos.insert_turno", side_effect=_insert_turno)
+    @patch("consultorio.utils.turnos_publicos.get_turno", side_effect=_get_turno)
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
-    @patch("consultorio.utils.turnos_publicos.guardar_json", side_effect=_guardar)
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
     def test_sin_smtp_env_no_llama_smtp(
-        self, mock_aw_date, mock_tp_date, _g, _c1, _c2, mock_smtp
+        self, mock_aw_date, mock_tp_date, _c1, _c2, _get, _ins, mock_smtp
     ):
         for key in ("SMTP_HOST", "SMTP_USER", "SMTP_PASS"):
             os.environ.pop(key, None)

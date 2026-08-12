@@ -32,6 +32,67 @@ def insert_pago(pago: dict) -> dict:
     return nuevo
 
 
+def get_turno(dni_paciente: str, fecha: str, hora: str) -> dict | None:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.get_turno(dni_paciente, fecha, hora)
+
+    hora_n = str(hora or "").strip()
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    for turno in cargar_json(TURNOS_FILE):
+        if turno.get("dni_paciente") != dni_paciente:
+            continue
+        if str(turno.get("hora") or "").strip() != hora_n:
+            continue
+        tf = normalizar_fecha_dia(turno.get("fecha")) or str(turno.get("fecha") or "").strip()[:10]
+        if tf == f or turno.get("fecha") == fecha:
+            return copy.deepcopy(turno)
+    return None
+
+
+def insert_turno(item: dict) -> dict:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.insert_turno(item)
+
+    turnos = cargar_json(TURNOS_FILE)
+    nuevo = copy.deepcopy(item)
+    if nuevo.get("fecha"):
+        nuevo["fecha"] = normalizar_fecha_dia(nuevo["fecha"]) or str(nuevo["fecha"]).strip()[:10]
+    turnos.append(nuevo)
+    guardar_json(TURNOS_FILE, turnos)
+    return nuevo
+
+
+def delete_turno(dni_paciente: str, fecha: str, hora: str) -> bool:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        return db_storage.delete_turno(dni_paciente, fecha, hora)
+
+    turnos = cargar_json(TURNOS_FILE)
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    hora_n = str(hora or "").strip()
+    nuevos = []
+    borrado = False
+    for turno in turnos:
+        tf = normalizar_fecha_dia(turno.get("fecha")) or str(turno.get("fecha") or "").strip()[:10]
+        mismo = (
+            turno.get("dni_paciente") == dni_paciente
+            and str(turno.get("hora") or "").strip() == hora_n
+            and (tf == f or turno.get("fecha") == fecha)
+        )
+        if mismo and not borrado:
+            borrado = True
+            continue
+        nuevos.append(turno)
+    if borrado:
+        guardar_json(TURNOS_FILE, nuevos)
+    return borrado
+
+
 def update_turno(dni_paciente: str, fecha: str, hora: str, campos: dict) -> bool:
     if use_database():
         from consultorio.storage import db_storage
@@ -39,11 +100,14 @@ def update_turno(dni_paciente: str, fecha: str, hora: str, campos: dict) -> bool
         return db_storage.update_turno(dni_paciente, fecha, hora, campos)
 
     turnos = cargar_json(TURNOS_FILE)
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    hora_n = str(hora or "").strip()
     for turno in turnos:
+        tf = normalizar_fecha_dia(turno.get("fecha")) or str(turno.get("fecha") or "").strip()[:10]
         if (
             turno.get("dni_paciente") == dni_paciente
-            and turno.get("fecha") == fecha
-            and turno.get("hora") == hora
+            and str(turno.get("hora") or "").strip() == hora_n
+            and (tf == f or turno.get("fecha") == fecha)
         ):
             turno.update(campos)
             guardar_json(TURNOS_FILE, turnos)

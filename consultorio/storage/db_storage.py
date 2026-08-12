@@ -677,12 +677,8 @@ def insert_historia(
     db.session.add(row)
 
     if fecha_turno and hora_turno:
-        turno = Turno.query.filter_by(
-            dni_paciente=item["dni"],
-            fecha=fecha_turno,
-            hora=_normalizar_hora(hora_turno),
-        ).first()
-        if turno:
+        turno = _buscar_turno_row(item["dni"], fecha_turno, hora_turno)
+        if turno and (not item.get("medico") or turno.medico == item.get("medico")):
             turno.estado = "atendido"
             turno.borrador_consulta = None
             turno.borrador_fecha_consulta = None
@@ -776,11 +772,63 @@ def pago_existe(dni: str, fecha: str, hora: str | None = None) -> bool:
     return query.first() is not None
 
 
-def update_turno(dni_paciente: str, fecha: str, hora: str, campos: dict) -> bool:
+def _buscar_turno_row(dni_paciente: str, fecha: str, hora: str):
     hora_norm = _normalizar_hora(hora)
-    row = Turno.query.filter_by(
+    f = normalizar_fecha_dia(fecha) or str(fecha).strip()[:10]
+    row = (
+        Turno.query.filter(
+            Turno.dni_paciente == dni_paciente,
+            func.substr(Turno.fecha, 1, 10) == f,
+            Turno.hora == hora_norm,
+        ).first()
+    )
+    if row:
+        return row
+    return Turno.query.filter_by(
         dni_paciente=dni_paciente, fecha=fecha, hora=hora_norm
     ).first()
+
+
+def get_turno(dni_paciente: str, fecha: str, hora: str) -> dict | None:
+    row = _buscar_turno_row(dni_paciente, fecha, hora)
+    return row.to_dict() if row else None
+
+
+def insert_turno(item: dict) -> dict:
+    hora = _normalizar_hora(item.get("hora"))
+    fecha = normalizar_fecha_dia(item.get("fecha")) or str(item.get("fecha") or "").strip()[:10]
+    row = Turno(
+        medico=item.get("medico", ""),
+        fecha=fecha,
+        hora=hora,
+        dni_paciente=item["dni_paciente"],
+        estado=item.get("estado", "sin atender"),
+        observacion=item.get("observacion"),
+        hora_recepcion=_normalizar_hora(item.get("hora_recepcion")) or None,
+        hora_sala_espera=_normalizar_hora(item.get("hora_sala_espera")) or None,
+        pago_registrado=item.get("pago_registrado"),
+        monto_pagado=item.get("monto_pagado"),
+        observacion_pago=item.get("observacion_pago"),
+        borrador_consulta=item.get("borrador_consulta"),
+        borrador_fecha_consulta=item.get("borrador_fecha_consulta"),
+        borrador_actualizado=item.get("borrador_actualizado"),
+    )
+    db.session.add(row)
+    db.session.commit()
+    return row.to_dict()
+
+
+def delete_turno(dni_paciente: str, fecha: str, hora: str) -> bool:
+    row = _buscar_turno_row(dni_paciente, fecha, hora)
+    if not row:
+        return False
+    db.session.delete(row)
+    db.session.commit()
+    return True
+
+
+def update_turno(dni_paciente: str, fecha: str, hora: str, campos: dict) -> bool:
+    row = _buscar_turno_row(dni_paciente, fecha, hora)
     if not row:
         return False
     for key, value in campos.items():
@@ -788,6 +836,8 @@ def update_turno(dni_paciente: str, fecha: str, hora: str, campos: dict) -> bool
             continue
         if key in ("hora_recepcion", "hora_sala_espera", "hora") and value:
             value = _normalizar_hora(value) or value
+        if key == "fecha" and value:
+            value = normalizar_fecha_dia(value) or str(value).strip()[:10]
         setattr(row, key, value)
     db.session.commit()
     return True

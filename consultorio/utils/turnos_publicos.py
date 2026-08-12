@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 
 from consultorio.paths import PACIENTES_FILE, TURNOS_FILE, timezone_ar
 from consultorio.storage import cargar_json, guardar_json
+from consultorio.storage.queries import delete_turno, get_turno, insert_turno, load_turnos_fecha
 from consultorio.utils import agenda_web as aw
 from consultorio.utils.email import avisar_turno_online, validar_email
 from consultorio.utils.fechas import normalizar_fecha_nacimiento
@@ -334,18 +335,19 @@ def reservar_turno(data: dict) -> tuple[dict, int]:
     obs_raw = data.get("observacion")
     observacion = (obs_raw.strip()[:500] if isinstance(obs_raw, str) else "") or ""
 
-    turnos = cargar_json(TURNOS_FILE)
-    turno_nuevo = {
-        "medico": medico,
-        "hora": hora,
-        "fecha": fecha,
-        "dni_paciente": paciente["dni"],
-        "estado": "sin atender",
-        "observacion": observacion,
-        "origen": "api_publica",
-    }
-    turnos.append(turno_nuevo)
-    guardar_json(TURNOS_FILE, turnos)
+    if get_turno(paciente["dni"], fecha, hora):
+        return {"error": "El paciente ya tiene un turno en esa fecha y hora"}, 409
+
+    turno_nuevo = insert_turno(
+        {
+            "medico": medico,
+            "hora": hora,
+            "fecha": fecha,
+            "dni_paciente": paciente["dni"],
+            "estado": "sin atender",
+            "observacion": observacion,
+        }
+    )
     _RANGO_CACHE.clear()
 
     try:
@@ -375,21 +377,15 @@ def cancelar_turno(dni: str, fecha: str, hora: str) -> tuple[dict, int]:
     if not fecha or not hora:
         return {"error": "Los campos 'fecha' y 'hora' son obligatorios"}, 400
 
-    turnos = cargar_json(TURNOS_FILE)
-    for i, turno in enumerate(turnos):
-        if (
-            turno.get("dni_paciente") == dni
-            and turno.get("fecha") == fecha
-            and turno.get("hora") == hora
-        ):
-            estado = turno.get("estado", "sin atender")
-            if estado not in ESTADOS_CANCELABLES:
-                return {
-                    "error": f"No se puede cancelar un turno en estado '{estado}'"
-                }, 400
-            turnos.pop(i)
-            guardar_json(TURNOS_FILE, turnos)
-            _RANGO_CACHE.clear()
-            return {"mensaje": "Turno cancelado correctamente"}, 200
-
-    return {"error": "Turno no encontrado"}, 404
+    turno = get_turno(dni, fecha, hora)
+    if not turno:
+        return {"error": "Turno no encontrado"}, 404
+    estado = turno.get("estado", "sin atender")
+    if estado not in ESTADOS_CANCELABLES:
+        return {
+            "error": f"No se puede cancelar un turno en estado '{estado}'"
+        }, 400
+    if not delete_turno(dni, fecha, hora):
+        return {"error": "Turno no encontrado"}, 404
+    _RANGO_CACHE.clear()
+    return {"mensaje": "Turno cancelado correctamente"}, 200

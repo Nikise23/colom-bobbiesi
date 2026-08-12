@@ -54,12 +54,21 @@ def crear_historia():
     nueva = dict(request.json or {})
     fecha_turno = nueva.pop("fecha_turno", None)
     hora_turno = nueva.pop("hora_turno", None)
-    nueva["medico"] = session.get("usuario", "")
+    usuario_medico = session.get("usuario", "")
+    nueva["medico"] = usuario_medico
 
     valido, mensaje = validar_historia(nueva)
     if not valido:
         return jsonify({"error": mensaje}), 400
 
+    if fecha_turno and hora_turno:
+        from consultorio.storage.queries import get_turno
+
+        turno = get_turno(nueva.get("dni"), fecha_turno, hora_turno)
+        if not turno:
+            return jsonify({"error": "Turno no encontrado"}), 404
+        if turno.get("medico") != usuario_medico:
+            return jsonify({"error": "No autorizado: el turno pertenece a otro médico"}), 403
 
     nueva["fecha_creacion"] = datetime.now(timezone_ar).isoformat()
 

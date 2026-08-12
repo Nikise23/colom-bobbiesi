@@ -3,17 +3,19 @@ from datetime import date, datetime, timedelta
 from flask import Blueprint, jsonify, render_template, request, session
 
 from consultorio.auth.decorators import login_requerido, rol_permitido, rol_requerido
+from consultorio.config import use_database
 from consultorio.paths import (
     AGENDA_FILE,
     DATA_FILE,
-    PACIENTES_FILE,
-    PAGOS_FILE,
     TURNOS_FILE,
     timezone_ar,
 )
 from consultorio.storage import cargar_json, guardar_json
 from consultorio.storage.queries import (
+    delete_turno,
+    get_turno,
     insert_pago,
+    insert_turno,
     load_pacientes_por_dnis,
     load_pagos_fecha,
     load_turnos_fecha,
@@ -85,30 +87,31 @@ def asignar_turno():
         return jsonify({"error": f"La hora '{data['hora']}' no está disponible para el médico {medico} el día {dia_es}"}), 400
 
 
-    turnos = cargar_json(TURNOS_FILE)
-    if any(t["medico"] == medico and t.get("fecha") == data["fecha"] and t["hora"] == data["hora"] for t in turnos):
+    ocupados = load_turnos_fecha(data["fecha"])
+    if any(
+        t.get("medico") == medico and t.get("hora") == data["hora"]
+        for t in ocupados
+    ):
         return jsonify({"error": "Ya existe un turno asignado para ese horario y fecha"}), 400
+    if get_turno(data["dni_paciente"], data["fecha"], data["hora"]):
+        return jsonify({"error": "El paciente ya tiene un turno en esa fecha y hora"}), 400
 
-
-    pacientes = cargar_json(PACIENTES_FILE)
-    if not any(p["dni"] == data["dni_paciente"] for p in pacientes):
+    if not obtener_paciente(data["dni_paciente"]):
         return jsonify({"error": "Paciente no encontrado"}), 404
 
     obs_raw = data.get("observacion")
     observacion = (obs_raw.strip()[:500] if isinstance(obs_raw, str) else "") or ""
 
-    turno_nuevo = {
-        "medico": medico,
-        "hora": data["hora"],
-        "fecha": data["fecha"],
-        "dni_paciente": data["dni_paciente"],
-        "estado": "sin atender",
-        "observacion": observacion,
-    }
-
-
-    turnos.append(turno_nuevo)
-    guardar_json(TURNOS_FILE, turnos)
+    insert_turno(
+        {
+            "medico": medico,
+            "hora": data["hora"],
+            "fecha": data["fecha"],
+            "dni_paciente": data["dni_paciente"],
+            "estado": "sin atender",
+            "observacion": observacion,
+        }
+    )
     return jsonify({"mensaje": "Turno asignado correctamente"})
 
 
@@ -122,18 +125,18 @@ def actualizar_estado_turno():
     fecha = data.get("fecha")
     hora = data.get("hora")
     nuevo_estado = data.get("estado")
-
+    usuario_medico = session.get("usuario")
 
     if nuevo_estado not in ["sin atender", "llamado", "atendido", "ausente", "atendiendo"]:
         return jsonify({"error": "Estado inválido"}), 400
 
+    turno = get_turno(dni_paciente, fecha, hora)
+    if not turno:
+        return jsonify({"error": "Turno no encontrado"}), 404
+    if turno.get("medico") != usuario_medico:
+        return jsonify({"error": "No autorizado: el turno pertenece a otro médico"}), 403
 
-    if not update_turno(
-        dni_paciente,
-        fecha,
-        hora,
-        {"estado": nuevo_estado},
-    ):
+    if not update_turno(dni_paciente, fecha, hora, {"estado": nuevo_estado}):
         return jsonify({"error": "Turno no encontrado"}), 404
 
     return jsonify({"mensaje": "Estado actualizado correctamente"})
@@ -191,53 +194,61 @@ def obtener_turnos_medico():
 @login_requerido
 @rol_permitido(["secretaria", "medico"])
 def editar_turno(dni, fecha, hora):
-    data = request.json
-    turnos = cargar_json(TURNOS_FILE)
-    
-    # Encontrar el turno específico
-    turno_encontrado = None
-    for turno in turnos:
-        if turno["dni_paciente"] == dni and turno["fecha"] == fecha and turno["hora"] == hora:
-            turno_encontrado = turno
-            break
-    
+    data = request.json or {}
+    turno_encontrado = get_turno(dni, fecha, hora)
     if not turno_encontrado:
         return jsonify({"error": "Turno no encontrado"}), 404
-    
-    # Actualizar los campos permitidos
-    if "nueva_hora" in data:
-        nueva_hora = data["nueva_hora"]
-        nueva_fecha = data.get("nueva_fecha", fecha)
-        # Verificar que la nueva hora no esté ocupada en la fecha correspondiente
-        if any(t["medico"] == turno_encontrado["medico"] and t["fecha"] == nueva_fecha and t["hora"] == nueva_hora and 
-               not (t["dni_paciente"] == dni and t["fecha"] == fecha and t["hora"] == hora) for t in turnos):
-            return jsonify({"error": "La nueva hora ya está ocupada"}), 400
-        turno_encontrado["hora"] = nueva_hora
-    
-    if "nueva_fecha" in data:
-        nueva_fecha = data["nueva_fecha"]
-        nueva_hora = data.get("nueva_hora", turno_encontrado["hora"])
-        # Verificar que la nueva fecha/hora no esté ocupada
-        if any(t["medico"] == turno_encontrado["medico"] and t["fecha"] == nueva_fecha and t["hora"] == nueva_hora and 
-               not (t["dni_paciente"] == dni and t["fecha"] == fecha and t["hora"] == hora) for t in turnos):
+
+    campos = {}
+    nueva_hora = data.get("nueva_hora", turno_encontrado["hora"])
+    nueva_fecha = data.get("nueva_fecha", turno_encontrado["fecha"])
+    cambia_horario = ("nueva_hora" in data and data["nueva_hora"] != turno_encontrado["hora"]) or (
+        "nueva_fecha" in data and data["nueva_fecha"] != turno_encontrado["fecha"]
+    )
+
+    if cambia_horario:
+        ocupados = load_turnos_fecha(nueva_fecha)
+        if any(
+            t.get("medico") == turno_encontrado["medico"]
+            and t.get("hora") == nueva_hora
+            and not (
+                t.get("dni_paciente") == dni
+                and t.get("fecha") == turno_encontrado["fecha"]
+                and t.get("hora") == turno_encontrado["hora"]
+            )
+            for t in ocupados
+        ):
             return jsonify({"error": "La nueva fecha/hora ya está ocupada"}), 400
-        turno_encontrado["fecha"] = nueva_fecha
-    
+        if "nueva_hora" in data:
+            campos["hora"] = data["nueva_hora"]
+        if "nueva_fecha" in data:
+            campos["fecha"] = data["nueva_fecha"]
+
     if "nuevo_medico" in data:
-        turno_encontrado["medico"] = data["nuevo_medico"]
-    
+        campos["medico"] = data["nuevo_medico"]
+
     if "nuevo_estado" in data:
-        estados_validos = ["sin atender", "recepcionado", "sala de espera", "llamado", "atendiendo", "atendido", "ausente"]
+        estados_validos = [
+            "sin atender",
+            "recepcionado",
+            "sala de espera",
+            "llamado",
+            "atendiendo",
+            "atendido",
+            "ausente",
+        ]
         if data["nuevo_estado"] in estados_validos:
-            turno_encontrado["estado"] = data["nuevo_estado"]
+            campos["estado"] = data["nuevo_estado"]
 
     if "observacion" in data:
         obs_raw = data.get("observacion")
-        turno_encontrado["observacion"] = (
-            obs_raw.strip()[:500] if isinstance(obs_raw, str) else ""
-        )
+        campos["observacion"] = obs_raw.strip()[:500] if isinstance(obs_raw, str) else ""
 
-    guardar_json(TURNOS_FILE, turnos)
+    if not campos:
+        return jsonify({"mensaje": "Sin cambios"})
+
+    if not update_turno(dni, fecha, hora, campos):
+        return jsonify({"error": "Turno no encontrado"}), 404
     return jsonify({"mensaje": "Turno actualizado correctamente"})
 
 
@@ -245,20 +256,9 @@ def editar_turno(dni, fecha, hora):
 @login_requerido
 @rol_permitido(["secretaria", "medico"])
 def eliminar_turno(dni, fecha, hora):
-    turnos = cargar_json(TURNOS_FILE)
-    
-    # Filtrar el turno a eliminar
-    turnos_filtrados = [
-        t for t in turnos 
-        if not (t["dni_paciente"] == dni and t["fecha"] == fecha and t["hora"] == hora)
-    ]
-    
-    if len(turnos_filtrados) == len(turnos):
+    if not delete_turno(dni, fecha, hora):
         return jsonify({"error": "Turno no encontrado"}), 404
-    
-    guardar_json(TURNOS_FILE, turnos_filtrados)
     return jsonify({"mensaje": "Turno eliminado correctamente"})
-
 
 
 @bp.route("/api/turnos/<dni>/<fecha>/<hora>/borrador-consulta", methods=["PUT", "POST", "DELETE"], endpoint="borrador_consulta_turno")
@@ -267,16 +267,7 @@ def eliminar_turno(dni, fecha, hora):
 def borrador_consulta_turno(dni, fecha, hora):
     """Borrador de la consulta en curso (turno en estado atendiendo)."""
     usuario_medico = session.get("usuario")
-    turnos = cargar_json(TURNOS_FILE)
-    turno_encontrado = None
-    for turno in turnos:
-        if (
-            turno.get("dni_paciente") == dni
-            and turno.get("fecha") == fecha
-            and turno.get("hora") == hora
-        ):
-            turno_encontrado = turno
-            break
+    turno_encontrado = get_turno(dni, fecha, hora)
     if not turno_encontrado:
         return jsonify({"error": "Turno no encontrado"}), 404
     if turno_encontrado.get("medico") != usuario_medico:
@@ -287,10 +278,16 @@ def borrador_consulta_turno(dni, fecha, hora):
         ), 400
 
     if request.method == "DELETE":
-        turno_encontrado.pop("borrador_consulta", None)
-        turno_encontrado.pop("borrador_fecha_consulta", None)
-        turno_encontrado.pop("borrador_actualizado", None)
-        guardar_json(TURNOS_FILE, turnos)
+        update_turno(
+            dni,
+            fecha,
+            hora,
+            {
+                "borrador_consulta": None,
+                "borrador_fecha_consulta": None,
+                "borrador_actualizado": None,
+            },
+        )
         return jsonify({"mensaje": "Borrador eliminado"})
 
     data = request.json or {}
@@ -302,17 +299,19 @@ def borrador_consulta_turno(dni, fecha, hora):
     if not isinstance(fecha_c, str):
         fecha_c = ""
     fecha_c = fecha_c.strip()[:32]
+    actualizado = datetime.now(timezone_ar).isoformat()
 
-    turno_encontrado["borrador_consulta"] = texto
-    turno_encontrado["borrador_fecha_consulta"] = fecha_c
-    turno_encontrado["borrador_actualizado"] = datetime.now(timezone_ar).isoformat()
-    guardar_json(TURNOS_FILE, turnos)
-    return jsonify(
+    update_turno(
+        dni,
+        fecha,
+        hora,
         {
-            "mensaje": "Borrador guardado",
-            "actualizado": turno_encontrado["borrador_actualizado"],
-        }
+            "borrador_consulta": texto,
+            "borrador_fecha_consulta": fecha_c,
+            "borrador_actualizado": actualizado,
+        },
     )
+    return jsonify({"mensaje": "Borrador guardado", "actualizado": actualizado})
 
 
 @bp.route("/api/turnos/<dni>/<fecha>/<hora>/finalizar-atencion", methods=["POST"], endpoint="finalizar_atencion")
@@ -321,16 +320,7 @@ def borrador_consulta_turno(dni, fecha, hora):
 def finalizar_atencion(dni, fecha, hora):
     """Guarda el borrador autoguardado como historia clínica y marca el turno como atendido."""
     usuario_medico = session.get("usuario")
-    turnos = cargar_json(TURNOS_FILE)
-    turno_encontrado = None
-    for turno in turnos:
-        if (
-            turno.get("dni_paciente") == dni
-            and turno.get("fecha") == fecha
-            and turno.get("hora") == hora
-        ):
-            turno_encontrado = turno
-            break
+    turno_encontrado = get_turno(dni, fecha, hora)
 
     if not turno_encontrado:
         return jsonify({"error": "Turno no encontrado"}), 404
@@ -358,18 +348,41 @@ def finalizar_atencion(dni, fecha, hora):
         if not valido:
             return jsonify({"error": mensaje}), 400
 
-        historias = cargar_json(DATA_FILE)
-        datos["id"] = len(historias) + 1
-        datos["fecha_creacion"] = datetime.now(timezone_ar).isoformat()
-        historias.append(datos)
-        guardar_json(DATA_FILE, historias)
-        historia_guardada = True
+        if use_database():
+            from consultorio.storage import db_storage
 
-    turno_encontrado["estado"] = "atendido"
-    turno_encontrado.pop("borrador_consulta", None)
-    turno_encontrado.pop("borrador_fecha_consulta", None)
-    turno_encontrado.pop("borrador_actualizado", None)
-    guardar_json(TURNOS_FILE, turnos)
+            datos["fecha_creacion"] = datetime.now(timezone_ar).isoformat()
+            db_storage.insert_historia(datos, fecha, hora)
+        else:
+            historias = cargar_json(DATA_FILE)
+            datos["id"] = len(historias) + 1
+            datos["fecha_creacion"] = datetime.now(timezone_ar).isoformat()
+            historias.append(datos)
+            guardar_json(DATA_FILE, historias)
+            update_turno(
+                dni,
+                fecha,
+                hora,
+                {
+                    "estado": "atendido",
+                    "borrador_consulta": None,
+                    "borrador_fecha_consulta": None,
+                    "borrador_actualizado": None,
+                },
+            )
+        historia_guardada = True
+    else:
+        update_turno(
+            dni,
+            fecha,
+            hora,
+            {
+                "estado": "atendido",
+                "borrador_consulta": None,
+                "borrador_fecha_consulta": None,
+                "borrador_actualizado": None,
+            },
+        )
 
     if historia_guardada:
         mensaje = "Historia clínica guardada y atención finalizada."
@@ -391,24 +404,23 @@ def recepcionar_paciente():
     dni_paciente = data.get("dni_paciente")
     fecha = data.get("fecha")
     hora = data.get("hora")
-    
+
     if not all([dni_paciente, fecha, hora]):
         return jsonify({"error": "DNI, fecha y hora son requeridos"}), 400
-    
-    turnos = cargar_json(TURNOS_FILE)
-    
-    for turno in turnos:
-        if (turno["dni_paciente"] == dni_paciente and 
-            turno["fecha"] == fecha and 
-            turno["hora"] == hora):
-            
-            turno["estado"] = "recepcionado"
-            turno["hora_recepcion"] = datetime.now(timezone_ar).strftime("%H:%M")
-            
-            guardar_json(TURNOS_FILE, turnos)
-            return jsonify({"mensaje": "Paciente recepcionado correctamente"})
-    
-    return jsonify({"error": "Turno no encontrado"}), 404
+
+    if not get_turno(dni_paciente, fecha, hora):
+        return jsonify({"error": "Turno no encontrado"}), 404
+
+    update_turno(
+        dni_paciente,
+        fecha,
+        hora,
+        {
+            "estado": "recepcionado",
+            "hora_recepcion": datetime.now(timezone_ar).strftime("%H:%M"),
+        },
+    )
+    return jsonify({"mensaje": "Paciente recepcionado correctamente"})
 
 
 @bp.route("/api/turnos/sala-espera", methods=["PUT"], endpoint="mover_a_sala_espera")
