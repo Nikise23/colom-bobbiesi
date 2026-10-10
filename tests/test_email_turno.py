@@ -162,6 +162,17 @@ class EmailSmtpTests(unittest.TestCase):
         self.assertIn("BEGIN:VEVENT", ics)
         self.assertIn("20260727T090000", ics)
 
+    def test_google_maps_url(self):
+        url = email_util.google_maps_url(
+            "Urquiza 1944, B1663 San Miguel, Provincia de Buenos Aires"
+        )
+        self.assertIsNotNone(url)
+        self.assertTrue(url.startswith("https://www.google.com/maps/search/?api=1&query="))
+        self.assertIn("Urquiza", url)
+        self.assertIn("San%20Miguel", url)
+        self.assertIsNone(email_util.google_maps_url(""))
+        self.assertIsNone(email_util.google_maps_url("   "))
+
     def test_formatear_fecha_mail(self):
         self.assertEqual(
             email_util.formatear_fecha_mail("2026-07-27"),
@@ -256,6 +267,9 @@ class ReservaConEmailTests(unittest.TestCase):
     @patch("consultorio.utils.email.enviar_email")
     def test_avisar_con_email_solo_paciente(self, mock_enviar):
         mock_enviar.return_value = True
+        os.environ["CONSULTORIO_DIRECCION"] = (
+            "Urquiza 1944, B1663 San Miguel, Provincia de Buenos Aires"
+        )
         result = email_util.avisar_turno_online(
             medico="Dr Test",
             fecha="2026-07-06",
@@ -271,8 +285,17 @@ class ReservaConEmailTests(unittest.TestCase):
         self.assertEqual(call.kwargs.get("destino") or call.args[2], "paciente@example.com")
         self.assertIn("Confirmación de turno", call.args[0])
         self.assertIn("html", call.kwargs)
-        self.assertIn("Guardar en el calendario", call.kwargs["html"])
-        self.assertIn("LUNES 06-07-2026", call.kwargs["html"])
+        html = call.kwargs["html"]
+        texto = call.args[1]
+        self.assertIn("Guardar en el calendario", html)
+        self.assertIn("LUNES 06-07-2026", html)
+        self.assertIn("https://www.google.com/maps/search/?api=1&amp;query=", html)
+        self.assertIn('style="color:#1a73e8', html)
+        self.assertIn("<a href=", html)
+        self.assertIn("Urquiza 1944", html)
+        self.assertNotIn("Muñoz 909", html)
+        self.assertIn("Urquiza 1944", texto)
+        self.assertIn("https://www.google.com/maps/search/?api=1&query=", texto)
         self.assertIn("ics_content", call.kwargs)
         self.assertIn("BEGIN:VCALENDAR", call.kwargs["ics_content"])
 

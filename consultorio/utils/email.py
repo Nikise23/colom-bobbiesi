@@ -80,6 +80,14 @@ def _parse_inicio(fecha: str, hora: str) -> datetime | None:
     return timezone_ar.localize(naive)
 
 
+def google_maps_url(direccion: str) -> str | None:
+    """URL de búsqueda en Google Maps para la dirección del consultorio."""
+    dir_limpia = (direccion or "").strip()
+    if not dir_limpia:
+        return None
+    return "https://www.google.com/maps/search/?api=1&query=" + quote(dir_limpia)
+
+
 def google_calendar_url(
     *,
     medico: str,
@@ -247,7 +255,11 @@ def _cuerpo_texto_paciente(
         f"Hora: {hora}",
     ]
     if direccion:
-        lineas.append(f"Dirección: {direccion}")
+        maps_url = google_maps_url(direccion)
+        if maps_url:
+            lineas.append(f"Dirección: {direccion} — {maps_url}")
+        else:
+            lineas.append(f"Dirección: {direccion}")
     lineas.append("")
     if calendar_url:
         lineas.append(f"Agregar al calendario: {calendar_url}")
@@ -297,9 +309,20 @@ def _html_confirmacion_paciente(
 
     dir_row = ""
     if direccion:
+        maps_url = google_maps_url(direccion)
+        if maps_url:
+            dir_valor = (
+                f'<a href="{escape(maps_url)}" '
+                f'style="color:#1a73e8;font-weight:600;text-decoration:underline;">'
+                f"{escape(direccion)}</a>"
+            )
+        else:
+            dir_valor = (
+                f'<span style="color:#2c3e50;font-weight:600;">{escape(direccion)}</span>'
+            )
         dir_row = (
             f'<tr><td style="padding:8px 0;color:#6c757d;width:110px;">Dirección</td>'
-            f'<td style="padding:8px 0;color:#2c3e50;font-weight:600;">{escape(direccion)}</td></tr>'
+            f'<td style="padding:8px 0;">{dir_valor}</td></tr>'
         )
 
     calendar_block = ""
