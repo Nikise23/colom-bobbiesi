@@ -21,6 +21,7 @@ BACKUP_ENTITIES: list[tuple[str, str]] = [
     ("usuarios", "usuarios.json"),
     ("agenda_web", "agenda_web.json"),
     ("bloqueos_web", "bloqueos_web.json"),
+    ("dias_especiales_web", "dias_especiales_web.json"),
 ]
 
 

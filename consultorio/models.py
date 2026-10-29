@@ -127,8 +127,9 @@ class BloqueoWeb(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     medico = db.Column(db.String(255), nullable=False, index=True)
-    tipo = db.Column(db.String(20), nullable=False)  # dia | rango_horas | semanal
+    tipo = db.Column(db.String(20), nullable=False)  # dia | rango_horas | semanal | periodo
     fecha = db.Column(db.String(30))
+    fecha_fin = db.Column(db.String(30))
     dia_semana = db.Column(db.String(20))
     hora_desde = db.Column(db.String(10))
     hora_hasta = db.Column(db.String(10))
@@ -144,6 +145,8 @@ class BloqueoWeb(db.Model):
         }
         if self.fecha:
             data["fecha"] = self.fecha
+        if self.fecha_fin:
+            data["fecha_fin"] = self.fecha_fin
         if self.dia_semana:
             data["dia_semana"] = self.dia_semana
         if self.hora_desde:
@@ -152,6 +155,41 @@ class BloqueoWeb(db.Model):
             data["hora_hasta"] = self.hora_hasta
         if self.motivo:
             data["motivo"] = self.motivo
+        return data
+
+
+class DiaEspecialWeb(db.Model):
+    __tablename__ = "dias_especiales_web"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    medico = db.Column(db.String(255), nullable=False, index=True)
+    tipo = db.Column(db.String(20), nullable=False)  # dia | periodo
+    nombre = db.Column(db.String(200), nullable=False)
+    fecha = db.Column(db.String(30), nullable=False)
+    fecha_fin = db.Column(db.String(30))
+    hora_desde = db.Column(db.String(10), nullable=False)
+    hora_hasta = db.Column(db.String(10), nullable=False)
+    duracion_minutos = db.Column(db.Integer, nullable=False, default=30)
+    presencial = db.Column(db.Boolean, nullable=False, default=True)
+    virtual = db.Column(db.Boolean, nullable=False, default=False)
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    def to_dict(self) -> dict:
+        data = {
+            "id": self.id,
+            "medico": self.medico,
+            "tipo": self.tipo,
+            "nombre": self.nombre,
+            "fecha": self.fecha,
+            "hora_desde": self.hora_desde,
+            "hora_hasta": self.hora_hasta,
+            "duracion_minutos": int(self.duracion_minutos or 30),
+            "presencial": bool(self.presencial),
+            "virtual": bool(self.virtual),
+            "activo": bool(self.activo),
+        }
+        if self.fecha_fin:
+            data["fecha_fin"] = self.fecha_fin
         return data
 
 

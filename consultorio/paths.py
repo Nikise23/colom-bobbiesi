@@ -16,6 +16,7 @@ AGENDA_FILE = _paths["agenda"]
 PAGOS_FILE = _paths["pagos"]
 AGENDA_WEB_FILE = _paths["agenda_web"]
 BLOQUEOS_WEB_FILE = _paths["bloqueos_web"]
+DIAS_ESPECIALES_WEB_FILE = _paths["dias_especiales_web"]
 
 # Médicos publicados inicialmente en el sitio (seed / compat)
 MEDICOS_WEB_SEED = ("Marianela Bobbiesi", "Francisco Colom")
@@ -46,5 +47,6 @@ def copiar_json_a_persistencia() -> None:
             "pagos.json",
             "agenda_web.json",
             "bloqueos_web.json",
+            "dias_especiales_web.json",
         ]:
             mover_a_persistencia(archivo)

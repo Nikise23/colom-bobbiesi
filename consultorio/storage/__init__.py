@@ -20,6 +20,8 @@ def cargar_json(path: str):
         return {}
     if path.endswith("bloqueos_web.json") and not isinstance(data, list):
         return []
+    if path.endswith("dias_especiales_web.json") and not isinstance(data, list):
+        return []
     return data
 
 

@@ -3,20 +3,24 @@
 from __future__ import annotations
 
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from consultorio.config import DIAS_AGENDA, use_database
 from consultorio.paths import (
     AGENDA_FILE,
     AGENDA_WEB_FILE,
     BLOQUEOS_WEB_FILE,
+    DIAS_ESPECIALES_WEB_FILE,
     MEDICOS_WEB_SEED,
 )
 from consultorio.storage import cargar_json, guardar_json
 
 _HORA_RE = re.compile(r"^(\d{1,2}):([0-5]\d)$")
 
-TIPOS_BLOQUEO = frozenset({"dia", "rango_horas", "semanal"})
+TIPOS_BLOQUEO = frozenset({"dia", "rango_horas", "semanal", "periodo"})
+TIPOS_DIA_ESPECIAL = frozenset({"dia", "periodo"})
+DURACION_MIN_MINUTOS = 5
+DURACION_MAX_MINUTOS = 180
 
 DIA_EN_ES = {
     "MONDAY": "LUNES",
@@ -95,6 +99,13 @@ def load_bloqueos_web() -> list:
     if not isinstance(data, list):
         return []
     return [b for b in data if isinstance(b, dict)]
+
+
+def load_dias_especiales_web() -> list:
+    data = cargar_json(DIAS_ESPECIALES_WEB_FILE)
+    if not isinstance(data, list):
+        return []
+    return [d for d in data if isinstance(d, dict)]
 
 
 def ensure_seed_from_internal() -> None:
@@ -309,6 +320,12 @@ def _hora_en_rango(hora: str, desde: str | None, hasta: str | None) -> bool:
     return hora < hasta
 
 
+def _fecha_en_periodo(fecha_str: str, fecha_inicio: str | None, fecha_fin: str | None) -> bool:
+    if not fecha_inicio or not fecha_fin:
+        return False
+    return fecha_inicio <= fecha_str <= fecha_fin
+
+
 def bloqueo_aplica(bloqueo: dict, fecha_str: str, dia_es: str, hora: str) -> bool:
     if not bloqueo.get("activo", True):
         return False
@@ -326,6 +343,11 @@ def bloqueo_aplica(bloqueo: dict, fecha_str: str, dia_es: str, hora: str) -> boo
             return False
         if not hd or not hh:
             return True
+        return _hora_en_rango(hora, hd, hh)
+
+    if tipo == "periodo":
+        if not _fecha_en_periodo(fecha_str, bloqueo.get("fecha"), bloqueo.get("fecha_fin")):
+            return False
         return _hora_en_rango(hora, hd, hh)
 
     if tipo == "semanal":
@@ -362,6 +384,66 @@ def _filtrar_horarios_futuros(fecha_dt: date, horarios: list[str]) -> list[str]:
     return [h for h in horarios if h >= ahora]
 
 
+def _hora_a_minutos(hora: str) -> int:
+    partes = hora.split(":")
+    return int(partes[0]) * 60 + int(partes[1])
+
+
+def _minutos_a_hora(minutos: int) -> str:
+    return f"{minutos // 60:02d}:{minutos % 60:02d}"
+
+
+def generar_slots_especiales(
+    hora_desde: str, hora_hasta: str, duracion_minutos: int
+) -> list[str]:
+    """Genera turnos [desde, hasta) cada `duracion_minutos` (el turno completo debe caber)."""
+    hd = normalizar_hora(hora_desde)
+    hh = normalizar_hora(hora_hasta)
+    if not hd or not hh or duracion_minutos <= 0:
+        return []
+    inicio = _hora_a_minutos(hd)
+    fin = _hora_a_minutos(hh)
+    if inicio >= fin:
+        return []
+    slots = []
+    actual = inicio
+    while actual + duracion_minutos <= fin:
+        slots.append(_minutos_a_hora(actual))
+        actual += duracion_minutos
+    return slots
+
+
+def dia_especial_aplica(especial: dict, fecha_str: str) -> bool:
+    if not especial.get("activo", True):
+        return False
+    tipo = especial.get("tipo")
+    if tipo == "dia":
+        return especial.get("fecha") == fecha_str
+    if tipo == "periodo":
+        return _fecha_en_periodo(fecha_str, especial.get("fecha"), especial.get("fecha_fin"))
+    return False
+
+
+def slots_dias_especiales(medico: str, fecha_str: str) -> list[str]:
+    slots: set[str] = set()
+    for especial in load_dias_especiales_web():
+        if especial.get("medico") != medico:
+            continue
+        if not dia_especial_aplica(especial, fecha_str):
+            continue
+        try:
+            duracion = int(especial.get("duracion_minutos") or 30)
+        except (TypeError, ValueError):
+            duracion = 30
+        for h in generar_slots_especiales(
+            especial.get("hora_desde"),
+            especial.get("hora_hasta"),
+            duracion,
+        ):
+            slots.add(h)
+    return sorted(slots)
+
+
 def horarios_web_libres(
     medico: str,
     fecha_str: str,
@@ -376,12 +458,22 @@ def horarios_web_libres(
     if err:
         return [], err
 
-    todos = list(dias.get(dia_es, []))
-    libres = [h for h in todos if h not in horas_ocupadas]
+    todos = set(dias.get(dia_es, []))
+    todos.update(slots_dias_especiales(medico, fecha_str))
+    libres = [h for h in sorted(todos) if h not in horas_ocupadas]
     libres = filtrar_bloqueos(medico, fecha_str, dia_es, libres)
     if filtrar_pasados:
         libres = _filtrar_horarios_futuros(fecha_dt, libres)
     return libres, None
+
+
+def _parse_fecha_iso(valor: str | None, campo: str) -> tuple[str | None, str | None]:
+    fecha = (valor or "").strip()
+    try:
+        datetime.strptime(fecha, "%Y-%m-%d")
+    except ValueError:
+        return None, f"{campo} inválida (YYYY-MM-DD)"
+    return fecha, None
 
 
 def validar_bloqueo_payload(data: dict) -> tuple[dict | None, str | None]:
@@ -390,7 +482,7 @@ def validar_bloqueo_payload(data: dict) -> tuple[dict | None, str | None]:
     if not medico:
         return None, "El campo 'medico' es obligatorio"
     if tipo not in TIPOS_BLOQUEO:
-        return None, "tipo inválido (dia, rango_horas o semanal)"
+        return None, "tipo inválido (dia, rango_horas, semanal o periodo)"
 
     agenda = cargar_json(AGENDA_FILE)
     if not isinstance(agenda, dict) or medico not in agenda:
@@ -417,14 +509,23 @@ def validar_bloqueo_payload(data: dict) -> tuple[dict | None, str | None]:
     }
 
     if tipo in ("dia", "rango_horas"):
-        fecha = (data.get("fecha") or "").strip()
-        try:
-            datetime.strptime(fecha, "%Y-%m-%d")
-        except ValueError:
-            return None, "fecha inválida (YYYY-MM-DD)"
+        fecha, err = _parse_fecha_iso(data.get("fecha"), "fecha")
+        if err:
+            return None, err
         item["fecha"] = fecha
         if tipo == "rango_horas" and (not hd or not hh):
             return None, "rango_horas requiere hora_desde y hora_hasta"
+    elif tipo == "periodo":
+        fecha, err = _parse_fecha_iso(data.get("fecha"), "fecha")
+        if err:
+            return None, err
+        fecha_fin, err = _parse_fecha_iso(data.get("fecha_fin"), "fecha_fin")
+        if err:
+            return None, err
+        if fecha_fin < fecha:
+            return None, "fecha_fin debe ser igual o posterior a fecha"
+        item["fecha"] = fecha
+        item["fecha_fin"] = fecha_fin
     else:
         dia = (data.get("dia_semana") or "").strip().upper()
         if dia not in DIAS_AGENDA:
@@ -478,6 +579,121 @@ def listar_bloqueos(medico: str | None = None) -> list:
     if medico:
         items = [b for b in items if b.get("medico") == medico]
     return sorted(items, key=lambda b: (b.get("medico", ""), b.get("id") or 0))
+
+
+def validar_dia_especial_payload(data: dict) -> tuple[dict | None, str | None]:
+    medico = (data.get("medico") or "").strip()
+    tipo = (data.get("tipo") or "").strip()
+    nombre = (data.get("nombre") or "").strip()
+    if not medico:
+        return None, "El campo 'medico' es obligatorio"
+    if tipo not in TIPOS_DIA_ESPECIAL:
+        return None, "tipo inválido (dia o periodo)"
+    if not nombre:
+        return None, "El campo 'nombre' es obligatorio"
+    if len(nombre) > 200:
+        return None, "nombre demasiado largo (máx. 200)"
+
+    agenda = cargar_json(AGENDA_FILE)
+    if not isinstance(agenda, dict) or medico not in agenda:
+        return None, "Médico no encontrado en la agenda interna"
+
+    hd = normalizar_hora(data.get("hora_desde")) if data.get("hora_desde") else None
+    hh = normalizar_hora(data.get("hora_hasta")) if data.get("hora_hasta") else None
+    if not hd:
+        return None, "hora_desde inválida (HH:MM)"
+    if not hh:
+        return None, "hora_hasta inválida (HH:MM)"
+    if hd >= hh:
+        return None, "hora_desde debe ser anterior a hora_hasta"
+
+    try:
+        duracion = int(data.get("duracion_minutos") or 30)
+    except (TypeError, ValueError):
+        return None, "duracion_minutos inválida"
+    if duracion < DURACION_MIN_MINUTOS or duracion > DURACION_MAX_MINUTOS:
+        return None, f"duracion_minutos debe estar entre {DURACION_MIN_MINUTOS} y {DURACION_MAX_MINUTOS}"
+
+    presencial = bool(data.get("presencial", True))
+    virtual = bool(data.get("virtual", False))
+    if not presencial and not virtual:
+        return None, "Seleccioná al menos una modalidad (presencial o virtual)"
+
+    if not generar_slots_especiales(hd, hh, duracion):
+        return None, "El rango horario no alcanza para un turno con esa duración"
+
+    item = {
+        "medico": medico,
+        "tipo": tipo,
+        "nombre": nombre,
+        "hora_desde": hd,
+        "hora_hasta": hh,
+        "duracion_minutos": duracion,
+        "presencial": presencial,
+        "virtual": virtual,
+        "activo": bool(data.get("activo", True)),
+    }
+
+    fecha, err = _parse_fecha_iso(data.get("fecha"), "fecha")
+    if err:
+        return None, err
+    item["fecha"] = fecha
+
+    if tipo == "periodo":
+        fecha_fin, err = _parse_fecha_iso(data.get("fecha_fin"), "fecha_fin")
+        if err:
+            return None, err
+        if fecha_fin < fecha:
+            return None, "fecha_fin debe ser igual o posterior a fecha"
+        item["fecha_fin"] = fecha_fin
+
+    return item, None
+
+
+def crear_dia_especial(data: dict) -> tuple[dict | None, str | None]:
+    item, err = validar_dia_especial_payload(data)
+    if err:
+        return None, err
+
+    if use_database():
+        from consultorio.storage import db_storage
+
+        created = db_storage.insert_dia_especial_web(item)
+    else:
+        dias = load_dias_especiales_web()
+        next_id = max((int(d.get("id") or 0) for d in dias), default=0) + 1
+        item["id"] = next_id
+        dias.append(item)
+        guardar_json(DIAS_ESPECIALES_WEB_FILE, dias)
+        created = item
+
+    _invalidar_cache_publica()
+    return created, None
+
+
+def eliminar_dia_especial(dia_id: int) -> tuple[bool, str | None]:
+    if use_database():
+        from consultorio.storage import db_storage
+
+        ok = db_storage.delete_dia_especial_web(dia_id)
+        if not ok:
+            return False, "Día especial no encontrado"
+    else:
+        dias = load_dias_especiales_web()
+        nuevos = [d for d in dias if int(d.get("id") or 0) != int(dia_id)]
+        if len(nuevos) == len(dias):
+            return False, "Día especial no encontrado"
+        guardar_json(DIAS_ESPECIALES_WEB_FILE, nuevos)
+
+    _invalidar_cache_publica()
+    return True, None
+
+
+def listar_dias_especiales(medico: str | None = None) -> list:
+    items = load_dias_especiales_web()
+    if medico:
+        items = [d for d in items if d.get("medico") == medico]
+    return sorted(items, key=lambda d: (d.get("medico", ""), d.get("fecha") or "", d.get("id") or 0))
 
 
 def _invalidar_cache_publica() -> None:

@@ -85,3 +85,37 @@ def eliminar_bloqueo_web(bloqueo_id):
     if not ok:
         return jsonify({"error": err or "Bloqueo no encontrado"}), 404
     return jsonify({"mensaje": "Bloqueo eliminado"})
+
+
+@bp.route("/api/dias-especiales-web", methods=["GET"], endpoint="listar_dias_especiales_web")
+@login_requerido
+@rol_requerido("secretaria")
+def listar_dias_especiales_web():
+    medico = (request.args.get("medico") or "").strip() or None
+    return jsonify({"dias_especiales": aw.listar_dias_especiales(medico)})
+
+
+@bp.route("/api/dias-especiales-web", methods=["POST"], endpoint="crear_dia_especial_web")
+@login_requerido
+@rol_requerido("secretaria")
+def crear_dia_especial_web():
+    data = request.get_json(silent=True) or {}
+    created, err = aw.crear_dia_especial(data)
+    if err:
+        status = 404 if "no encontrado" in err.lower() else 400
+        return jsonify({"error": err}), status
+    return jsonify({"mensaje": "Día especial creado", "dia_especial": created}), 201
+
+
+@bp.route(
+    "/api/dias-especiales-web/<int:dia_id>",
+    methods=["DELETE"],
+    endpoint="eliminar_dia_especial_web",
+)
+@login_requerido
+@rol_requerido("secretaria")
+def eliminar_dia_especial_web(dia_id):
+    ok, err = aw.eliminar_dia_especial(dia_id)
+    if not ok:
+        return jsonify({"error": err or "Día especial no encontrado"}), 404
+    return jsonify({"mensaje": "Día especial eliminado"})

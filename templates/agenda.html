@@ -345,7 +345,7 @@
 <div class="card mb-4">
   <div class="card-header bg-primary text-white">
     <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Configurar agendas</h5>
-    <small>Agenda interna = trabajo diario. Horarios web / bloqueos = lo que ve el sitio.</small>
+    <small>Agenda interna = trabajo diario. Horarios web / bloqueos / días especiales = lo que ve el sitio.</small>
   </div>
   <div class="card-body">
     <ul class="nav nav-tabs mb-3" role="tablist">
@@ -357,6 +357,9 @@
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="tab-bloqueos" data-bs-toggle="tab" data-bs-target="#pane-bloqueos" type="button" role="tab">Bloqueos web</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-especiales" data-bs-toggle="tab" data-bs-target="#pane-especiales" type="button" role="tab">Días especiales</button>
       </li>
     </ul>
 
@@ -419,12 +422,17 @@
             <select id="bloqueo-tipo" class="form-select form-select-sm" onchange="toggleCamposBloqueo()">
               <option value="dia">Día completo</option>
               <option value="rango_horas">Rango horario</option>
+              <option value="periodo">Período (fecha a fecha)</option>
               <option value="semanal">Semanal (día de semana)</option>
             </select>
           </div>
           <div class="col-md-2" id="wrap-bloqueo-fecha">
-            <label class="form-label small mb-0">Fecha</label>
+            <label class="form-label small mb-0" id="label-bloqueo-fecha">Fecha</label>
             <input type="date" id="bloqueo-fecha" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-2 d-none" id="wrap-bloqueo-fecha-fin">
+            <label class="form-label small mb-0">Fecha fin</label>
+            <input type="date" id="bloqueo-fecha-fin" class="form-control form-control-sm">
           </div>
           <div class="col-md-2 d-none" id="wrap-bloqueo-dia">
             <label class="form-label small mb-0">Día semana</label>
@@ -464,6 +472,81 @@
           </table>
         </div>
       </div>
+
+      <div class="tab-pane fade" id="pane-especiales" role="tabpanel">
+        <p class="text-muted small">
+          Turnos especiales para un médico en un día o período. Se suman a los horarios web habituales y siguen sujetos a bloqueos.
+        </p>
+        <form id="form-dia-especial" class="row g-2 align-items-end mb-3">
+          <div class="col-md-3">
+            <label class="form-label small mb-0">Médico</label>
+            <select id="especial-medico" class="form-select form-select-sm" required></select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small mb-0">Tipo</label>
+            <select id="especial-tipo" class="form-select form-select-sm" onchange="toggleCamposEspecial()">
+              <option value="dia">Día especial</option>
+              <option value="periodo">Período</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small mb-0">Nombre</label>
+            <input type="text" id="especial-nombre" class="form-control form-control-sm" maxlength="200" placeholder="ej: Guardia extra" required>
+          </div>
+          <div class="col-md-2" id="wrap-especial-fecha">
+            <label class="form-label small mb-0" id="label-especial-fecha">Fecha</label>
+            <input type="date" id="especial-fecha" class="form-control form-control-sm" required>
+          </div>
+          <div class="col-md-2 d-none" id="wrap-especial-fecha-fin">
+            <label class="form-label small mb-0">Fecha fin</label>
+            <input type="date" id="especial-fecha-fin" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label small mb-0">Desde</label>
+            <input type="time" id="especial-hora-desde" class="form-control form-control-sm" value="08:00" required>
+          </div>
+          <div class="col-md-1">
+            <label class="form-label small mb-0">Hasta</label>
+            <input type="time" id="especial-hora-hasta" class="form-control form-control-sm" value="20:00" required>
+          </div>
+          <div class="col-md-1">
+            <label class="form-label small mb-0">Duración</label>
+            <div class="input-group input-group-sm">
+              <input type="number" id="especial-duracion" class="form-control" min="5" max="180" step="5" value="30" required>
+              <span class="input-group-text">Min.</span>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small mb-0 d-block">Modalidad</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="especial-presencial" checked>
+              <label class="form-check-label small" for="especial-presencial">Presencial</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="especial-virtual">
+              <label class="form-check-label small" for="especial-virtual">Virtual</label>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Agregar</button>
+          </div>
+        </form>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Médico</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Detalle</th>
+                <th>Modalidad</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-dias-especiales"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -496,12 +579,13 @@ function renderTablaEditableAgenda() {
         tbody.appendChild(row);
       }
       window._agendaOriginal = JSON.parse(JSON.stringify(agenda));
-      const sel = document.getElementById('bloqueo-medico');
-      if (sel) {
-        sel.innerHTML = Object.keys(agenda).sort().map(med =>
-          `<option value="${med}">${med}</option>`
-        ).join('');
-      }
+      const opcionesMedicos = Object.keys(agenda).sort().map(med =>
+        `<option value="${med}">${med}</option>`
+      ).join('');
+      const selBloqueo = document.getElementById('bloqueo-medico');
+      if (selBloqueo) selBloqueo.innerHTML = opcionesMedicos;
+      const selEspecial = document.getElementById('especial-medico');
+      if (selEspecial) selEspecial.innerHTML = opcionesMedicos;
     });
 }
 
@@ -613,11 +697,17 @@ async function copiarAgendaWeb(medico) {
 
 function toggleCamposBloqueo() {
   const tipo = document.getElementById('bloqueo-tipo').value;
-  document.getElementById('wrap-bloqueo-fecha').classList.toggle('d-none', tipo === 'semanal');
-  document.getElementById('wrap-bloqueo-dia').classList.toggle('d-none', tipo !== 'semanal');
+  const esSemanal = tipo === 'semanal';
+  const esPeriodo = tipo === 'periodo';
+  document.getElementById('wrap-bloqueo-fecha').classList.toggle('d-none', esSemanal);
+  document.getElementById('wrap-bloqueo-fecha-fin').classList.toggle('d-none', !esPeriodo);
+  document.getElementById('wrap-bloqueo-dia').classList.toggle('d-none', !esSemanal);
+  document.getElementById('label-bloqueo-fecha').textContent = esPeriodo ? 'Fecha inicio' : 'Fecha';
+  document.getElementById('bloqueo-fecha-fin').required = esPeriodo;
   const necesitaHoras = tipo === 'rango_horas';
-  document.getElementById('wrap-bloqueo-desde').classList.toggle('opacity-50', tipo === 'dia');
-  document.getElementById('wrap-bloqueo-hasta').classList.toggle('opacity-50', tipo === 'dia');
+  const horasOpcionales = tipo === 'dia' || tipo === 'periodo';
+  document.getElementById('wrap-bloqueo-desde').classList.toggle('opacity-50', horasOpcionales);
+  document.getElementById('wrap-bloqueo-hasta').classList.toggle('opacity-50', horasOpcionales);
   if (necesitaHoras) {
     document.getElementById('bloqueo-hora-desde').required = true;
     document.getElementById('bloqueo-hora-hasta').required = true;
@@ -634,6 +724,10 @@ function detalleBloqueo(b) {
   }
   if (b.tipo === 'rango_horas') {
     return `${b.fecha} ${b.hora_desde || ''}-${b.hora_hasta || ''}`;
+  }
+  if (b.tipo === 'periodo') {
+    const rango = (b.hora_desde && b.hora_hasta) ? ` ${b.hora_desde}-${b.hora_hasta}` : ' (todo el día)';
+    return `${b.fecha || ''} → ${b.fecha_fin || ''}${rango}`;
   }
   const rango = (b.hora_desde && b.hora_hasta) ? ` ${b.hora_desde}-${b.hora_hasta}` : ' (todo el día)';
   return `${b.fecha || ''}${rango}`;
@@ -689,6 +783,9 @@ document.getElementById('form-bloqueo-web')?.addEventListener('submit', async (e
     payload.dia_semana = document.getElementById('bloqueo-dia-semana').value;
   } else {
     payload.fecha = document.getElementById('bloqueo-fecha').value;
+    if (tipo === 'periodo') {
+      payload.fecha_fin = document.getElementById('bloqueo-fecha-fin').value;
+    }
   }
   if (hd) payload.hora_desde = hd;
   if (hh) payload.hora_hasta = hh;
@@ -711,11 +808,115 @@ document.getElementById('form-bloqueo-web')?.addEventListener('submit', async (e
   }
 });
 
+function toggleCamposEspecial() {
+  const tipo = document.getElementById('especial-tipo').value;
+  const esPeriodo = tipo === 'periodo';
+  document.getElementById('wrap-especial-fecha-fin').classList.toggle('d-none', !esPeriodo);
+  document.getElementById('label-especial-fecha').textContent = esPeriodo ? 'Fecha inicio' : 'Fecha';
+  document.getElementById('especial-fecha-fin').required = esPeriodo;
+}
+
+function detalleDiaEspecial(d) {
+  const horas = `${d.hora_desde || ''}-${d.hora_hasta || ''} / ${d.duracion_minutos || 30} min`;
+  if (d.tipo === 'periodo') {
+    return `${d.fecha || ''} → ${d.fecha_fin || ''} · ${horas}`;
+  }
+  return `${d.fecha || ''} · ${horas}`;
+}
+
+function modalidadDiaEspecial(d) {
+  const partes = [];
+  if (d.presencial) partes.push('Presencial');
+  if (d.virtual) partes.push('Virtual');
+  return partes.join(' / ') || '—';
+}
+
+function renderDiasEspeciales() {
+  fetch('/api/dias-especiales-web')
+    .then(r => r.json())
+    .then(data => {
+      const tbody = document.getElementById('tbody-dias-especiales');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const items = data.dias_especiales || [];
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-muted">Sin días especiales</td></tr>';
+        return;
+      }
+      for (const d of items) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.medico}</td>
+          <td>${d.nombre || ''}</td>
+          <td><span class="badge bg-info text-dark">${d.tipo}</span></td>
+          <td>${detalleDiaEspecial(d)}</td>
+          <td>${modalidadDiaEspecial(d)}</td>
+          <td><button class="btn btn-outline-danger btn-sm" onclick="eliminarDiaEspecial(${d.id})">Eliminar</button></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    });
+}
+
+async function eliminarDiaEspecial(id) {
+  if (!confirm('¿Eliminar este día especial?')) return;
+  const res = await fetch(`/api/dias-especiales-web/${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) {
+    alert(data.error || 'No se pudo eliminar');
+    return;
+  }
+  renderDiasEspeciales();
+}
+
+document.getElementById('form-dia-especial')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const tipo = document.getElementById('especial-tipo').value;
+  const payload = {
+    medico: document.getElementById('especial-medico').value,
+    tipo,
+    nombre: document.getElementById('especial-nombre').value.trim(),
+    fecha: document.getElementById('especial-fecha').value,
+    hora_desde: document.getElementById('especial-hora-desde').value,
+    hora_hasta: document.getElementById('especial-hora-hasta').value,
+    duracion_minutos: Number(document.getElementById('especial-duracion').value || 30),
+    presencial: document.getElementById('especial-presencial').checked,
+    virtual: document.getElementById('especial-virtual').checked,
+  };
+  if (tipo === 'periodo') {
+    payload.fecha_fin = document.getElementById('especial-fecha-fin').value;
+  }
+  try {
+    const res = await fetch('/api/dias-especiales-web', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Error al crear día especial');
+      return;
+    }
+    e.target.reset();
+    document.getElementById('especial-hora-desde').value = '08:00';
+    document.getElementById('especial-hora-hasta').value = '20:00';
+    document.getElementById('especial-duracion').value = '30';
+    document.getElementById('especial-presencial').checked = true;
+    document.getElementById('especial-virtual').checked = false;
+    toggleCamposEspecial();
+    renderDiasEspeciales();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   renderTablaEditableAgenda();
   renderTablaAgendaWeb();
   renderBloqueosWeb();
+  renderDiasEspeciales();
   toggleCamposBloqueo();
+  toggleCamposEspecial();
 });
 </script>
 {% endif %}

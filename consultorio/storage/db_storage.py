@@ -9,6 +9,7 @@ from consultorio.models import (
     AgendaHorario,
     AgendaWebHorario,
     BloqueoWeb,
+    DiaEspecialWeb,
     HistoriaClinica,
     MedicoWeb,
     Paciente,
@@ -321,6 +322,7 @@ def save_bloqueos_web(data: list) -> None:
             row.medico = item["medico"]
             row.tipo = item["tipo"]
             row.fecha = item.get("fecha")
+            row.fecha_fin = item.get("fecha_fin")
             row.dia_semana = item.get("dia_semana")
             row.hora_desde = _normalizar_hora(item.get("hora_desde")) or None
             row.hora_hasta = _normalizar_hora(item.get("hora_hasta")) or None
@@ -332,6 +334,7 @@ def save_bloqueos_web(data: list) -> None:
                     medico=item["medico"],
                     tipo=item["tipo"],
                     fecha=item.get("fecha"),
+                    fecha_fin=item.get("fecha_fin"),
                     dia_semana=item.get("dia_semana"),
                     hora_desde=_normalizar_hora(item.get("hora_desde")) or None,
                     hora_hasta=_normalizar_hora(item.get("hora_hasta")) or None,
@@ -361,6 +364,7 @@ def insert_bloqueo_web(item: dict) -> dict:
         medico=item["medico"],
         tipo=item["tipo"],
         fecha=item.get("fecha"),
+        fecha_fin=item.get("fecha_fin"),
         dia_semana=item.get("dia_semana"),
         hora_desde=_normalizar_hora(item.get("hora_desde")) or None,
         hora_hasta=_normalizar_hora(item.get("hora_hasta")) or None,
@@ -374,6 +378,89 @@ def insert_bloqueo_web(item: dict) -> dict:
 
 def delete_bloqueo_web(bloqueo_id: int) -> bool:
     row = BloqueoWeb.query.get(bloqueo_id)
+    if row is None:
+        return False
+    db.session.delete(row)
+    db.session.commit()
+    return True
+
+
+def load_dias_especiales_web() -> list:
+    return [
+        d.to_dict()
+        for d in DiaEspecialWeb.query.order_by(DiaEspecialWeb.id).all()
+    ]
+
+
+def save_dias_especiales_web(data: list) -> None:
+    if not isinstance(data, list):
+        return
+    existing = {d.id: d for d in DiaEspecialWeb.query.all()}
+    kept = set()
+
+    for item in data:
+        if not isinstance(item, dict) or not item.get("medico") or not item.get("tipo"):
+            continue
+        did = item.get("id")
+        if did is not None and did in existing:
+            row = existing[did]
+            kept.add(did)
+            row.medico = item["medico"]
+            row.tipo = item["tipo"]
+            row.nombre = item.get("nombre") or ""
+            row.fecha = item.get("fecha")
+            row.fecha_fin = item.get("fecha_fin")
+            row.hora_desde = _normalizar_hora(item.get("hora_desde")) or item.get("hora_desde")
+            row.hora_hasta = _normalizar_hora(item.get("hora_hasta")) or item.get("hora_hasta")
+            row.duracion_minutos = int(item.get("duracion_minutos") or 30)
+            row.presencial = bool(item.get("presencial", True))
+            row.virtual = bool(item.get("virtual", False))
+            row.activo = bool(item.get("activo", True))
+        else:
+            db.session.add(
+                DiaEspecialWeb(
+                    medico=item["medico"],
+                    tipo=item["tipo"],
+                    nombre=item.get("nombre") or "",
+                    fecha=item.get("fecha"),
+                    fecha_fin=item.get("fecha_fin"),
+                    hora_desde=_normalizar_hora(item.get("hora_desde")) or item.get("hora_desde"),
+                    hora_hasta=_normalizar_hora(item.get("hora_hasta")) or item.get("hora_hasta"),
+                    duracion_minutos=int(item.get("duracion_minutos") or 30),
+                    presencial=bool(item.get("presencial", True)),
+                    virtual=bool(item.get("virtual", False)),
+                    activo=bool(item.get("activo", True)),
+                )
+            )
+
+    for did, row in existing.items():
+        if did not in kept:
+            db.session.delete(row)
+
+    db.session.commit()
+
+
+def insert_dia_especial_web(item: dict) -> dict:
+    row = DiaEspecialWeb(
+        medico=item["medico"],
+        tipo=item["tipo"],
+        nombre=item["nombre"],
+        fecha=item["fecha"],
+        fecha_fin=item.get("fecha_fin"),
+        hora_desde=item["hora_desde"],
+        hora_hasta=item["hora_hasta"],
+        duracion_minutos=int(item.get("duracion_minutos") or 30),
+        presencial=bool(item.get("presencial", True)),
+        virtual=bool(item.get("virtual", False)),
+        activo=bool(item.get("activo", True)),
+    )
+    db.session.add(row)
+    db.session.commit()
+    return row.to_dict()
+
+
+def delete_dia_especial_web(dia_id: int) -> bool:
+    row = DiaEspecialWeb.query.get(dia_id)
     if row is None:
         return False
     db.session.delete(row)
@@ -885,6 +972,7 @@ LOADERS = {
     "pagos": load_pagos,
     "agenda_web": load_agenda_web,
     "bloqueos_web": load_bloqueos_web,
+    "dias_especiales_web": load_dias_especiales_web,
 }
 
 SAVERS = {
@@ -896,6 +984,7 @@ SAVERS = {
     "pagos": save_pagos,
     "agenda_web": save_agenda_web,
     "bloqueos_web": save_bloqueos_web,
+    "dias_especiales_web": save_dias_especiales_web,
 }
 
 DEFAULTS = {
@@ -907,6 +996,7 @@ DEFAULTS = {
     "pagos": [],
     "agenda_web": {},
     "bloqueos_web": [],
+    "dias_especiales_web": [],
 }
 
 

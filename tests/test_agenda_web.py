@@ -46,6 +46,7 @@ AGENDA_WEB = {
 }
 
 BLOQUEOS = []
+DIAS_ESPECIALES = []
 TURNOS = []
 PACIENTES = [{"dni": "12345678", "nombre": "Ana", "apellido": "Test"}]
 
@@ -57,6 +58,8 @@ def _store(path):
         return AGENDA_WEB
     if path.endswith("bloqueos_web.json"):
         return list(BLOQUEOS)
+    if path.endswith("dias_especiales_web.json"):
+        return list(DIAS_ESPECIALES)
     if path.endswith("turnos.json"):
         return list(TURNOS)
     if path.endswith("pacientes.json"):
@@ -73,6 +76,7 @@ class AgendaWebPublicTests(unittest.TestCase):
         os.environ["PUBLIC_API_CACHE_SECONDS"] = "0"
         os.environ.pop("DATABASE_URL", None)
         BLOQUEOS.clear()
+        DIAS_ESPECIALES.clear()
         TURNOS.clear()
         tp._RANGO_CACHE.clear()
         self.app = create_app()
@@ -176,6 +180,59 @@ class AgendaWebPublicTests(unittest.TestCase):
 
     @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.date")
+    @patch("consultorio.utils.agenda_web.date")
+    def test_bloqueo_periodo(self, mock_aw_date, mock_tp_date, *_):
+        mock_aw_date.today.return_value = date(2026, 7, 1)
+        mock_tp_date.today.return_value = date(2026, 7, 1)
+        BLOQUEOS.append(
+            {
+                "id": 5,
+                "medico": "Dr Test",
+                "tipo": "periodo",
+                "fecha": "2026-07-06",
+                "fecha_fin": "2026-07-10",
+                "activo": True,
+            }
+        )
+        # 2026-07-06 = lunes (dentro del período)
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-06")
+        self.assertIsNone(err)
+        self.assertEqual(slots, [])
+        # 2026-07-10 = viernes (fin inclusive)
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-10")
+        self.assertIsNone(err)
+        self.assertEqual(slots, [])
+        # 2026-07-13 = lunes siguiente (fuera del período)
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-13")
+        self.assertIsNone(err)
+        self.assertEqual(slots, ["09:00", "09:30"])
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.date")
+    @patch("consultorio.utils.agenda_web.date")
+    def test_bloqueo_periodo_con_horas(self, mock_aw_date, mock_tp_date, *_):
+        mock_aw_date.today.return_value = date(2026, 7, 1)
+        mock_tp_date.today.return_value = date(2026, 7, 1)
+        BLOQUEOS.append(
+            {
+                "id": 6,
+                "medico": "Dr Test",
+                "tipo": "periodo",
+                "fecha": "2026-07-06",
+                "fecha_fin": "2026-07-10",
+                "hora_desde": "09:00",
+                "hora_hasta": "09:30",
+                "activo": True,
+            }
+        )
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-06")
+        self.assertIsNone(err)
+        self.assertEqual(slots, ["09:30"])
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
     @patch("consultorio.utils.turnos_publicos.guardar_json")
     @patch("consultorio.utils.turnos_publicos.date")
     @patch("consultorio.utils.agenda_web.date")
@@ -222,11 +279,79 @@ class AgendaWebPublicTests(unittest.TestCase):
         )
         self.assertIn("no está en la agenda interna", err)
 
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.date")
+    @patch("consultorio.utils.agenda_web.date")
+    def test_dia_especial_suma_slots(self, mock_aw_date, mock_tp_date, *_):
+        mock_aw_date.today.return_value = date(2026, 7, 1)
+        mock_tp_date.today.return_value = date(2026, 7, 1)
+        DIAS_ESPECIALES.append(
+            {
+                "id": 1,
+                "medico": "Dr Test",
+                "tipo": "dia",
+                "nombre": "Extra",
+                "fecha": "2026-07-06",
+                "hora_desde": "11:00",
+                "hora_hasta": "12:00",
+                "duracion_minutos": 30,
+                "presencial": True,
+                "virtual": False,
+                "activo": True,
+            }
+        )
+        # lunes: agenda web 09:00/09:30 + especiales 11:00/11:30
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-06")
+        self.assertIsNone(err)
+        self.assertEqual(slots, ["09:00", "09:30", "11:00", "11:30"])
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.turnos_publicos.date")
+    @patch("consultorio.utils.agenda_web.date")
+    def test_dia_especial_periodo(self, mock_aw_date, mock_tp_date, *_):
+        mock_aw_date.today.return_value = date(2026, 7, 1)
+        mock_tp_date.today.return_value = date(2026, 7, 1)
+        DIAS_ESPECIALES.append(
+            {
+                "id": 2,
+                "medico": "Dr Test",
+                "tipo": "periodo",
+                "nombre": "Semana extra",
+                "fecha": "2026-07-06",
+                "fecha_fin": "2026-07-10",
+                "hora_desde": "16:00",
+                "hora_hasta": "17:00",
+                "duracion_minutos": 30,
+                "presencial": True,
+                "virtual": True,
+                "activo": True,
+            }
+        )
+        # martes 2026-07-07: web 14:00 + especial 16:00/16:30
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-07")
+        self.assertIsNone(err)
+        self.assertEqual(slots, ["14:00", "16:00", "16:30"])
+        # lunes siguiente fuera del período
+        slots, err = tp.slots_disponibles("Dr Test", "2026-07-13")
+        self.assertIsNone(err)
+        self.assertEqual(slots, ["09:00", "09:30"])
+
+    def test_generar_slots_especiales(self):
+        self.assertEqual(
+            aw.generar_slots_especiales("08:00", "09:00", 30),
+            ["08:00", "08:30"],
+        )
+        self.assertEqual(aw.generar_slots_especiales("08:00", "08:20", 30), [])
+
 
 class AgendaWebStaffApiTests(unittest.TestCase):
     def setUp(self):
         self._env = os.environ.copy()
         os.environ.pop("DATABASE_URL", None)
+        BLOQUEOS.clear()
+        DIAS_ESPECIALES.clear()
         self.app = create_app()
         self.app.config["TESTING"] = True
         self.app.config["SECRET_KEY"] = "test"
@@ -286,6 +411,86 @@ class AgendaWebStaffApiTests(unittest.TestCase):
         self.assertEqual(res.status_code, 201)
         self.assertEqual(res.get_json()["bloqueo"]["tipo"], "semanal")
         mock_guardar.assert_called()
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.agenda_web.guardar_json")
+    @patch("consultorio.utils.agenda_web.use_database", return_value=False)
+    def test_crear_bloqueo_periodo(self, _db, mock_guardar, *_):
+        res = self.client.post(
+            "/api/bloqueos-web",
+            json={
+                "medico": "Dr Test",
+                "tipo": "periodo",
+                "fecha": "2026-07-06",
+                "fecha_fin": "2026-07-20",
+                "motivo": "Vacaciones",
+            },
+        )
+        self.assertEqual(res.status_code, 201)
+        bloqueo = res.get_json()["bloqueo"]
+        self.assertEqual(bloqueo["tipo"], "periodo")
+        self.assertEqual(bloqueo["fecha"], "2026-07-06")
+        self.assertEqual(bloqueo["fecha_fin"], "2026-07-20")
+        mock_guardar.assert_called()
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.agenda_web.use_database", return_value=False)
+    def test_crear_bloqueo_periodo_fecha_invalida(self, *_):
+        res = self.client.post(
+            "/api/bloqueos-web",
+            json={
+                "medico": "Dr Test",
+                "tipo": "periodo",
+                "fecha": "2026-07-20",
+                "fecha_fin": "2026-07-06",
+            },
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("fecha_fin", res.get_json()["error"])
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.agenda_web.guardar_json")
+    @patch("consultorio.utils.agenda_web.use_database", return_value=False)
+    def test_crear_dia_especial(self, _db, mock_guardar, *_):
+        res = self.client.post(
+            "/api/dias-especiales-web",
+            json={
+                "medico": "Dr Test",
+                "tipo": "dia",
+                "nombre": "Guardia",
+                "fecha": "2026-07-06",
+                "hora_desde": "08:00",
+                "hora_hasta": "10:00",
+                "duracion_minutos": 30,
+                "presencial": True,
+                "virtual": False,
+            },
+        )
+        self.assertEqual(res.status_code, 201)
+        especial = res.get_json()["dia_especial"]
+        self.assertEqual(especial["tipo"], "dia")
+        self.assertEqual(especial["nombre"], "Guardia")
+        mock_guardar.assert_called()
+
+    @patch("consultorio.utils.agenda_web.cargar_json", side_effect=_store)
+    @patch("consultorio.utils.agenda_web.use_database", return_value=False)
+    def test_crear_dia_especial_sin_modalidad(self, *_):
+        res = self.client.post(
+            "/api/dias-especiales-web",
+            json={
+                "medico": "Dr Test",
+                "tipo": "dia",
+                "nombre": "Guardia",
+                "fecha": "2026-07-06",
+                "hora_desde": "08:00",
+                "hora_hasta": "10:00",
+                "duracion_minutos": 30,
+                "presencial": False,
+                "virtual": False,
+            },
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("modalidad", res.get_json()["error"])
 
 
 if __name__ == "__main__":

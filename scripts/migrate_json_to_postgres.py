@@ -164,6 +164,7 @@ def migrate(
         "pagos",
         "agenda_web",
         "bloqueos_web",
+        "dias_especiales_web",
     ]
     if only:
         invalid = [e for e in only if e not in entities]
